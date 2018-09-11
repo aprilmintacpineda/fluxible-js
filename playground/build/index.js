@@ -7,7 +7,7 @@ var _lib = require('./lib');
 }); /** @format */
 
 (0, _lib.addListener)(function () {
-  console.log('updated!', (0, _lib.getState)());
+  console.log('update listener', (0, _lib.getState)());
 });
 
 setInterval(function () {

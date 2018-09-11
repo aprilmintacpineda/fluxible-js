@@ -7,7 +7,7 @@ initializeState({
 });
 
 addListener(() => {
-  console.log('updated!', getState());
+  console.log('update listener', getState());
 });
 
 setInterval(() => {
