@@ -1,24 +1,10 @@
-/** @format */
+"use strict";
 
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _extends =
-  Object.assign ||
-  function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-    return target;
-  };
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 exports.initializeState = initializeState;
 exports.getState = getState;
@@ -29,15 +15,15 @@ exports.addListener = addListener;
 var state = {};
 var updateListeners = [];
 
-function initializeState (initialState) {
+function initializeState(initialState) {
   state = _extends({}, initialState);
 }
 
-function getState () {
+function getState() {
   return state;
 }
 
-function updateState (newState) {
+function updateState(newState) {
   state = _extends({}, state, newState);
 
   updateListeners.forEach(function (callback) {
@@ -45,7 +31,7 @@ function updateState (newState) {
   });
 }
 
-function addListener (callback) {
+function addListener(callback) {
   updateListeners.push(callback);
 
   return function () {
