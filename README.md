@@ -12,7 +12,7 @@ We developers are like cats. We like to fit ourselves inside a box. Sometimes th
 
 > I like this box, I'm gonna use this box, I'm going to fit myself inside it.
 
-Though libraries were not intended to limit us, but as time passes by, more advanced libraries tend to do so. We basically rely on the APIs and the pattern that's provided by the library we are using.
+Though libraries were not intended to limit but rather to extend our abilities, as time passes by, more advanced libraries tend to tie us so much to the pattern that it uses consequently limiting our abilities while at the same time extending it.
 
 The goal of this state management library is to allow you to initialize, update, and share states while giving back the control to the developer. Think of it like a substantially bigger box.
 
