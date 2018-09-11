@@ -1,0 +1,46 @@
+{
+  "name": "fluxible-js",
+  "version": "1.0.0",
+  "description": "State management library that gives you flexibility of execution.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "jest",
+    "build": "node build.js && node build-playground.js",
+    "playground": "node playground/build/index.js",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write",
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/aprilmintacpineda/fluxible-js.git"
+  },
+  "keywords": [
+    "state-management",
+    "stateful",
+    "state-pattern",
+    "store-management"
+  ],
+  "author": "April Mintac Pineda",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/aprilmintacpineda/fluxible-js/issues"
+  },
+  "homepage": "https://github.com/aprilmintacpineda/fluxible-js#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^9.0.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-minify": "^0.4.3",
+    "eslint": "^5.5.0",
+    "husky": "^0.14.3",
+    "lint-staged": "^7.2.2",
+    "prettier": "^1.14.2"
+  }
+}

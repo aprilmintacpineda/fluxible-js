@@ -1,0 +1,13 @@
+{
+  "editor.formatOnSave": true,
+  "eslint.autoFixOnSave": true,
+  "editor.snippetSuggestions": "top",
+  "editor.tabSize": 2,
+  "editor.renderWhitespace": "all",
+  "editor.trimAutoWhitespace": true,
+  "editor.foldingStrategy": "indentation",
+  "files.trimTrailingWhitespace": true,
+  "files.trimFinalNewlines": false,
+  "git.ignoreMissingGitWarning": true,
+  "javascript.updateImportsOnFileMove.enabled": "never"
+}
