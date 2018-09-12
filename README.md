@@ -33,6 +33,51 @@ The goal of this state management library is to allow you to initialize, update,
 
 1. `npm run test`
 
+## Install
+
+`npm i -s fluxible-js`
+
+## Flow
+
+#### Initialize store
+
+```js
+import { initializeStore } from 'fluxible-js';
+
+initializeStore({
+  user: null,
+  someOtherState: 'value',
+  anotherState: {
+    value: 'value'
+  }
+});
+```
+
+#### Subscribe to store updates
+
+```js
+import { addListener, getStore } from 'fluxible-js';
+
+const unsubscribe = addListener(() => {
+  console.log('store was updated!', getStore());
+});
+
+// along the way if you want to unsubscribe, you can call the returned function of addListener
+unsubscribe();
+```
+
+The `getStore` function would return the updated store at the moment of call.
+
+#### Update the store
+
+```js
+import { updateStore } from 'fluxible-js';
+
+updateStore({
+  someOtherState: 'updated value'
+});
+```
+
 # Contributing
 
 Discussions, questions, suggestions, bug reports, feature request, etc are all welcome. Just create an issue.
