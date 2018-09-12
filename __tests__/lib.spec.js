@@ -30,7 +30,7 @@ describe('lib.spec.js', () => {
   });
 
   describe('store updates', () => {
-    test('Update store only updates parts of the store that\'s to be updated. getStore returns the updated store.', () => {
+    test("Update store only updates parts of the store that's to be updated. getStore returns the updated store.", () => {
       const initialStore = {
         value: 'testValue',
         count: 1
@@ -119,6 +119,56 @@ describe('lib.spec.js', () => {
         user: {
           name: 'test user'
         },
+        testValue: 'value',
+        anotherValue: 'test value'
+      });
+
+      updateStore({
+        user: {
+          name: 'another test user'
+        },
+        testValue: 'another test value'
+      });
+
+      expect(storage.setItem).toHaveBeenCalledWith(
+        'fluxible-js',
+        JSON.stringify({
+          user: {
+            name: 'another test user'
+          }
+        })
+      );
+    });
+
+    test('when getItem returns null', () => {
+      const initialStore = {
+        user: null,
+        testValue: 'value',
+        anotherValue: 'test value'
+      };
+
+      const storage = {
+        getItem: jest.fn(() => {
+          return null;
+        }),
+        setItem: jest.fn((key, item) => {})
+      };
+
+      initializeStore({
+        initialStore,
+        persist: {
+          storage,
+          restore: savedStore => {
+            return {
+              user: savedStore.user || null
+            };
+          }
+        }
+      });
+
+      expect(storage.getItem).toHaveBeenCalledWith('fluxible-js');
+      expect(getStore()).toEqual({
+        user: null,
         testValue: 'value',
         anotherValue: 'test value'
       });
