@@ -3,6 +3,13 @@
   "version": "1.0.0",
   "description": "State management library that gives you flexibility of execution.",
   "main": "lib/index.js",
+  "files": [
+    "lib/*",
+    "__tests__/*",
+    "package.json",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
     "test": "jest --env=node --coverage",
     "build": "node build.js && node build-playground.js",
