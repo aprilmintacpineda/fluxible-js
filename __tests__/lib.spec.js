@@ -102,19 +102,26 @@ describe('lib.spec.js', () => {
         setItem: jest.fn((key, item) => {})
       };
 
+      const persist = {
+        storage,
+        restore: jest.fn(savedStore => {
+          return {
+            user: savedStore.user
+          };
+        })
+      };
+
       initializeStore({
         initialStore,
-        persist: {
-          storage,
-          restore: savedStore => {
-            return {
-              user: savedStore.user
-            };
-          }
-        }
+        persist
       });
 
       expect(storage.getItem).toHaveBeenCalledWith('fluxible-js');
+      expect(persist.restore).toHaveBeenCalledWith({
+        user: {
+          name: 'test user'
+        }
+      });
       expect(getStore()).toEqual({
         user: {
           name: 'test user'

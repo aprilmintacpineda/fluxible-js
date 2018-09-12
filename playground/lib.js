@@ -32,8 +32,7 @@ function initializeStore(config) {
     // set the storage first
     persistStorage = config.persist.storage;
 
-    var savedStore = JSON.parse(persistStorage.getItem('fluxible-js')) || {};
-    persistedStates = config.persist.restore(savedStore);
+    persistedStates = config.persist.restore(JSON.parse(persistStorage.getItem('fluxible-js')) || {});
 
     // we should only save states that were restored
     persistedStateKeys = Object.keys(persistedStates);
