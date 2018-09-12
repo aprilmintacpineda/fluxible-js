@@ -30,7 +30,7 @@ describe('lib.spec.js', () => {
   });
 
   describe('store updates', () => {
-    test("Update store only updates parts of the store that's to be updated. getStore returns the updated store.", () => {
+    test('Update store only updates parts of the store that\'s to be updated. getStore returns the updated store.', () => {
       const initialStore = {
         value: 'testValue',
         count: 1
@@ -93,11 +93,11 @@ describe('lib.spec.js', () => {
 
       const storage = {
         getItem: jest.fn(() => {
-          return {
+          return JSON.stringify({
             user: {
               name: 'test user'
             }
-          };
+          });
         }),
         setItem: jest.fn((key, item) => {})
       };
