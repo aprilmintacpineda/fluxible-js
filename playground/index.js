@@ -1,17 +1,17 @@
 /** @format */
 
-import { initializeState, updateState, addListener, getState } from './lib';
+import { initializeStore, updateStore, addListener, getStore } from './lib';
 
-initializeState({
+initializeStore({
   count: 1
 });
 
 addListener(() => {
-  console.log('update listener', getState());
+  console.log('update listener', getStore());
 });
 
 setInterval(() => {
-  updateState({
-    count: getState().count + 1
+  updateStore({
+    count: getStore().count + 1
   });
 }, 1000);
