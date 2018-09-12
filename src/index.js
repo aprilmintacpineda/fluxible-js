@@ -2,15 +2,31 @@
 
 let store = {};
 const updateListeners = [];
+let persistedStateKeys;
+let persistStorage;
 
 /**
  * initialize store.
- * @param {Object} Object that would be used as initial store
+ * @param {Object} Config that should contain the required config.initialStore and the optional config.persist
  * @return {undefined}
  */
-export function initializeStore (initialStore) {
+export function initializeStore (config) {
+  // persist
+  let persistedStates = {};
+  if (config.persist) {
+    // set the storage first
+    persistStorage = config.persist.storage;
+
+    const savedStore = persistStorage.getItem('fluxible-js');
+    persistedStates = config.persist.restore(savedStore || {});
+
+    // we should only save states that were restored
+    persistedStateKeys = Object.keys(persistedStates);
+  }
+
   store = {
-    ...initialStore
+    ...config.initialStore,
+    ...persistedStates
   };
 }
 
@@ -36,6 +52,22 @@ export function updateStore (storeUpdates) {
   updateListeners.forEach(callback => {
     callback();
   });
+
+  if (persistedStateKeys) {
+    persistStorage.setItem(
+      'fluxible-js',
+      JSON.stringify(
+        // we should only save states that were restored
+        persistedStateKeys.reduce(
+          (compiled, key) => ({
+            ...compiled,
+            [key]: store[key]
+          }),
+          {}
+        )
+      )
+    );
+  }
 }
 
 /**

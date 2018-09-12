@@ -3,7 +3,9 @@
 var _lib = require('./lib');
 
 (0, _lib.initializeStore)({
-  count: 1
+  initialStore: {
+    count: 1
+  }
 }); /** @format */
 
 (0, _lib.addListener)(function () {

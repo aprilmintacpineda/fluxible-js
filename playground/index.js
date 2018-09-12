@@ -3,7 +3,9 @@
 import { initializeStore, updateStore, addListener, getStore } from './lib';
 
 initializeStore({
-  count: 1
+  initialStore: {
+    count: 1
+  }
 });
 
 addListener(() => {

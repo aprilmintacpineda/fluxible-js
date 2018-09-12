@@ -45,13 +45,48 @@ The goal of this state management library is to allow you to initialize, update,
 import { initializeStore } from 'fluxible-js';
 
 initializeStore({
-  user: null,
-  someOtherState: 'value',
-  anotherState: {
-    value: 'value'
+  initialStore: {
+    user: null,
+    someOtherState: 'value',
+    anotherState: {
+      value: 'value'
+    }
   }
 });
 ```
+
+`initializeStore` function expects an object as the only parameter, the object have a required property called `initialStore` which would be used as the initial value of the store.
+
+There's also the optional property called `persist` which should also be an object containing two required properties:
+
+- `storage` which should be a reference to the storage that would be used to save the store. It must have `getItem` and `setItem` methods. Both methods should be synchronous. Example would be `window.localStorage`.
+- `restore` which should be a function that is synchronous. Restore will be called upon initialization and will receive the `savedStore` as the its only argument. The `savedStore` would be an object containing the states that were previously saved to the storage. It should return an object which would be the states that you want to restore.
+
+Persist feature would only save keys that were returned by `config.persist.restore`. That means, other states that you did not return in that method wouldn't be saved.
+
+###### Example
+
+```js
+import { initializeStore } from 'fluxible-js';
+
+initializeStore({
+  initialStore: {
+    user: null,
+    someOtherState: 'value',
+    anotherState: {
+      value: 'value'
+    }
+  },
+  persist: {
+    storage: window.localStorage,
+    restore: savedStore => ({
+      user: savedStore.user || null
+    })
+  }
+});
+```
+
+In the case above, only `user` would be saved and the rest wouldn't be saved.
 
 #### Subscribe to store updates
 
