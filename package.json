@@ -1,6 +1,6 @@
 {
   "name": "fluxible-js",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "State management library that gives you flexibility of execution.",
   "main": "lib/index.js",
   "files": [
