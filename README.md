@@ -2,10 +2,6 @@
 
 # Fluxible-JS
 
-:white_check_mark: Light weight at 697B, minified.
-
-:white_check_mark: Has no dependencies.
-
 <img src="https://1.bp.blogspot.com/_Jj--y7nzkjo/TFMSsUC6qkI/AAAAAAAAJjo/KZu6JhzpCjI/s1600/DSC_0702.JPG">
 
 ###### I do not own the image you see above.
