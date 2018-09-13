@@ -2,6 +2,10 @@
 
 # Fluxible-JS
 
+<img src="docs/test-screen-shot.png">
+
+Smaller, faster, better. A small state management system that supports the idea of asynchronous actions and state persistence out of the box.
+
 <img src="https://1.bp.blogspot.com/_Jj--y7nzkjo/TFMSsUC6qkI/AAAAAAAAJjo/KZu6JhzpCjI/s1600/DSC_0702.JPG">
 
 ###### I do not own the image you see above.
@@ -15,8 +19,6 @@ We developers are like cats. We like to fit ourselves inside a box. Sometimes th
 Though libraries were not intended to limit but rather to extend our abilities, as time passes by, more advanced libraries tend to tie us so much to the pattern that it uses consequently limiting our abilities while at the same time extending it.
 
 The goal of this state management library is to allow you to initialize, update, and share states while giving back the control to the developer. Think of it like a substantially bigger box.
-
-<img src="docs/test-screen-shot.png">
 
 # Guides
 
