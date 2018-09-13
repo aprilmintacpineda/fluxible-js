@@ -1,5 +1,6 @@
 /** @format */
 
+const updateListeners = [];
 let store = {};
 let persistedStateKeys;
 let persistStorage;
@@ -47,30 +48,43 @@ export function getStore () {
 export function updateStore (storeUpdates) {
   if (persistTimeout) clearTimeout(persistTimeout);
 
-  return new Promise(resolve => {
-    store = {
-      ...store,
-      ...storeUpdates
-    };
+  store = {
+    ...store,
+    ...storeUpdates
+  };
 
-    if (persistedStateKeys) {
-      persistTimeout = setTimeout(() => {
-        persistStorage.setItem(
-          'fluxible-js',
-          JSON.stringify(
-            // we should only save states that were restored
-            persistedStateKeys.reduce(
-              (compiled, key) => ({
-                ...compiled,
-                [key]: store[key]
-              }),
-              {}
-            )
+  if (persistedStateKeys) {
+    persistTimeout = setTimeout(() => {
+      persistStorage.setItem(
+        'fluxible-js',
+        JSON.stringify(
+          // we should only save states that were restored
+          persistedStateKeys.reduce(
+            (compiled, key) => ({
+              ...compiled,
+              [key]: store[key]
+            }),
+            {}
           )
-        );
-      }, 200);
-    }
+        )
+      );
+    }, 200);
+  }
 
-    resolve();
+  updateListeners.forEach(callback => {
+    callback();
   });
+}
+
+/**
+ * registers an update listener to be called after every store updates.
+ * @param {Function} callback function
+ * @return {Function} call this function to remove the listener
+ */
+export function addUpdateListener (listener) {
+  updateListeners.push(listener);
+
+  return () => {
+    updateListeners.splice(updateListeners.indexOf(listener), 1);
+  };
 }

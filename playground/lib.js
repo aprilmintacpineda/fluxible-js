@@ -9,11 +9,13 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 exports.initializeStore = initializeStore;
 exports.getStore = getStore;
 exports.updateStore = updateStore;
+exports.addUpdateListener = addUpdateListener;
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 /** @format */
 
+var updateListeners = [];
 var store = {};
 var persistedStateKeys = void 0;
 var persistStorage = void 0;
@@ -56,19 +58,32 @@ function getStore() {
 function updateStore(storeUpdates) {
   if (persistTimeout) clearTimeout(persistTimeout);
 
-  return new Promise(function (resolve) {
-    store = _extends({}, store, storeUpdates);
+  store = _extends({}, store, storeUpdates);
 
-    if (persistedStateKeys) {
-      persistTimeout = setTimeout(function () {
-        persistStorage.setItem('fluxible-js', JSON.stringify(
-        // we should only save states that were restored
-        persistedStateKeys.reduce(function (compiled, key) {
-          return _extends({}, compiled, _defineProperty({}, key, store[key]));
-        }, {})));
-      }, 200);
-    }
+  if (persistedStateKeys) {
+    persistTimeout = setTimeout(function () {
+      persistStorage.setItem('fluxible-js', JSON.stringify(
+      // we should only save states that were restored
+      persistedStateKeys.reduce(function (compiled, key) {
+        return _extends({}, compiled, _defineProperty({}, key, store[key]));
+      }, {})));
+    }, 200);
+  }
 
-    resolve();
+  updateListeners.forEach(function (callback) {
+    callback();
   });
+}
+
+/**
+ * registers an update listener to be called after every store updates.
+ * @param {Function} callback function
+ * @return {Function} call this function to remove the listener
+ */
+function addUpdateListener(listener) {
+  updateListeners.push(listener);
+
+  return function () {
+    updateListeners.splice(updateListeners.indexOf(listener), 1);
+  };
 }

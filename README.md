@@ -86,19 +86,27 @@ initializeStore({
 
 In the case above, only `user` would be saved and the rest wouldn't be saved.
 
-#### Update the store
+#### Listen to store updates
 
-```js
-import { updateStore, getStore } from 'fluxible-js';
+```jsx
+import { addUpdateListener, getStore } from 'fluxible-js';
 
-updateStore({
-  someOtherState: 'updated value'
-}).then(() => {
-  console.log('store update completed', getStore());
+const unsubscribeCallback = addUpdateListener(() => {
+  console.log('store has been updated!', getStore());
 });
 ```
 
-`updateStore` returns a promise.
+`addUpdateListener` expects a function as its only parameter. This function would be called (without arguments) every after store updates.
+
+#### Update the store
+
+```js
+import { updateStore } from 'fluxible-js';
+
+updateStore({
+  someOtherState: 'updated value'
+});
+```
 
 # Contributing
 
