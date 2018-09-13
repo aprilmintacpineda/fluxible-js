@@ -1,6 +1,6 @@
 /** @format */
 
-import { initializeStore, updateStore, addListener, getStore } from './lib';
+import { initializeStore, updateStore, getStore } from './lib';
 
 initializeStore({
   initialStore: {
@@ -8,12 +8,10 @@ initializeStore({
   }
 });
 
-addListener(() => {
-  console.log('update listener', getStore());
-});
-
 setInterval(() => {
-  updateStore({
+  return updateStore({
     count: getStore().count + 1
+  }).then(() => {
+    console.log('store was updated!', getStore().count);
   });
 }, 1000);

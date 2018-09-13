@@ -16,6 +16,8 @@ Though libraries were not intended to limit but rather to extend our abilities, 
 
 The goal of this state management library is to allow you to initialize, update, and share states while giving back the control to the developer. Think of it like a substantially bigger box.
 
+<img src="docs/test-screen-shot.png">
+
 # Guides
 
 ## Run me
@@ -55,7 +57,7 @@ initializeStore({
 
 There's also the optional property called `persist` which should also be an object containing two required properties:
 
-- `storage` which should be a reference to the storage that would be used to save the store. It must have `getItem` and `setItem` methods. Both methods should be synchronous. Example would be `window.localStorage`.
+- `storage` which should be a reference to the storage that would be used to save the store. It must have `getItem` and `setItem` methods. Both methods should be synchronous. Example would be `window.localStorage`. The call to `setItem` is deferred by 200ms, this is to minimize and to improve performance.
 - `restore` which should be a function that is synchronous. Restore will be called upon initialization and will receive the `savedStore` as the its only argument. The `savedStore` would be an object containing the states that were previously saved to the storage. It should return an object which would be the states that you want to restore.
 
 Persist feature would only save keys that were returned by `config.persist.restore`. That means, other states that you did not return in that method wouldn't be saved.
@@ -84,30 +86,19 @@ initializeStore({
 
 In the case above, only `user` would be saved and the rest wouldn't be saved.
 
-#### Subscribe to store updates
-
-```js
-import { addListener, getStore } from 'fluxible-js';
-
-const unsubscribe = addListener(() => {
-  console.log('store was updated!', getStore());
-});
-
-// along the way if you want to unsubscribe, you can call the returned function of addListener
-unsubscribe();
-```
-
-The `getStore` function would return the updated store at the moment of call.
-
 #### Update the store
 
 ```js
-import { updateStore } from 'fluxible-js';
+import { updateStore, getStore } from 'fluxible-js';
 
 updateStore({
   someOtherState: 'updated value'
+}).then(() => {
+  console.log('store update completed', getStore());
 });
 ```
+
+`updateStore` returns a promise.
 
 # Contributing
 

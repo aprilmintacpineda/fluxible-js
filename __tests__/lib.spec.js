@@ -1,6 +1,6 @@
 /** @format */
 
-import { getStore, updateStore, initializeStore, addListener } from '../src';
+import { getStore, updateStore, initializeStore } from '../src';
 
 describe('lib.spec.js', () => {
   describe('store initialization', () => {
@@ -14,23 +14,10 @@ describe('lib.spec.js', () => {
 
       expect(getStore()).toEqual(initialStore);
     });
-
-    test('does not call listeners on store initialization', () => {
-      const listener = jest.fn();
-      const initialStore = {
-        count: 1,
-        countAgain: 2
-      };
-
-      addListener(listener);
-      initializeStore({ initialStore });
-
-      expect(listener).not.toHaveBeenCalled();
-    });
   });
 
   describe('store updates', () => {
-    test("Update store only updates parts of the store that's to be updated. getStore returns the updated store.", () => {
+    test('Update store returns a promise', () => {
       const initialStore = {
         value: 'testValue',
         count: 1
@@ -38,53 +25,38 @@ describe('lib.spec.js', () => {
 
       initializeStore({ initialStore });
 
-      updateStore({
-        count: 100
-      });
-
-      expect(getStore()).toEqual({
-        value: 'testValue',
-        count: 100
-      });
+      expect(
+        updateStore({
+          count: 100
+        })
+      ).toBeInstanceOf(Promise);
     });
 
-    test('Listeners are called every after update and are removed when callback was called.', () => {
+    test('Update store only updates parts of the store that\'s to be updated. getStore returns the updated store.', () => {
+      expect.assertions(1);
+
       const initialStore = {
         value: 'testValue',
         count: 1
       };
 
-      const updateListener = jest.fn();
-
       initializeStore({ initialStore });
-      const unsubscribeUpdateListener = addListener(updateListener);
 
-      updateStore({
+      return updateStore({
         count: 100
-      });
-
-      expect(updateListener).toHaveBeenCalled();
-      expect(getStore()).toEqual({
-        value: 'testValue',
-        count: 100
-      });
-
-      unsubscribeUpdateListener();
-
-      updateStore({
-        count: 1
-      });
-
-      expect(updateListener).toHaveBeenCalledTimes(1);
-      expect(getStore()).toEqual({
-        value: 'testValue',
-        count: 1
+      }).then(() => {
+        expect(getStore()).toEqual({
+          value: 'testValue',
+          count: 100
+        });
       });
     });
   });
 
   describe('persist', () => {
     test('calls getItem and setItem on config.persist.storage', () => {
+      expect.assertions(4);
+
       const initialStore = {
         user: null,
         testValue: 'value',
@@ -99,6 +71,7 @@ describe('lib.spec.js', () => {
             }
           });
         }),
+        // eslint-disable-next-line
         setItem: jest.fn((key, item) => {})
       };
 
@@ -130,24 +103,94 @@ describe('lib.spec.js', () => {
         anotherValue: 'test value'
       });
 
-      updateStore({
+      return updateStore({
         user: {
           name: 'another test user'
         },
         testValue: 'another test value'
-      });
-
-      expect(storage.setItem).toHaveBeenCalledWith(
-        'fluxible-js',
-        JSON.stringify({
-          user: {
-            name: 'another test user'
-          }
-        })
-      );
+      })
+        .then(() => new Promise(resolve => setTimeout(resolve, 200)))
+        .then(() => {
+          expect(storage.setItem).toHaveBeenCalledWith(
+            'fluxible-js',
+            JSON.stringify({
+              user: {
+                name: 'another test user'
+              }
+            })
+          );
+        });
     });
 
-    test('when getItem returns null', () => {
+    test('calls setItem only once after multiple state updates within 200 ms', () => {
+      expect.assertions(2);
+
+      const initialStore = {
+        user: null,
+        testValue: 'value',
+        anotherValue: 'test value'
+      };
+
+      const storage = {
+        getItem: jest.fn(() => {
+          return JSON.stringify({
+            user: {
+              name: 'test user'
+            }
+          });
+        }),
+        // eslint-disable-next-line
+        setItem: jest.fn((key, item) => {})
+      };
+
+      const persist = {
+        storage,
+        restore: jest.fn(savedStore => {
+          return {
+            user: savedStore.user
+          };
+        })
+      };
+
+      initializeStore({
+        initialStore,
+        persist
+      });
+
+      return Promise.all([
+        updateStore({
+          anotherValue: 'call 1'
+        }),
+        updateStore({
+          anotherValue: 'call 2'
+        }),
+        updateStore({
+          anotherValue: 'call 3'
+        }),
+        updateStore({
+          anotherValue: 'call 4'
+        }),
+        updateStore({
+          anotherValue: 'call 5',
+          testValue: 'call 5'
+        })
+      ])
+        .then(() => new Promise(resolve => setTimeout(resolve, 200)))
+        .then(() => {
+          expect(storage.setItem).toHaveBeenCalledTimes(1);
+          expect(getStore()).toEqual({
+            user: {
+              name: 'test user'
+            },
+            testValue: 'call 5',
+            anotherValue: 'call 5'
+          });
+        });
+    });
+
+    test('returns empty object when getItem returned null', () => {
+      expect.assertions(3);
+
       const initialStore = {
         user: null,
         testValue: 'value',
@@ -158,6 +201,7 @@ describe('lib.spec.js', () => {
         getItem: jest.fn(() => {
           return null;
         }),
+        // eslint-disable-next-line
         setItem: jest.fn((key, item) => {})
       };
 
@@ -180,21 +224,23 @@ describe('lib.spec.js', () => {
         anotherValue: 'test value'
       });
 
-      updateStore({
+      return updateStore({
         user: {
           name: 'another test user'
         },
         testValue: 'another test value'
-      });
-
-      expect(storage.setItem).toHaveBeenCalledWith(
-        'fluxible-js',
-        JSON.stringify({
-          user: {
-            name: 'another test user'
-          }
-        })
-      );
+      })
+        .then(() => new Promise(resolve => setTimeout(resolve, 200)))
+        .then(() => {
+          expect(storage.setItem).toHaveBeenCalledWith(
+            'fluxible-js',
+            JSON.stringify({
+              user: {
+                name: 'another test user'
+              }
+            })
+          );
+        });
     });
   });
 });

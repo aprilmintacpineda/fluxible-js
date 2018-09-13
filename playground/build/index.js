@@ -8,12 +8,10 @@ var _lib = require('./lib');
   }
 }); /** @format */
 
-(0, _lib.addListener)(function () {
-  console.log('update listener', (0, _lib.getStore)());
-});
-
 setInterval(function () {
-  (0, _lib.updateStore)({
+  return (0, _lib.updateStore)({
     count: (0, _lib.getStore)().count + 1
+  }).then(function () {
+    console.log('store was updated!', (0, _lib.getStore)().count);
   });
 }, 1000);
