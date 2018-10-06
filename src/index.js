@@ -56,7 +56,7 @@ export function updateStore (storeUpdates) {
 
     persistTimeout = setTimeout(() => {
       // we should only save states that were restored
-      let statesToPersist = {};
+      const statesToPersist = {};
 
       for (let a = 0; a < persistedStateKeys.length; a++) {
         statesToPersist[persistedStateKeys[a]] = store[persistedStateKeys[a]];
