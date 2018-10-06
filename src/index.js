@@ -46,34 +46,29 @@ export function getStore () {
  * @return {Promise}
  */
 export function updateStore (storeUpdates) {
-  if (persistTimeout) clearTimeout(persistTimeout);
-
   store = {
     ...store,
     ...storeUpdates
   };
 
   if (persistedStateKeys) {
+    if (persistTimeout) clearTimeout(persistTimeout);
+
     persistTimeout = setTimeout(() => {
-      persistStorage.setItem(
-        'fluxible-js',
-        JSON.stringify(
-          // we should only save states that were restored
-          persistedStateKeys.reduce(
-            (compiled, key) => ({
-              ...compiled,
-              [key]: store[key]
-            }),
-            {}
-          )
-        )
-      );
+      // we should only save states that were restored
+      let statesToPersist = {};
+
+      for (let a = 0; a < persistedStateKeys.length; a++) {
+        statesToPersist[persistedStateKeys[a]] = store[persistedStateKeys[a]];
+      }
+
+      persistStorage.setItem('fluxible-js', JSON.stringify(statesToPersist));
     }, 200);
   }
 
-  updateListeners.forEach(callback => {
-    callback();
-  });
+  for (let a = 0; a < updateListeners.length; a++) {
+    updateListeners[a]();
+  }
 }
 
 /**

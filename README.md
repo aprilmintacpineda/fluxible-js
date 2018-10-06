@@ -110,6 +110,8 @@ updateStore({
 });
 ```
 
+Do not mutate the returned value of `getStore`. Doing so may lead to unwanted changes in your app.
+
 # Contributing
 
 Discussions, questions, suggestions, bug reports, feature request, etc are all welcome. Just create an issue.
