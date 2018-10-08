@@ -51,9 +51,14 @@ export function updateStore (storeUpdates) {
     ...storeUpdates
   };
 
-  if (persistedStateKeys) {
-    if (persistTimeout) clearTimeout(persistTimeout);
+  if (persistTimeout) clearTimeout(persistTimeout);
 
+  const limit = updateListeners.length;
+  for (let a = 0; a < limit; a++) {
+    updateListeners[a]();
+  }
+
+  if (persistedStateKeys) {
     persistTimeout = setTimeout(() => {
       // we should only save states that were restored
       const statesToPersist = {};
@@ -64,10 +69,6 @@ export function updateStore (storeUpdates) {
 
       persistStorage.setItem('fluxible-js', JSON.stringify(statesToPersist));
     }, 200);
-  }
-
-  for (let a = 0; a < updateListeners.length; a++) {
-    updateListeners[a]();
   }
 }
 
