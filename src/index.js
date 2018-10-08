@@ -53,10 +53,9 @@ export function updateStore (storeUpdates) {
 
   if (persistTimeout) clearTimeout(persistTimeout);
 
-  const limit = updateListeners.length;
-  for (let a = 0; a < limit; a++) {
-    updateListeners[a]();
-  }
+  updateListeners.forEach(callback => {
+    callback();
+  });
 
   if (persistedStateKeys) {
     persistTimeout = setTimeout(() => {

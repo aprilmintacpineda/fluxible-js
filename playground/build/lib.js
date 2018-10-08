@@ -57,18 +57,17 @@ function updateStore(storeUpdates) {
 
   if (persistTimeout) clearTimeout(persistTimeout);
 
-  var limit = updateListeners.length;
-  for (var a = 0; a < limit; a++) {
-    updateListeners[a]();
-  }
+  updateListeners.forEach(function (callback) {
+    callback();
+  });
 
   if (persistedStateKeys) {
     persistTimeout = setTimeout(function () {
       // we should only save states that were restored
       var statesToPersist = {};
 
-      for (var _a = 0; _a < persistedStateKeys.length; _a++) {
-        statesToPersist[persistedStateKeys[_a]] = store[persistedStateKeys[_a]];
+      for (var a = 0; a < persistedStateKeys.length; a++) {
+        statesToPersist[persistedStateKeys[a]] = store[persistedStateKeys[a]];
       }
 
       persistStorage.setItem('fluxible-js', JSON.stringify(statesToPersist));
