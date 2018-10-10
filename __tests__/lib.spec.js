@@ -56,23 +56,61 @@ describe('lib.spec.js', () => {
   });
 
   describe('update listeners', () => {
-    test('calls update listeners after every update update', () => {
+    test('calls appropriate listeners after update store', () => {
       const initialStore = {
         value: 'testValue',
         count: 1
       };
 
-      const listener = jest.fn();
+      const countListener = jest.fn();
+      const valueListener = jest.fn();
 
       initializeStore({ initialStore });
-      addUpdateListener(listener);
+      addUpdateListener(countListener, ['count']);
+      addUpdateListener(valueListener, ['value']);
 
-      updateStore({ count: 100 });
-      updateStore({ count: 100 });
-      updateStore({ count: 100 });
-      updateStore({ count: 100 });
+      updateStore({ count: 2 });
+      updateStore({ count: 3 });
+      updateStore({ count: 4 });
+      updateStore({ count: 5 });
 
-      expect(listener).toHaveBeenCalledTimes(4);
+      expect(countListener).toHaveBeenNthCalledWith(1, {
+        value: 'testValue',
+        count: 2
+      });
+
+      expect(countListener).toHaveBeenNthCalledWith(2, {
+        value: 'testValue',
+        count: 3
+      });
+
+      expect(countListener).toHaveBeenNthCalledWith(3, {
+        value: 'testValue',
+        count: 4
+      });
+
+      expect(countListener).toHaveBeenNthCalledWith(4, {
+        value: 'testValue',
+        count: 5
+      });
+
+      expect(valueListener).not.toHaveBeenCalled();
+
+      updateStore({ value: 'another' });
+      updateStore({ value: 'another value' });
+
+      expect(valueListener).toHaveBeenNthCalledWith(1, {
+        value: 'another',
+        count: 5
+      });
+
+      expect(valueListener).toHaveBeenNthCalledWith(2, {
+        value: 'another value',
+        count: 5
+      });
+
+      expect(countListener).toHaveBeenCalledTimes(4);
+      expect(valueListener).toHaveBeenCalledTimes(2);
     });
 
     test('can unsubscribe a listener', () => {
@@ -85,8 +123,8 @@ describe('lib.spec.js', () => {
       const listener2 = jest.fn();
 
       initializeStore({ initialStore });
-      const unsub1 = addUpdateListener(listener1);
-      addUpdateListener(listener2);
+      const unsub1 = addUpdateListener(listener1, ['count']);
+      addUpdateListener(listener2, ['count']);
 
       updateStore({ count: 100 });
       updateStore({ count: 100 });

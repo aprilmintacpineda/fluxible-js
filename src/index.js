@@ -45,16 +45,22 @@ export function getStore () {
  * @param {Object} the object containing updates on the store states.
  * @return {Promise}
  */
-export function updateStore (storeUpdates) {
+export function updateStore (newStates) {
   store = {
     ...store,
-    ...storeUpdates
+    ...newStates
   };
 
   if (persistTimeout) clearTimeout(persistTimeout);
+  const updatedStates = Object.keys(newStates);
 
-  updateListeners.forEach(callback => {
-    callback();
+  updateListeners.forEach(listener => {
+    for (let a = 0; a < updatedStates.length; a++) {
+      if (listener.states.indexOf(`{${updatedStates[a]}}`) !== -1) {
+        listener.callback(store);
+        break;
+      }
+    }
   });
 
   if (persistedStateKeys) {
@@ -76,7 +82,12 @@ export function updateStore (storeUpdates) {
  * @param {Function} callback function
  * @return {Function} call this function to remove the listener
  */
-export function addUpdateListener (listener) {
+export function addUpdateListener (callback, states) {
+  const listener = {
+    callback,
+    states: states.map(state => `{${state}}`).join(' ')
+  };
+
   updateListeners.push(listener);
 
   return () => {
