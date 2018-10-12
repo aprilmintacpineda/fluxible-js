@@ -1,6 +1,6 @@
 /** @format */
 
-import { getStore, updateStore, initializeStore, addUpdateListener } from '../src';
+import { getStore, updateStore, initializeStore, addObserver } from '../src';
 
 describe('lib.spec.js', () => {
   describe('store initialization', () => {
@@ -66,8 +66,8 @@ describe('lib.spec.js', () => {
       const valueListener = jest.fn();
 
       initializeStore({ initialStore });
-      addUpdateListener(countListener, ['count']);
-      addUpdateListener(valueListener, ['value']);
+      addObserver(countListener, ['count']);
+      addObserver(valueListener, ['value']);
 
       updateStore({ count: 2 });
       updateStore({ count: 3 });
@@ -123,8 +123,8 @@ describe('lib.spec.js', () => {
       const listener2 = jest.fn();
 
       initializeStore({ initialStore });
-      const unsub1 = addUpdateListener(listener1, ['count']);
-      addUpdateListener(listener2, ['count']);
+      const unsub1 = addObserver(listener1, ['count']);
+      addObserver(listener2, ['count']);
 
       updateStore({ count: 100 });
       updateStore({ count: 100 });

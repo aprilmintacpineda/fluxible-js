@@ -1,6 +1,6 @@
 /** @format */
 
-const updateListeners = [];
+const observers = [];
 let store = {};
 let persistedStateKeys;
 let persistStorage;
@@ -54,7 +54,7 @@ export function updateStore (newStates) {
   if (persistTimeout) clearTimeout(persistTimeout);
   const updatedStates = Object.keys(newStates);
 
-  updateListeners.forEach(listener => {
+  observers.forEach(listener => {
     for (let a = 0; a < updatedStates.length; a++) {
       if (listener.states.indexOf(`{${updatedStates[a]}}`) !== -1) {
         listener.callback(store);
@@ -82,15 +82,15 @@ export function updateStore (newStates) {
  * @param {Function} callback function
  * @return {Function} call this function to remove the listener
  */
-export function addUpdateListener (callback, states) {
+export function addObserver (callback, states) {
   const listener = {
     callback,
     states: states.map(state => `{${state}}`).join(' ')
   };
 
-  updateListeners.push(listener);
+  observers.push(listener);
 
   return () => {
-    updateListeners.splice(updateListeners.indexOf(listener), 1);
+    observers.splice(observers.indexOf(listener), 1);
   };
 }

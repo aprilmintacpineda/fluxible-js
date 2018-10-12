@@ -91,14 +91,21 @@ In the case above, only `user` would be saved and the rest wouldn't be saved.
 #### Listen to store updates
 
 ```jsx
-import { addUpdateListener, getStore } from 'fluxible-js';
+import { addObserver, getStore } from 'fluxible-js';
 
-const unsubscribeCallback = addUpdateListener(() => {
-  console.log('store has been updated!', getStore());
-});
+const unsubscribeCallback = addObserver(
+  () => {
+    console.log('store has been updated!', getStore());
+  },
+  ['someOtherState', 'anotherState']
+);
 ```
 
-`addUpdateListener` expects a function as its only parameter. This function would be called (without arguments) every after store updates.
+`addObserver` expects a function as the argument. This function would be called every **AFTER** store updates and will receive the updated store as it's only argument.
+
+The second argument is an array of strings which lists the names of the states that you are listening to, it's important that this list has the same name as the states you want to listen to. In the example above, I wanted to listen to `someOtherState` and `anotherState`, so every time one of those two gets updated my listener will be called.
+
+`addObserver` returns a function that you can call later on to remove _that_ observer.
 
 #### Update the store
 
@@ -110,7 +117,7 @@ updateStore({
 });
 ```
 
-Do not mutate the returned value of `getStore`. Doing so may lead to unwanted changes in your app.
+**Do not mutate the store directly. Doing so may lead to unwanted behaviors in your app.**
 
 # Contributing
 
