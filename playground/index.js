@@ -1,6 +1,6 @@
 /** @format */
 
-import { initializeStore, updateStore, getStore } from './lib';
+import { initializeStore, updateStore, addObserver, getStore } from './lib';
 
 initializeStore({
   initialStore: {
@@ -8,10 +8,22 @@ initializeStore({
   }
 });
 
+addObserver(
+  updatedState => {
+    // eslint-disable-next-line
+    console.log('observer called. Updated state:', updatedState);
+  },
+  ['count']
+);
+
 setInterval(() => {
-  return updateStore({
+  updateStore({
     count: getStore().count + 1
-  }).then(() => {
-    console.log('store was updated!', getStore().count);
   });
+
+  // eslint-disable-next-line
+  console.log('This line ran after updateStore:', getStore());
 }, 1000);
+
+// eslint-disable-next-line
+console.log('initialStore', getStore());

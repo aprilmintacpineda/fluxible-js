@@ -2,7 +2,7 @@
 
 # Fluxible-JS
 
-<img src="docs/test-screen-shot.png">
+<img src="docs/test-screenshot.png">
 
 Smaller, faster, better. A small state management system that supports the idea of asynchronous actions and state persistence out of the box.
 
@@ -26,8 +26,9 @@ The goal of this state management library is to allow you to initialize, update,
 
 1. `git clone git@github.com:aprilmintacpineda/fluxible-js.git`
 2. `npm i`
-3. `npm run build`
-4. `npm run playground`
+3. `npm run playground`
+
+<img src="docs/playground-screenshot.png">
 
 ## Test me
 
@@ -118,6 +119,22 @@ updateStore({
 ```
 
 **Do not mutate the store directly. Doing so may lead to unwanted behaviors in your app.**
+
+#### Performing asynchronous operation
+
+The library itself does not restrict you to anything. You could use promises, async/await, or even generator functions (using generator function might require you to have your own implementation). The only thing that the library does is manage state, that would be updating the state and calling observers upon state update.
+
+Example:
+
+```js
+Axios.get(url, config).then(response => {
+  // do what you need to do
+  // then update the store when you're good.
+  updateStore({
+    someOtherState: someValue
+  });
+});
+```
 
 # Contributing
 

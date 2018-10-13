@@ -13,7 +13,7 @@
   "scripts": {
     "test": "npm run build && jest --env=node --coverage",
     "build": "node build.js && node build-playground.js",
-    "playground": "node playground/build/index.js",
+    "playground": "npm run build && node playground/build/index.js",
     "lint": "prettier \"src/index.js\" \"playground/index.js\" \"__tests__/**/*.js\" --write && eslint \"src/index.js\" \"playground/index.js\" --fix",
     "precommit": "lint-staged"
   },
