@@ -11,7 +11,10 @@
     "README.md"
   ],
   "scripts": {
-    "test": "npm run build && jest --env=node --coverage",
+    "reinstallNodeModules": "rm -rf node_modules package-lock.json && npm i",
+    "test-all": "npm run func-test && npm run perf-test",
+    "test-func": "npm run build && jest __tests__/lib.spec.js --env=node --coverage",
+    "test-perf": "npm run build && babel-node __tests__/perf.spec.js",
     "build": "node build.js && node build-playground.js",
     "playground": "npm run build && node playground/build/index.js",
     "lint": "prettier \"src/index.js\" \"playground/index.js\" \"__tests__/**/*.js\" --write && eslint \"src/index.js\" \"playground/index.js\" --fix",
@@ -47,12 +50,12 @@
   "homepage": "https://github.com/aprilmintacpineda/fluxible-js#readme",
   "devDependencies": {
     "babel-core": "^6.26.3",
-    "babel-eslint": "^9.0.0",
+    "babel-eslint": "^10.0.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.7.0",
-    "babel-preset-minify": "^0.4.3",
-    "eslint": "^5.6.1",
-    "husky": "^0.14.3",
+    "babel-preset-minify": "^0.5.0",
+    "eslint": "^5.7.0",
+    "husky": "^1.1.2",
     "jest": "^23.6.0",
     "lint-staged": "^7.3.0",
     "prettier": "^1.14.3"

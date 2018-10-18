@@ -1,6 +1,6 @@
 /** @format */
 
-import { getStore, updateStore, initializeStore, addObserver } from '../src';
+import { getStore, updateStore, initializeStore, addObserver } from '../lib';
 
 describe('lib.spec.js', () => {
   describe('store initialization', () => {
@@ -55,8 +55,8 @@ describe('lib.spec.js', () => {
     });
   });
 
-  describe('update listeners', () => {
-    test('calls appropriate listeners after update store', () => {
+  describe('observers', () => {
+    test('calls appropriate observer after update store', () => {
       const initialStore = {
         value: 'testValue',
         count: 1
@@ -70,26 +70,25 @@ describe('lib.spec.js', () => {
       addObserver(valueListener, ['value']);
 
       updateStore({ count: 2 });
-      updateStore({ count: 3 });
-      updateStore({ count: 4 });
-      updateStore({ count: 5 });
-
-      expect(countListener).toHaveBeenNthCalledWith(1, {
+      expect(countListener).toHaveBeenCalledWith({
         value: 'testValue',
         count: 2
       });
 
-      expect(countListener).toHaveBeenNthCalledWith(2, {
+      updateStore({ count: 3 });
+      expect(countListener).toHaveBeenCalledWith({
         value: 'testValue',
         count: 3
       });
 
-      expect(countListener).toHaveBeenNthCalledWith(3, {
+      updateStore({ count: 4 });
+      expect(countListener).toHaveBeenCalledWith({
         value: 'testValue',
         count: 4
       });
 
-      expect(countListener).toHaveBeenNthCalledWith(4, {
+      updateStore({ count: 5 });
+      expect(countListener).toHaveBeenCalledWith({
         value: 'testValue',
         count: 5
       });
@@ -97,14 +96,13 @@ describe('lib.spec.js', () => {
       expect(valueListener).not.toHaveBeenCalled();
 
       updateStore({ value: 'another' });
-      updateStore({ value: 'another value' });
-
-      expect(valueListener).toHaveBeenNthCalledWith(1, {
+      expect(valueListener).toHaveBeenCalledWith({
         value: 'another',
         count: 5
       });
 
-      expect(valueListener).toHaveBeenNthCalledWith(2, {
+      updateStore({ value: 'another value' });
+      expect(valueListener).toHaveBeenCalledWith({
         value: 'another value',
         count: 5
       });

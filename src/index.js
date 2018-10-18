@@ -1,96 +1,107 @@
 /** @format */
 
-const observers = [];
+let observers = [];
 let store = {};
-let persistedStateKeys;
-let persistStorage;
-let persistTimeout;
+let persistedStateKeys = null;
+let persistStorage = null;
+let persistTimeout = null;
 
-/**
- * initialize store.
- * @param {Object} Config that should contain the required config.initialStore and the optional config.persist
- * @return {undefined}
- */
 export function initializeStore (config) {
-  // persist
-  let persistedStates = {};
-  if (config.persist) {
+  observers = [];
+  store = {};
+  persistedStateKeys = null;
+  persistStorage = null;
+  persistTimeout = null;
+
+  if (config.persist !== undefined) {
+    // persist
+    let persistedStates = {};
+
     // set the storage first
     persistStorage = config.persist.storage;
 
+    // get saved store from storage
     persistedStates = config.persist.restore(
       JSON.parse(persistStorage.getItem('fluxible-js')) || {}
     );
 
     // we should only save states that were restored
     persistedStateKeys = Object.keys(persistedStates);
+
+    Object.keys(config.initialStore).forEach(key => {
+      if (persistedStateKeys.indexOf(key) === -1) {
+        store[key] = config.initialStore[key];
+      } else {
+        store[key] = persistedStates[key];
+      }
+    });
+  } else {
+    Object.keys(config.initialStore).forEach(key => {
+      store[key] = config.initialStore[key];
+    });
+  }
+}
+
+export function getStore () {
+  return { ...store };
+}
+
+export function updateStore (updatedStates) {
+  if (persistedStateKeys !== null) {
+    if (persistTimeout !== null) clearTimeout(persistTimeout);
+
+    persistTimeout = setTimeout(() => {
+      persistStorage.setItem(
+        'fluxible-js',
+        JSON.stringify(
+          persistedStateKeys.reduce((compiled, key) => {
+            compiled[key] = store[key];
+            return compiled;
+          }, {})
+        )
+      );
+    }, 200);
   }
 
-  store = {
-    ...config.initialStore,
-    ...persistedStates
-  };
-}
+  const updatedStateKeys = Object.keys(updatedStates);
 
-/**
- * get the most latest store.
- * @return {Object} the store
- */
-export function getStore () {
-  return store;
-}
+  updatedStateKeys.forEach(key => {
+    store[key] = updatedStates[key];
+  });
 
-/**
- * updates some parts of the store.
- * @param {Object} the object containing updates on the store states.
- * @return {Promise}
- */
-export function updateStore (newStates) {
-  store = {
-    ...store,
-    ...newStates
-  };
-
-  if (persistTimeout) clearTimeout(persistTimeout);
-  const updatedStates = Object.keys(newStates);
-
-  observers.forEach(listener => {
-    for (let a = 0; a < updatedStates.length; a++) {
-      if (listener.states.indexOf(`{${updatedStates[a]}}`) !== -1) {
-        listener.callback(store);
-        break;
+  // only notify observers that observes the store keys that were updated
+  observers.forEach(observer => {
+    // we want to maximize performance, so we loop as little as possible
+    if (updatedStateKeys.length < observer.wantedKeys.length) {
+      for (let a = 0; a < updatedStateKeys.length; a++) {
+        if (observer.wantedKeys.indexOf(updatedStateKeys[a]) !== -1) {
+          observer.callback(store);
+          break;
+        }
+      }
+    } else {
+      // they are either of the same length or
+      // the observer.wantedKeys is less than the updatedStateKeys
+      for (let a = 0; a < observer.wantedKeys.length; a++) {
+        if (updatedStateKeys.indexOf(observer.wantedKeys[a]) !== -1) {
+          observer.callback(store);
+          break;
+        }
       }
     }
   });
-
-  if (persistedStateKeys) {
-    persistTimeout = setTimeout(() => {
-      // we should only save states that were restored
-      const statesToPersist = {};
-
-      for (let a = 0; a < persistedStateKeys.length; a++) {
-        statesToPersist[persistedStateKeys[a]] = store[persistedStateKeys[a]];
-      }
-
-      persistStorage.setItem('fluxible-js', JSON.stringify(statesToPersist));
-    }, 200);
-  }
 }
 
-/**
- * registers an update listener to be called after every store updates.
- * @param {Function} callback function
- * @return {Function} call this function to remove the listener
- */
-export function addObserver (callback, states) {
-  const listener = {
+export function addObserver (callback, wantedKeys) {
+  const thisObserver = {
     callback,
-    states: states.map(state => `{${state}}`).join(' ')
+    wantedKeys,
+    id: Math.random().toString()
   };
 
-  observers.push(listener);
+  observers.push(thisObserver);
 
   return () => {
-    observers.splice(observers.indexOf(listener), 1);
+    observers = observers.filter(observer => observer.id !== thisObserver.id);
   };
 }

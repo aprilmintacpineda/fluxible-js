@@ -1,2 +1,3 @@
 lib/*
 playground/lib/*
+__tests__/perf.spec.js

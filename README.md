@@ -2,9 +2,11 @@
 
 # Fluxible-JS
 
-<img src="docs/test-screenshot.png">
-
 Smaller, faster, better. A small state management system that supports the idea of asynchronous actions and state persistence out of the box.
+
+<img src="docs/ss-test-func.png">
+
+<img src="docs/ss-test-perf.png">
 
 <img src="https://1.bp.blogspot.com/_Jj--y7nzkjo/TFMSsUC6qkI/AAAAAAAAJjo/KZu6JhzpCjI/s1600/DSC_0702.JPG">
 
