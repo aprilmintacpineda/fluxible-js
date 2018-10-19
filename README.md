@@ -11,7 +11,7 @@ Smaller, faster, better. A small state management system that supports the idea 
 Performance test was ran on:
 
 MacBook Pro (Retina, 15-inch, Mid 2015).
-Processor: 2.5 GHz Intel Core i7
+Processor: 2.5 GHz Intel Core i7, 1 processor, 4 cores.
 Memory: 16 GB 1600 MHz DDR3
 
 <img src="https://1.bp.blogspot.com/_Jj--y7nzkjo/TFMSsUC6qkI/AAAAAAAAJjo/KZu6JhzpCjI/s1600/DSC_0702.JPG">
