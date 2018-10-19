@@ -7,12 +7,6 @@ let persistStorage = null;
 let persistTimeout = null;
 
 export function initializeStore (config) {
-  observers = [];
-  store = {};
-  persistedStateKeys = null;
-  persistStorage = null;
-  persistTimeout = null;
-
   if (config.persist !== undefined) {
     // persist
     let persistedStates = {};
@@ -29,11 +23,7 @@ export function initializeStore (config) {
     persistedStateKeys = Object.keys(persistedStates);
 
     Object.keys(config.initialStore).forEach(key => {
-      if (persistedStateKeys.indexOf(key) === -1) {
-        store[key] = config.initialStore[key];
-      } else {
-        store[key] = persistedStates[key];
-      }
+      store[key] = persistedStates[key] || config.initialStore[key];
     });
   } else {
     Object.keys(config.initialStore).forEach(key => {
@@ -43,7 +33,7 @@ export function initializeStore (config) {
 }
 
 export function getStore () {
-  return { ...store };
+  return store;
 }
 
 export function updateStore (updatedStates) {

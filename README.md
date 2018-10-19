@@ -8,6 +8,12 @@ Smaller, faster, better. A small state management system that supports the idea 
 
 <img src="docs/ss-test-perf.png">
 
+Performance test was ran on:
+
+MacBook Pro (Retina, 15-inch, Mid 2015).
+Processor: 2.5 GHz Intel Core i7
+Memory: 16 GB 1600 MHz DDR3
+
 <img src="https://1.bp.blogspot.com/_Jj--y7nzkjo/TFMSsUC6qkI/AAAAAAAAJjo/KZu6JhzpCjI/s1600/DSC_0702.JPG">
 
 ###### I do not own the image you see above.

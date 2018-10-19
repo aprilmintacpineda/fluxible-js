@@ -12,8 +12,8 @@
   ],
   "scripts": {
     "reinstallNodeModules": "rm -rf node_modules package-lock.json && npm i",
-    "test-all": "npm run func-test && npm run perf-test",
-    "test-func": "npm run build && jest __tests__/lib.spec.js --env=node --coverage",
+    "test-all": "npm run test-func && npm run test-perf",
+    "test-func": "npm run build && jest __tests__/functions/* --env=node --coverage",
     "test-perf": "npm run build && babel-node __tests__/perf.spec.js",
     "build": "node build.js && node build-playground.js",
     "playground": "npm run build && node playground/build/index.js",

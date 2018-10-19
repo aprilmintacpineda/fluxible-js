@@ -3,9 +3,6 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 exports.initializeStore = initializeStore;
 exports.getStore = getStore;
 exports.updateStore = updateStore;
@@ -19,12 +16,6 @@ var persistStorage = null;
 var persistTimeout = null;
 
 function initializeStore(config) {
-  observers = [];
-  store = {};
-  persistedStateKeys = null;
-  persistStorage = null;
-  persistTimeout = null;
-
   if (config.persist !== undefined) {
     // persist
     var persistedStates = {};
@@ -39,11 +30,7 @@ function initializeStore(config) {
     persistedStateKeys = Object.keys(persistedStates);
 
     Object.keys(config.initialStore).forEach(function (key) {
-      if (persistedStateKeys.indexOf(key) === -1) {
-        store[key] = config.initialStore[key];
-      } else {
-        store[key] = persistedStates[key];
-      }
+      store[key] = persistedStates[key] || config.initialStore[key];
     });
   } else {
     Object.keys(config.initialStore).forEach(function (key) {
@@ -53,7 +40,7 @@ function initializeStore(config) {
 }
 
 function getStore() {
-  return _extends({}, store);
+  return store;
 }
 
 function updateStore(updatedStates) {
