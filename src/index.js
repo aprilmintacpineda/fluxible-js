@@ -7,28 +7,27 @@ let persistStorage = null;
 let persistTimeout = null;
 
 export function initializeStore (config) {
+  const initialStoreKeys = Object.keys(config.initialStore);
+
   if (config.persist !== undefined) {
-    // persist
-    let persistedStates = {};
-
-    // set the storage first
-    persistStorage = config.persist.storage;
-
     // get saved store from storage
-    persistedStates = config.persist.restore(
-      JSON.parse(persistStorage.getItem('fluxible-js')) || {}
+    const persistedStates = config.persist.restore(
+      JSON.parse(config.persist.storage.getItem('fluxible-js')) || {}
     );
+
+    for (let a = 0; a < initialStoreKeys.length; a++) {
+      store[initialStoreKeys[a]] =
+        persistedStates[initialStoreKeys[a]] || config.initialStore[initialStoreKeys[a]];
+    }
 
     // we should only save states that were restored
     persistedStateKeys = Object.keys(persistedStates);
-
-    Object.keys(config.initialStore).forEach(key => {
-      store[key] = persistedStates[key] || config.initialStore[key];
-    });
+    // save the storage
+    persistStorage = config.persist.storage;
   } else {
-    Object.keys(config.initialStore).forEach(key => {
-      store[key] = config.initialStore[key];
-    });
+    for (let a = 0; a < initialStoreKeys.length; a++) {
+      store[initialStoreKeys[a]] = config.initialStore[initialStoreKeys[a]];
+    }
   }
 }
 
@@ -55,31 +54,31 @@ export function updateStore (updatedStates) {
 
   const updatedStateKeys = Object.keys(updatedStates);
 
-  updatedStateKeys.forEach(key => {
-    store[key] = updatedStates[key];
-  });
+  for (let a = 0; a < updatedStateKeys.length; a++) {
+    store[updatedStateKeys[a]] = updatedStates[updatedStateKeys[a]];
+  }
 
-  // only notify observers that observes the store keys that were updated
-  observers.forEach(observer => {
+  // only notify observers that observers the store keys that were updated
+  for (let a = 0; a < observers.length; a++) {
     // we want to maximize performance, so we loop as little as possible
-    if (updatedStateKeys.length < observer.wantedKeys.length) {
-      for (let a = 0; a < updatedStateKeys.length; a++) {
-        if (observer.wantedKeys.indexOf(updatedStateKeys[a]) !== -1) {
-          observer.callback(store);
+    if (updatedStateKeys.length < observers[a].wantedKeys.length) {
+      for (let b = 0; b < updatedStateKeys.length; b++) {
+        if (observers[a].wantedKeys.indexOf(updatedStateKeys[b]) !== -1) {
+          observers[a].callback(store);
           break;
         }
       }
     } else {
       // they are either of the same length or
-      // the observer.wantedKeys is less than the updatedStateKeys
-      for (let a = 0; a < observer.wantedKeys.length; a++) {
-        if (updatedStateKeys.indexOf(observer.wantedKeys[a]) !== -1) {
-          observer.callback(store);
+      // the observers[a].wantedKeys is less than the updatedStateKeys
+      for (let b = 0; b < observers[a].wantedKeys.length; b++) {
+        if (updatedStateKeys.indexOf(observers[a].wantedKeys[b]) !== -1) {
+          observers[a].callback(store);
           break;
         }
       }
     }
-  });
+  }
 }
 
 export function addObserver (callback, wantedKeys) {
@@ -92,6 +91,10 @@ export function addObserver (callback, wantedKeys) {
   observers.push(thisObserver);
 
   return () => {
-    observers = observers.filter(observer => observer.id !== thisObserver.id);
+    for (let a = 0; a < observers.length; a++) {
+      if (observers[a].id === thisObserver.id) {
+        return observers.splice(a, 1);
+      }
+    }
   };
 }

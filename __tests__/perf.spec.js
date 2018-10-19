@@ -54,7 +54,7 @@ for (let a = 0; a < maxKeys; a++) {
 displayAverageTimeAndReset();
 
 // ----------
-console.log('updateStore with 1000 keys and 0 observers:');
+console.log('updateStore with ' + maxKeys + ' keys and 0 observers:');
 
 timeTaken = Date.now();
 updateStore(initialStore);
@@ -88,7 +88,7 @@ for (let a = 0; a < maxKeys; a++) {
 displayAverageTimeAndReset();
 
 // ----------
-console.log('updateStore with 1000 keys and 1000 observers:');
+console.log('updateStore with ' + maxKeys + ' keys and ' + maxKeys + ' observers:');
 
 timeTaken = Date.now();
 updateStore(initialStore);
@@ -120,5 +120,24 @@ for (let a = 0; a < maxKeys; a++) {
 }
 
 displayAverageTimeAndReset();
+
+// ---------- TODO
+// console.log('removing an observer with ', maxKeys + 1, ' observers');
+//
+// tmp = addObserver(() => {}, ['test1', 'test2', 'test3']);
+//
+// timeTaken = Date.now();
+// tmp();
+// timeTaken = Date.now() - timeTaken;
+//
+// displayTotalTime();
+
+// for (let a = 0; a < maxKeys; a++) {
+//   now = Date.now();
+//   getStore();
+//   average += Date.now() - now;
+// }
+//
+// displayAverageTimeAndReset();
 
 console.log('END');

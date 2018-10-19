@@ -4,21 +4,41 @@
 
 Smaller, faster, better. A small state management system that supports the idea of asynchronous actions and state persistence out of the box.
 
+# Tests
+
+## Unit tests
+
 <img src="docs/ss-test-func.png">
 
-<img src="docs/ss-test-perf.png">
+## Performance tests
 
-Performance test was ran on:
+All performance test was ran on:
 
 MacBook Pro (Retina, 15-inch, Mid 2015).
 Processor: 2.5 GHz Intel Core i7, 1 processor, 4 cores.
 Memory: 16 GB 1600 MHz DDR3
 
+#### With a 10 key-store
+
+<img src="docs/ss-test-perf-10.png">
+
+#### With a 100 key-store
+
+<img src="docs/ss-test-perf-100.png">
+
+#### With a 1,000 key-store
+
+<img src="docs/ss-test-perf-1000.png">
+
+#### With a 10,000 key-store
+
+<img src="docs/ss-test-perf-10000.png">
+
+---
+
 <img src="https://1.bp.blogspot.com/_Jj--y7nzkjo/TFMSsUC6qkI/AAAAAAAAJjo/KZu6JhzpCjI/s1600/DSC_0702.JPG">
 
 ###### I do not own the image you see above.
-
----
 
 We developers are like cats. We like to fit ourselves inside a box. Sometimes the boxes we use are so small that our movements are so limited. Libraries are like boxes, basically, using a library is like saying:
 
