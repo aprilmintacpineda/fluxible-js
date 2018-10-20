@@ -37,7 +37,7 @@ console.log('Beginning of perf test');
 console.log('-----\n');
 
 // ----------
-console.log('initialStore:');
+console.log('initializeStore:');
 
 timeTaken = Date.now();
 initializeStore({ initialStore });

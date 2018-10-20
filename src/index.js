@@ -58,7 +58,7 @@ export function updateStore (updatedStates) {
     store[updatedStateKeys[a]] = updatedStates[updatedStateKeys[a]];
   }
 
-  // only notify observers that observers the store keys that were updated
+  // only notify observers that observes the store keys that were updated
   for (let a = 0; a < observers.length; a++) {
     // we want to maximize performance, so we loop as little as possible
     if (updatedStateKeys.length < observers[a].wantedKeys.length) {
@@ -70,7 +70,7 @@ export function updateStore (updatedStates) {
       }
     } else {
       // they are either of the same length or
-      // the observers[a].wantedKeys is less than the updatedStateKeys
+      // the wantedKeys is less than the updatedStateKeys
       for (let b = 0; b < observers[a].wantedKeys.length; b++) {
         if (updatedStateKeys.indexOf(observers[a].wantedKeys[b]) !== -1) {
           observers[a].callback(store);

@@ -8,7 +8,7 @@ Smaller, faster, better. A small state management system that supports the idea 
 
 ## Unit tests
 
-<img src="docs/ss-test-func.png">
+<img src="docs/ss-test-unit.png">
 
 ## Performance tests
 
@@ -60,7 +60,9 @@ The goal of this state management library is to allow you to initialize, update,
 
 ## Test me
 
-1. `npm run test`
+- `npm run test-func` to run unit tests.
+- `npm run test-perf` to run performance test.
+- `npm run test-all` to run both.
 
 ## Install
 
@@ -155,13 +157,21 @@ The library itself does not restrict you to anything. You could use promises, as
 Example:
 
 ```js
-Axios.get(url, config).then(response => {
-  // do what you need to do
-  // then update the store when you're good.
+import { updateStore } from 'fluxible';
+
+function myAction() {
   updateStore({
     someOtherState: someValue
   });
-});
+
+  Axios.get(url, config).then(response => {
+    // do what you need to do
+    // then update the store when you're good.
+    updateStore({
+      someOtherState: someValue
+    });
+  });
+}
 ```
 
 # Contributing
