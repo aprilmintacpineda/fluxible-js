@@ -80,7 +80,7 @@ function addObserver(callback, wantedKeys) {
   var thisObserver = {
     callback: callback,
     wantedKeys: wantedKeys,
-    id: Math.random().toString()
+    id: Math.random()
   };
 
   observers.push(thisObserver);

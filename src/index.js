@@ -85,7 +85,7 @@ export function addObserver (callback, wantedKeys) {
   const thisObserver = {
     callback,
     wantedKeys,
-    id: Math.random().toString()
+    id: Math.random()
   };
 
   observers.push(thisObserver);

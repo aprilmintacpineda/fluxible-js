@@ -121,23 +121,22 @@ for (let a = 0; a < maxKeys; a++) {
 
 displayAverageTimeAndReset();
 
-// ---------- TODO
-// console.log('removing an observer with ', maxKeys + 1, ' observers');
-//
-// tmp = addObserver(() => {}, ['test1', 'test2', 'test3']);
-//
-// timeTaken = Date.now();
-// tmp();
-// timeTaken = Date.now() - timeTaken;
-//
-// displayTotalTime();
+console.log('removing an observer with ', maxKeys + 1, ' observers');
 
-// for (let a = 0; a < maxKeys; a++) {
-//   now = Date.now();
-//   getStore();
-//   average += Date.now() - now;
-// }
-//
-// displayAverageTimeAndReset();
+tmp = addObserver(() => {}, ['test1', 'test2', 'test3']);
+timeTaken = Date.now();
+tmp();
+timeTaken = Date.now() - timeTaken;
+
+displayTotalTime();
+
+for (let a = 0; a < maxKeys; a++) {
+  tmp = addObserver(() => {}, ['test1', 'test2', 'test3']);
+  now = Date.now();
+  tmp();
+  average += Date.now() - now;
+}
+
+displayAverageTimeAndReset();
 
 console.log('END');
