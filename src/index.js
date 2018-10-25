@@ -1,29 +1,26 @@
 /** @format */
 
-let observers = [];
-let store = {};
-let persistedStateKeys = null;
-let persistStorage = null;
-let persistTimeout = null;
+const observers = [];
+const store = {};
+// state persistence
+let persistStorage = 0;
+let persistRestore = 0;
+let persistTimeout = 0;
 
 export function initializeStore (config) {
   const initialStoreKeys = Object.keys(config.initialStore);
 
-  if (config.persist !== undefined) {
+  if (config.persist) {
+    persistStorage = config.persist.storage;
+    persistRestore = config.persist.restore;
+
     // get saved store from storage
-    const persistedStates = config.persist.restore(
-      JSON.parse(config.persist.storage.getItem('fluxible-js')) || {}
-    );
+    const persistedStates = persistRestore(JSON.parse(persistStorage.getItem('fluxible-js')) || {});
 
     for (let a = 0; a < initialStoreKeys.length; a++) {
       store[initialStoreKeys[a]] =
         persistedStates[initialStoreKeys[a]] || config.initialStore[initialStoreKeys[a]];
     }
-
-    // we should only save states that were restored
-    persistedStateKeys = Object.keys(persistedStates);
-    // save the storage
-    persistStorage = config.persist.storage;
   } else {
     for (let a = 0; a < initialStoreKeys.length; a++) {
       store[initialStoreKeys[a]] = config.initialStore[initialStoreKeys[a]];
@@ -36,20 +33,8 @@ export function getStore () {
 }
 
 export function updateStore (updatedStates) {
-  if (persistedStateKeys !== null) {
-    if (persistTimeout !== null) clearTimeout(persistTimeout);
-
-    persistTimeout = setTimeout(() => {
-      persistStorage.setItem(
-        'fluxible-js',
-        JSON.stringify(
-          persistedStateKeys.reduce((compiled, key) => {
-            compiled[key] = store[key];
-            return compiled;
-          }, {})
-        )
-      );
-    }, 200);
+  if (persistTimeout !== 0) {
+    persistTimeout = clearTimeout(persistTimeout);
   }
 
   const updatedStateKeys = Object.keys(updatedStates);
@@ -78,6 +63,12 @@ export function updateStore (updatedStates) {
         }
       }
     }
+  }
+
+  if (persistRestore !== 0) {
+    persistTimeout = setTimeout(() => {
+      persistStorage.setItem('fluxible-js', JSON.stringify(persistRestore(store)));
+    }, 200);
   }
 }
 

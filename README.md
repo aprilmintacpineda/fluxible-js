@@ -119,6 +119,10 @@ initializeStore({
 
 In the case above, only `user` would be saved and the rest wouldn't be saved.
 
+###### Notes
+
+`config.persist.restore` should not do anything else other than return the states you want to persist. It is also being used for the `config.persist.storage.saveItem` instead of recalculating, it simply calls `config.persist.restore` and expect it to return the states you want to persist. This optimizes performance.
+
 #### Listen to store updates
 
 ```jsx

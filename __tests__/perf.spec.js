@@ -1,6 +1,6 @@
 /** @format */
 
-import { getStore, updateStore, initializeStore, addObserver } from '../lib';
+import { getStore, updateStore, initializeStore, addObserver } from '../lib/index.min.js';
 
 const maxKeys = 10000;
 const initialStore = {};

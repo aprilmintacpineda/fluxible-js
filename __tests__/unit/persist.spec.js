@@ -4,7 +4,7 @@ import { updateStore, initializeStore, getStore } from '../../lib';
 
 describe('persist', () => {
   test('calls getItem and setItem on config.persist.storage', () => {
-    expect.assertions(4);
+    expect.assertions(5);
 
     const initialStore = {
       user: null,
@@ -26,11 +26,9 @@ describe('persist', () => {
 
     const persist = {
       storage,
-      restore: jest.fn(savedStore => {
-        return {
-          user: savedStore.user
-        };
-      })
+      restore: jest.fn(savedStore => ({
+        user: savedStore.user
+      }))
     };
 
     initializeStore({
@@ -68,6 +66,13 @@ describe('persist', () => {
           }
         })
       );
+      expect(persist.restore).toHaveBeenCalledWith({
+        user: {
+          name: 'another test user'
+        },
+        testValue: 'another test value',
+        anotherValue: 'test value'
+      });
     });
   });
 

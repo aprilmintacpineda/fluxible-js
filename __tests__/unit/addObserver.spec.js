@@ -11,13 +11,19 @@ describe('observers', () => {
 
     const countListener = jest.fn();
     const valueListener = jest.fn();
+    const bothListener = jest.fn();
 
     initializeStore({ initialStore });
     addObserver(countListener, ['count']);
     addObserver(valueListener, ['value']);
+    addObserver(bothListener, ['count', 'value']);
 
     updateStore({ count: 2 });
     expect(countListener).toHaveBeenCalledWith({
+      value: 'testValue',
+      count: 2
+    });
+    expect(bothListener).toHaveBeenCalledWith({
       value: 'testValue',
       count: 2
     });
@@ -27,15 +33,27 @@ describe('observers', () => {
       value: 'testValue',
       count: 3
     });
+    expect(bothListener).toHaveBeenCalledWith({
+      value: 'testValue',
+      count: 3
+    });
 
     updateStore({ count: 4 });
     expect(countListener).toHaveBeenCalledWith({
       value: 'testValue',
       count: 4
     });
+    expect(bothListener).toHaveBeenCalledWith({
+      value: 'testValue',
+      count: 4
+    });
 
     updateStore({ count: 5 });
     expect(countListener).toHaveBeenCalledWith({
+      value: 'testValue',
+      count: 5
+    });
+    expect(bothListener).toHaveBeenCalledWith({
       value: 'testValue',
       count: 5
     });
@@ -47,15 +65,24 @@ describe('observers', () => {
       value: 'another',
       count: 5
     });
+    expect(bothListener).toHaveBeenCalledWith({
+      value: 'another',
+      count: 5
+    });
 
     updateStore({ value: 'another value' });
     expect(valueListener).toHaveBeenCalledWith({
       value: 'another value',
       count: 5
     });
+    expect(bothListener).toHaveBeenCalledWith({
+      value: 'another value',
+      count: 5
+    });
 
     expect(countListener).toHaveBeenCalledTimes(4);
     expect(valueListener).toHaveBeenCalledTimes(2);
+    expect(bothListener).toHaveBeenCalledTimes(6);
   });
 
   test('can unsubscribe a listener', () => {
