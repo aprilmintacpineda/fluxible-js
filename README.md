@@ -90,12 +90,12 @@ initializeStore({
 
 `initializeStore` function expects an object as the only parameter, the object have a required property called `initialStore` which would be used as the initial value of the store.
 
-There's also the optional property called `persist` which should also be an object containing two required properties:
+There's also the optional property called `persist` which must also be an object containing two required properties:
 
-- `storage` which should be a reference to the storage that would be used to save the store. It must have `getItem` and `setItem` methods. Both methods should be synchronous. Example would be `window.localStorage`. The call to `setItem` is deferred by 200ms, this is to minimize and to improve performance.
-- `restore` which should be a function that is synchronous. Restore will be called upon initialization and will receive the `savedStore` as the its only argument. The `savedStore` would be an object containing the states that were previously saved to the storage. It should return an object which would be the states that you want to restore.
+- `storage` which must be a reference to the storage that would be used to save the store. It must have `getItem` and `setItem` methods. Both methods must be synchronous. Example would be `window.localStorage`. The call to `setItem` is deferred by 200ms, this is to minimize and to improve performance.
+- `restore` which must be a function that is synchronous. Restore will be called upon initialization and will receive the `savedStore` as the its only argument. The `savedStore` would be an object containing the states that were previously saved to the storage. It must return an object which would be the states that you want to restore.
 
-Persist feature would only save keys that were returned by `config.persist.restore`. That means, other states that you did not return in that method wouldn't be saved.
+Persist feature would only save keys that were returned by `config.persist.restore`. That means, other states that you did not return in that method wouldn't be saved. `config.persist.restore` must not do anything else other than return the states you want to persist. It is also being used for the `config.persist.storage.saveItem` instead of recalculating, it simply calls `config.persist.restore` and expect it to return the states you want to persist. This optimizes performance.
 
 ###### Example
 
@@ -120,10 +120,6 @@ initializeStore({
 ```
 
 In the case above, only `user` would be saved and the rest wouldn't be saved.
-
-###### Notes
-
-`config.persist.restore` should not do anything else other than return the states you want to persist. It is also being used for the `config.persist.storage.saveItem` instead of recalculating, it simply calls `config.persist.restore` and expect it to return the states you want to persist. This optimizes performance.
 
 ## Listen to store updates
 
@@ -201,13 +197,14 @@ addEvent('my-event', payload => {
 ```js
 import { emitEvent } from 'fluxible-js';
 
+// returns -1 if the emitted event does not exists
 emitEvent('my-event', {
   value: 1,
   anotherValue: 2
 });
 ```
 
-The second argument to `emitEvent` is an object or value would be passed to the event listeners as **payload**. Then from the event listeners, feel free to do whatever you need to do such as update the store.
+The second argument to `emitEvent` is an object or value that would be passed to the event listeners as **payload**. Then from the event listeners, feel free to do whatever you need to do such as update the store.
 
 ```js
 import { addEvent, updateStore } from 'fluxible-js';
