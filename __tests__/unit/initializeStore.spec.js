@@ -2,7 +2,7 @@
 
 import { getStore, initializeStore } from '../../lib';
 
-describe('store initialization', () => {
+describe('initializeStore', () => {
   test('initializes store', () => {
     const initialStore = {
       count: 1,

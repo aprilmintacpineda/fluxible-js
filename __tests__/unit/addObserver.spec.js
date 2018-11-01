@@ -2,7 +2,7 @@
 
 import { updateStore, initializeStore, addObserver } from '../../lib';
 
-describe('observers', () => {
+describe('addObserver', () => {
   test('calls appropriate observer after update store', () => {
     const initialStore = {
       value: 'testValue',

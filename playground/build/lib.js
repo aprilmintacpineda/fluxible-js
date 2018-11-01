@@ -7,10 +7,13 @@ exports.initializeStore = initializeStore;
 exports.getStore = getStore;
 exports.updateStore = updateStore;
 exports.addObserver = addObserver;
+exports.addEvent = addEvent;
+exports.emitEvent = emitEvent;
 
 
-var observers = [];
 var store = {};
+var eventBus = {};
+var observers = [];
 
 var persistStorage = 0;
 var persistRestore = 0;
@@ -91,4 +94,22 @@ function addObserver(callback, wantedKeys) {
       }
     }
   };
+}
+
+function addEvent(ev, callback) {
+  if (eventBus[ev] === undefined) {
+    eventBus[ev] = [callback];
+  } else {
+    eventBus[ev].push(callback);
+  }
+}
+
+function emitEvent(ev, payload) {
+  if (!eventBus[ev]) {
+    return -1;
+  }
+
+  for (var a = 0; a < eventBus[ev].length; a++) {
+    eventBus[ev][a](payload);
+  }
 }

@@ -1,7 +1,7 @@
 /** @format */
 import { getStore, updateStore, initializeStore } from '../../lib';
 
-describe('store updates', () => {
+describe('updateStore', () => {
   test('Update store only updates parts of the store that\'s to be updated. getStore returns the updated store.', () => {
     const initialStore = {
       value: 'testValue',

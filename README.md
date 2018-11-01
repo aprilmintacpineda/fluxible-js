@@ -18,6 +18,10 @@ MacBook Pro (Retina, 15-inch, Mid 2015).
 Processor: 2.5 GHz Intel Core i7, 1 processor, 4 cores.
 Memory: 16 GB 1600 MHz DDR3
 
+**Complete disclosure**
+
+These tests may or may not be accurate. Consider these to be the cases under the best circumstances.
+
 #### With a 10 key-store
 
 <img src="docs/ss-test-perf-10.png">
@@ -48,9 +52,7 @@ Though libraries were not intended to limit but rather to extend our abilities, 
 
 The goal of this state management library is to allow you to initialize, update, and share states while giving back the control to the developer. Think of it like a substantially bigger box.
 
-# Guides
-
-## Run me
+# Run me
 
 1. `git clone git@github.com:aprilmintacpineda/fluxible-js.git`
 2. `npm i`
@@ -58,19 +60,19 @@ The goal of this state management library is to allow you to initialize, update,
 
 <img src="docs/playground-screenshot.png">
 
-## Test me
+# Test me
 
 - `npm run test-func` to run unit tests.
 - `npm run test-perf` to run performance test.
-- `npm run test-all` to run both.
+- `npm run test` to run both.
 
-## Install
+# Install
 
 `npm i -s fluxible-js`
 
-## Flow
+# Usage
 
-#### Initialize store
+## Initialize store
 
 ```js
 import { initializeStore } from 'fluxible-js';
@@ -123,7 +125,7 @@ In the case above, only `user` would be saved and the rest wouldn't be saved.
 
 `config.persist.restore` should not do anything else other than return the states you want to persist. It is also being used for the `config.persist.storage.saveItem` instead of recalculating, it simply calls `config.persist.restore` and expect it to return the states you want to persist. This optimizes performance.
 
-#### Listen to store updates
+## Listen to store updates
 
 ```jsx
 import { addObserver, getStore } from 'fluxible-js';
@@ -142,7 +144,7 @@ The second argument is an array of strings which lists the names of the states t
 
 `addObserver` returns a function that you can call later on to remove _that_ observer.
 
-#### Update the store
+## Update the store
 
 ```js
 import { updateStore } from 'fluxible-js';
@@ -154,14 +156,14 @@ updateStore({
 
 **Do not mutate the store directly. Doing so may lead to unwanted behaviors in your app.**
 
-#### Performing asynchronous operation
+## Performing asynchronous operation
 
 The library itself does not restrict you to anything. You could use promises, async/await, or even generator functions (using generator function might require you to have your own implementation). The only thing that the library does is manage state, that would be updating the state and calling observers upon state update.
 
 Example:
 
 ```js
-import { updateStore } from 'fluxible';
+import { updateStore } from 'fluxible-js';
 
 function myAction() {
   updateStore({
@@ -176,6 +178,45 @@ function myAction() {
     });
   });
 }
+```
+
+# Event bus
+
+## Adding events and event listeners
+
+```js
+import { addEvent } from 'fluxible-js';
+
+addEvent('my-event', payload => {
+  console.log('first listener', payload);
+});
+
+addEvent('my-event', payload => {
+  console.log('second listener', payload);
+});
+```
+
+## Emitting events
+
+```js
+import { emitEvent } from 'fluxible-js';
+
+emitEvent('my-event', {
+  value: 1,
+  anotherValue: 2
+});
+```
+
+The second argument to `emitEvent` is an object or value would be passed to the event listeners as **payload**. Then from the event listeners, feel free to do whatever you need to do such as update the store.
+
+```js
+import { addEvent, updateStore } from 'fluxible-js';
+
+addEvent('my-event', payload => {
+  updateStore({
+    newValue: payload.newValue
+  });
+});
 ```
 
 # Contributing

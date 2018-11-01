@@ -1,6 +1,13 @@
 /** @format */
 
-import { getStore, updateStore, initializeStore, addObserver } from '../lib/index.min.js';
+import {
+  getStore,
+  updateStore,
+  initializeStore,
+  addObserver,
+  addEvent,
+  emitEvent
+} from '../lib/index.min.js';
 
 const maxKeys = 10000;
 const initialStore = {};
@@ -121,6 +128,7 @@ for (let a = 0; a < maxKeys; a++) {
 
 displayAverageTimeAndReset();
 
+// ----------
 console.log('removing an observer with ', maxKeys + 1, ' observers');
 
 tmp = addObserver(() => {}, ['test1', 'test2', 'test3']);
@@ -134,6 +142,54 @@ for (let a = 0; a < maxKeys; a++) {
   tmp = addObserver(() => {}, ['test1', 'test2', 'test3']);
   now = Date.now();
   tmp();
+  average += Date.now() - now;
+}
+
+displayAverageTimeAndReset();
+
+// ----------
+console.log('Adding events');
+
+timeTaken = Date.now();
+addEvent('test-event', () => {});
+timeTaken = Date.now() - timeTaken;
+
+displayTotalTime();
+
+let called = false;
+let event;
+
+for (let a = 0; a < maxKeys; a++) {
+  now = Date.now();
+  addEvent('test-event-' + Math.floor(Math.random() * 100 + 1), () => {
+    called = true;
+  });
+  average += Date.now() - now;
+}
+
+displayAverageTimeAndReset();
+
+// ----------
+console.log('Emitting events with ' + maxKeys + ' previously added events');
+
+do {
+  event = 'test-event-' + Math.floor(Math.random() * 100 + 1);
+  timeTaken = Date.now();
+  emitEvent(event);
+  timeTaken = Date.now() - timeTaken;
+} while (!called);
+
+displayTotalTime();
+
+for (let a = 0; a < maxKeys; a++) {
+  called = false;
+
+  do {
+    event = 'test-event-' + Math.floor(Math.random() * 100 + 1);
+    now = Date.now();
+    emitEvent(event);
+  } while (!called);
+
   average += Date.now() - now;
 }
 

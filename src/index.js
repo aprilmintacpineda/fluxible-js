@@ -1,7 +1,8 @@
 /** @format */
 
-const observers = [];
 const store = {};
+const eventBus = {};
+const observers = [];
 // state persistence
 let persistStorage = 0;
 let persistRestore = 0;
@@ -14,7 +15,6 @@ export function initializeStore (config) {
     persistStorage = config.persist.storage;
     persistRestore = config.persist.restore;
 
-    // get saved store from storage
     const persistedStates = persistRestore(JSON.parse(persistStorage.getItem('fluxible-js')) || {});
 
     for (let a = 0; a < initialStoreKeys.length; a++) {
@@ -88,4 +88,22 @@ export function addObserver (callback, wantedKeys) {
       }
     }
   };
+}
+
+export function addEvent (ev, callback) {
+  if (eventBus[ev] === undefined) {
+    eventBus[ev] = [callback];
+  } else {
+    eventBus[ev].push(callback);
+  }
+}
+
+export function emitEvent (ev, payload) {
+  if (!eventBus[ev]) {
+    return -1;
+  }
+
+  for (let a = 0; a < eventBus[ev].length; a++) {
+    eventBus[ev][a](payload);
+  }
 }

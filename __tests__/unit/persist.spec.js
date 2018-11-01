@@ -2,7 +2,7 @@
 
 import { updateStore, initializeStore, getStore } from '../../lib';
 
-describe('persist', () => {
+describe('config.persist', () => {
   test('calls getItem and setItem on config.persist.storage', () => {
     expect.assertions(5);
 
