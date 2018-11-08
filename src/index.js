@@ -1,15 +1,16 @@
 /** @format */
 
-const store = {};
 const eventBus = {};
 const observers = [];
+let store = {};
 // state persistence
 let persistStorage = 0;
 let persistRestore = 0;
 let persistTimeout = 0;
+let persistedStateKeys = 0;
 
 export function initializeStore (config) {
-  const initialStoreKeys = Object.keys(config.initialStore);
+  store = config.initialStore;
 
   if (config.persist) {
     persistStorage = config.persist.storage;
@@ -17,13 +18,10 @@ export function initializeStore (config) {
 
     const persistedStates = persistRestore(JSON.parse(persistStorage.getItem('fluxible-js')) || {});
 
-    for (let a = 0; a < initialStoreKeys.length; a++) {
-      store[initialStoreKeys[a]] =
-        persistedStates[initialStoreKeys[a]] || config.initialStore[initialStoreKeys[a]];
-    }
-  } else {
-    for (let a = 0; a < initialStoreKeys.length; a++) {
-      store[initialStoreKeys[a]] = config.initialStore[initialStoreKeys[a]];
+    persistedStateKeys = Object.keys(persistedStates);
+
+    for (let a = 0; a < persistedStateKeys.length; a++) {
+      store[persistedStateKeys[a]] = persistedStates[persistedStateKeys[a]];
     }
   }
 }

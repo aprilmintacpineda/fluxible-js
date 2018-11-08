@@ -11,16 +11,17 @@ exports.addEvent = addEvent;
 exports.emitEvent = emitEvent;
 
 
-var store = {};
 var eventBus = {};
 var observers = [];
+var store = {};
 
 var persistStorage = 0;
 var persistRestore = 0;
 var persistTimeout = 0;
+var persistedStateKeys = 0;
 
 function initializeStore(config) {
-  var initialStoreKeys = Object.keys(config.initialStore);
+  store = config.initialStore;
 
   if (config.persist) {
     persistStorage = config.persist.storage;
@@ -28,12 +29,10 @@ function initializeStore(config) {
 
     var persistedStates = persistRestore(JSON.parse(persistStorage.getItem('fluxible-js')) || {});
 
-    for (var a = 0; a < initialStoreKeys.length; a++) {
-      store[initialStoreKeys[a]] = persistedStates[initialStoreKeys[a]] || config.initialStore[initialStoreKeys[a]];
-    }
-  } else {
-    for (var _a = 0; _a < initialStoreKeys.length; _a++) {
-      store[initialStoreKeys[_a]] = config.initialStore[initialStoreKeys[_a]];
+    persistedStateKeys = Object.keys(persistedStates);
+
+    for (var a = 0; a < persistedStateKeys.length; a++) {
+      store[persistedStateKeys[a]] = persistedStates[persistedStateKeys[a]];
     }
   }
 }
@@ -53,18 +52,18 @@ function updateStore(updatedStates) {
     store[updatedStateKeys[a]] = updatedStates[updatedStateKeys[a]];
   }
 
-  for (var _a2 = 0; _a2 < observers.length; _a2++) {
-    if (updatedStateKeys.length < observers[_a2].wantedKeys.length) {
+  for (var _a = 0; _a < observers.length; _a++) {
+    if (updatedStateKeys.length < observers[_a].wantedKeys.length) {
       for (var b = 0; b < updatedStateKeys.length; b++) {
-        if (observers[_a2].wantedKeys.indexOf(updatedStateKeys[b]) !== -1) {
-          observers[_a2].callback(store);
+        if (observers[_a].wantedKeys.indexOf(updatedStateKeys[b]) !== -1) {
+          observers[_a].callback(store);
           break;
         }
       }
     } else {
-      for (var _b = 0; _b < observers[_a2].wantedKeys.length; _b++) {
-        if (updatedStateKeys.indexOf(observers[_a2].wantedKeys[_b]) !== -1) {
-          observers[_a2].callback(store);
+      for (var _b = 0; _b < observers[_a].wantedKeys.length; _b++) {
+        if (updatedStateKeys.indexOf(observers[_a].wantedKeys[_b]) !== -1) {
+          observers[_a].callback(store);
           break;
         }
       }
