@@ -38,21 +38,47 @@ function displayAverageTimeAndReset () {
 console.log('created initialStore with', maxKeys, 'keys.');
 
 console.log('\n-----');
-console.log('NO PERSIST: Beginning of perf test');
+console.log('PERSISTING', maxKeys, 'states: Beginning of perf test');
 console.log('-----\n');
 
 // ----------
 console.log('initializeStore:');
 
 timeTaken = Date.now();
-initializeStore({ initialStore });
+initializeStore({
+  initialStore,
+  persist: {
+    storage: {
+      setItem () {},
+      getItem () {
+        return JSON.stringify(initialStore);
+      }
+    },
+    restore (savedStore) {
+      return savedStore;
+    }
+  }
+});
 timeTaken = Date.now() - timeTaken;
 
 displayTotalTime();
 
 for (let a = 0; a < maxKeys; a++) {
   now = Date.now();
-  initializeStore({ initialStore });
+  initializeStore({
+    initialStore,
+    persist: {
+      storage: {
+        setItem () {},
+        getItem () {
+          return JSON.stringify(initialStore);
+        }
+      },
+      restore (savedStore) {
+        return savedStore;
+      }
+    }
+  });
   average += Date.now() - now;
 }
 

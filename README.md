@@ -8,9 +8,9 @@ Smaller, faster, better. A small state management system that supports the idea 
 
 ## Unit tests
 
-<img src="docs/ss-test-unit.png">
+<img src="docs/test-unit.png">
 
-## Performance tests
+## Performance tests with a 10,000 key-store
 
 All performance test was ran on:
 
@@ -22,21 +22,13 @@ Memory: 16 GB 1600 MHz DDR3
 
 These tests may or may not be accurate. Consider these to be the cases under the best circumstances.
 
-#### With a 10 key-store
+#### With persist with (simulated storage)
 
-<img src="docs/ss-test-perf-10.png">
+<img src="docs/test-perf-persist.png">
 
-#### With a 100 key-store
+#### With no persist
 
-<img src="docs/ss-test-perf-100.png">
-
-#### With a 1,000 key-store
-
-<img src="docs/ss-test-perf-1000.png">
-
-#### With a 10,000 key-store
-
-<img src="docs/ss-test-perf-10000.png">
+<img src="docs/test-perf.png">
 
 ---
 
@@ -95,7 +87,7 @@ There's also the optional property called `persist` which must also be an object
 - `storage` which must be a reference to the storage that would be used to save the store. It must have `getItem` and `setItem` methods. Both methods must be synchronous. Example would be `window.localStorage`. The call to `setItem` is deferred by 200ms, this is to minimize and to improve performance.
 - `restore` which must be a function that is synchronous. Restore will be called upon initialization and will receive the `savedStore` as the its only argument. The `savedStore` would be an object containing the states that were previously saved to the storage. It must return an object which would be the states that you want to restore.
 
-Persist feature would only save keys that were returned by `config.persist.restore`. That means, other states that you did not return in that method wouldn't be saved. `config.persist.restore` must not do anything else other than return the states you want to persist. It is also being used for the `config.persist.storage.saveItem` instead of recalculating, it simply calls `config.persist.restore` and expect it to return the states you want to persist. This optimizes performance.
+Persist feature would only save keys that were returned by `config.persist.restore`. That means, other states that you did not return in that method wouldn't be saved. Persist will not fire every state update that you do. It checks if it needs to fire and it would only fire when you updated a state that you persisted.
 
 ###### Example
 

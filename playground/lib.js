@@ -15,8 +15,8 @@ var eventBus = {};
 var observers = [];
 var store = {};
 
+var shouldPersist = false;
 var persistStorage = 0;
-var persistRestore = 0;
 var persistTimeout = 0;
 var persistedStateKeys = 0;
 
@@ -24,12 +24,10 @@ function initializeStore(config) {
   store = config.initialStore;
 
   if (config.persist) {
-    persistStorage = config.persist.storage;
-    persistRestore = config.persist.restore;
-
-    var persistedStates = persistRestore(JSON.parse(persistStorage.getItem('fluxible-js')) || {});
+    var persistedStates = config.persist.restore(JSON.parse(config.persist.storage.getItem('fluxible-js')) || {});
 
     persistedStateKeys = Object.keys(persistedStates);
+    persistStorage = config.persist.storage;
 
     for (var a = 0; a < persistedStateKeys.length; a++) {
       store[persistedStateKeys[a]] = persistedStates[persistedStateKeys[a]];
@@ -43,13 +41,20 @@ function getStore() {
 
 function updateStore(updatedStates) {
   if (persistTimeout !== 0) {
-    persistTimeout = clearTimeout(persistTimeout);
+    clearTimeout(persistTimeout);
+    persistTimeout = 0;
   }
 
   var updatedStateKeys = Object.keys(updatedStates);
 
   for (var a = 0; a < updatedStateKeys.length; a++) {
     store[updatedStateKeys[a]] = updatedStates[updatedStateKeys[a]];
+
+    if (persistedStateKeys !== 0) {
+      if (!shouldPersist && persistedStateKeys.indexOf(updatedStateKeys[a]) !== -1) {
+        shouldPersist = true;
+      }
+    }
   }
 
   for (var _a = 0; _a < observers.length; _a++) {
@@ -70,9 +75,18 @@ function updateStore(updatedStates) {
     }
   }
 
-  if (persistRestore !== 0) {
+  if (shouldPersist) {
     persistTimeout = setTimeout(function () {
-      persistStorage.setItem('fluxible-js', JSON.stringify(persistRestore(store)));
+      if (persistTimeout !== 0) {
+        var statesToSave = {};
+
+        for (var _a2 = 0; _a2 < persistedStateKeys.length; _a2++) {
+          statesToSave[persistedStateKeys[_a2]] = store[persistedStateKeys[_a2]];
+        }
+
+        persistStorage.setItem('fluxible-js', JSON.stringify(statesToSave));
+        shouldPersist = false;
+      }
     }, 200);
   }
 }

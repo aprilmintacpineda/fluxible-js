@@ -15,6 +15,7 @@
     "test": "npm run test-unit && npm run test-perf",
     "test-unit": "npm run build && jest __tests__/unit/* --env=node --coverage",
     "test-perf": "npm run build && babel-node __tests__/perf.spec.js",
+    "test-perf-persist": "npm run build && babel-node __tests__/perf-persist.spec.js",
     "build": "node build.js && node build-playground.js",
     "playground": "npm run build && node playground/build/index.js",
     "lint": "prettier \"src/index.js\" \"playground/index.js\" \"__tests__/**/*.js\" --write && eslint \"src/index.js\" \"playground/index.js\" --fix",

@@ -4,8 +4,8 @@ const eventBus = {};
 const observers = [];
 let store = {};
 // state persistence
+let shouldPersist = false;
 let persistStorage = 0;
-let persistRestore = 0;
 let persistTimeout = 0;
 let persistedStateKeys = 0;
 
@@ -13,12 +13,12 @@ export function initializeStore (config) {
   store = config.initialStore;
 
   if (config.persist) {
-    persistStorage = config.persist.storage;
-    persistRestore = config.persist.restore;
-
-    const persistedStates = persistRestore(JSON.parse(persistStorage.getItem('fluxible-js')) || {});
+    const persistedStates = config.persist.restore(
+      JSON.parse(config.persist.storage.getItem('fluxible-js')) || {}
+    );
 
     persistedStateKeys = Object.keys(persistedStates);
+    persistStorage = config.persist.storage;
 
     for (let a = 0; a < persistedStateKeys.length; a++) {
       store[persistedStateKeys[a]] = persistedStates[persistedStateKeys[a]];
@@ -32,13 +32,20 @@ export function getStore () {
 
 export function updateStore (updatedStates) {
   if (persistTimeout !== 0) {
-    persistTimeout = clearTimeout(persistTimeout);
+    clearTimeout(persistTimeout);
+    persistTimeout = 0;
   }
 
   const updatedStateKeys = Object.keys(updatedStates);
 
   for (let a = 0; a < updatedStateKeys.length; a++) {
     store[updatedStateKeys[a]] = updatedStates[updatedStateKeys[a]];
+
+    if (persistedStateKeys !== 0) {
+      if (!shouldPersist && persistedStateKeys.indexOf(updatedStateKeys[a]) !== -1) {
+        shouldPersist = true;
+      }
+    }
   }
 
   // only notify observers that observes the store keys that were updated
@@ -63,9 +70,26 @@ export function updateStore (updatedStates) {
     }
   }
 
-  if (persistRestore !== 0) {
+  /**
+   * we should only save states to the store when a
+   * persisted state has been updated.
+   */
+  if (shouldPersist) {
     persistTimeout = setTimeout(() => {
-      persistStorage.setItem('fluxible-js', JSON.stringify(persistRestore(store)));
+      /**
+       * in-case we are next in stack and the persistTimeout
+       * has just been cleared, we shouldn't save states to the store.
+       */
+      if (persistTimeout !== 0) {
+        const statesToSave = {};
+
+        for (let a = 0; a < persistedStateKeys.length; a++) {
+          statesToSave[persistedStateKeys[a]] = store[persistedStateKeys[a]];
+        }
+
+        persistStorage.setItem('fluxible-js', JSON.stringify(statesToSave));
+        shouldPersist = false;
+      }
     }, 200);
   }
 }
