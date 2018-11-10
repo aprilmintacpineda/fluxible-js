@@ -3,6 +3,7 @@
 const eventBus = {};
 const observers = [];
 let store = {};
+
 // state persistence
 let shouldPersist = false;
 let persistStorage = 0;
@@ -41,10 +42,16 @@ export function updateStore (updatedStates) {
   for (let a = 0; a < updatedStateKeys.length; a++) {
     store[updatedStateKeys[a]] = updatedStates[updatedStateKeys[a]];
 
-    if (persistedStateKeys !== 0) {
-      if (!shouldPersist && persistedStateKeys.indexOf(updatedStateKeys[a]) !== -1) {
-        shouldPersist = true;
-      }
+    /**
+     * We only want to do this if we have not previously stopped
+     * the persist timeout.
+     */
+    if (
+      !shouldPersist &&
+      persistedStateKeys !== 0 &&
+      persistedStateKeys.indexOf(updatedStateKeys[a]) !== -1
+    ) {
+      shouldPersist = true;
     }
   }
 
@@ -71,8 +78,11 @@ export function updateStore (updatedStates) {
   }
 
   /**
-   * we should only save states to the store when a
+   * We should only save states to the store when a
    * persisted state has been updated.
+   *
+   * We also take into consideration if we have previously
+   * stopped a persist timeout.
    */
   if (shouldPersist) {
     persistTimeout = setTimeout(() => {
@@ -113,7 +123,7 @@ export function addObserver (callback, wantedKeys) {
 }
 
 export function addEvent (ev, callback) {
-  if (eventBus[ev] === undefined) {
+  if (!eventBus[ev]) {
     eventBus[ev] = [callback];
   } else {
     eventBus[ev].push(callback);
