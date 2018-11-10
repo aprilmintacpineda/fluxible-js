@@ -10,7 +10,7 @@ let persistTimeout = 0;
 let persistedStateKeys = 0;
 
 export function initializeStore (config) {
-  store = config.initialStore;
+  store = { ...config.initialStore };
 
   if (config.persist) {
     const persistedStates = config.persist.restore(

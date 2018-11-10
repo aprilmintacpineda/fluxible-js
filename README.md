@@ -89,6 +89,8 @@ There's also the optional property called `persist` which must also be an object
 
 Persist feature would only save keys that were returned by `config.persist.restore`. That means, other states that you did not return in that method wouldn't be saved. Persist will not fire every state update that you do. It checks if it needs to fire and it would only fire when you updated a state that you persisted.
 
+`initializeStore` function does not mutate the original `initialStore`.
+
 ###### Example
 
 ```js
