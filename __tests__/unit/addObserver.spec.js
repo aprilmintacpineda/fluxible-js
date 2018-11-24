@@ -19,66 +19,30 @@ describe('addObserver', () => {
     addObserver(bothListener, ['count', 'value']);
 
     updateStore({ count: 2 });
-    expect(countListener).toHaveBeenCalledWith({
-      value: 'testValue',
-      count: 2
-    });
-    expect(bothListener).toHaveBeenCalledWith({
-      value: 'testValue',
-      count: 2
-    });
+    expect(countListener).toHaveBeenCalled();
+    expect(bothListener).toHaveBeenCalled();
 
     updateStore({ count: 3 });
-    expect(countListener).toHaveBeenCalledWith({
-      value: 'testValue',
-      count: 3
-    });
-    expect(bothListener).toHaveBeenCalledWith({
-      value: 'testValue',
-      count: 3
-    });
+    expect(countListener).toHaveBeenCalled();
+    expect(bothListener).toHaveBeenCalled();
 
     updateStore({ count: 4 });
-    expect(countListener).toHaveBeenCalledWith({
-      value: 'testValue',
-      count: 4
-    });
-    expect(bothListener).toHaveBeenCalledWith({
-      value: 'testValue',
-      count: 4
-    });
+    expect(countListener).toHaveBeenCalled();
+    expect(bothListener).toHaveBeenCalled();
 
     updateStore({ count: 5 });
-    expect(countListener).toHaveBeenCalledWith({
-      value: 'testValue',
-      count: 5
-    });
-    expect(bothListener).toHaveBeenCalledWith({
-      value: 'testValue',
-      count: 5
-    });
+    expect(countListener).toHaveBeenCalled();
+    expect(bothListener).toHaveBeenCalled();
 
     expect(valueListener).not.toHaveBeenCalled();
 
     updateStore({ value: 'another' });
-    expect(valueListener).toHaveBeenCalledWith({
-      value: 'another',
-      count: 5
-    });
-    expect(bothListener).toHaveBeenCalledWith({
-      value: 'another',
-      count: 5
-    });
+    expect(valueListener).toHaveBeenCalled();
+    expect(bothListener).toHaveBeenCalled();
 
     updateStore({ value: 'another value' });
-    expect(valueListener).toHaveBeenCalledWith({
-      value: 'another value',
-      count: 5
-    });
-    expect(bothListener).toHaveBeenCalledWith({
-      value: 'another value',
-      count: 5
-    });
+    expect(valueListener).toHaveBeenCalled();
+    expect(bothListener).toHaveBeenCalled();
 
     expect(countListener).toHaveBeenCalledTimes(4);
     expect(valueListener).toHaveBeenCalledTimes(2);

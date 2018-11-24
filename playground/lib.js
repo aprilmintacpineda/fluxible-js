@@ -4,11 +4,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.initializeStore = initializeStore;
-exports.getStore = getStore;
 exports.updateStore = updateStore;
 exports.addObserver = addObserver;
 exports.addEvent = addEvent;
 exports.emitEvent = emitEvent;
+exports.store = void 0;
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
@@ -16,28 +16,45 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 var eventBus = {};
 var observers = [];
-var store = {};
+var id = 0;
 var shouldPersist = false;
 var persistStorage = 0;
 var persistTimeout = 0;
 var persistedStateKeys = 0;
+var persistedStateKeysLen = 0;
+var store = {};
+exports.store = store;
 
-function initializeStore(config) {
-  store = _objectSpread({}, config.initialStore);
+function exists(arr, needle) {
+  var len = arr.length;
+  var a = 0;
 
-  if (config.persist) {
-    var persistedStates = config.persist.restore(JSON.parse(config.persist.storage.getItem('fluxible-js')) || {});
-    persistedStateKeys = Object.keys(persistedStates);
-    persistStorage = config.persist.storage;
-
-    for (var a = 0; a < persistedStateKeys.length; a++) {
-      store[persistedStateKeys[a]] = persistedStates[persistedStateKeys[a]];
+  while (a < len) {
+    if (arr[a] === needle) {
+      return true;
     }
+
+    ++a;
   }
+
+  return false;
 }
 
-function getStore() {
-  return store;
+function initializeStore(config) {
+  exports.store = store = _objectSpread({}, config.initialStore);
+
+  if ('persist' in config) {
+    var persistedStates = config.persist.restore(JSON.parse(config.persist.storage.getItem('fluxible-js')) || {});
+    persistedStateKeys = Object.keys(persistedStates);
+    persistedStateKeysLen = persistedStateKeys.length;
+    persistStorage = config.persist.storage;
+    var a = 0;
+
+    while (a < persistedStateKeysLen) {
+      store[persistedStateKeys[a]] = persistedStates[persistedStateKeys[a]];
+      ++a;
+    }
+  }
 }
 
 function updateStore(updatedStates) {
@@ -47,42 +64,61 @@ function updateStore(updatedStates) {
   }
 
   var updatedStateKeys = Object.keys(updatedStates);
+  var updatedStateKeysLen = updatedStateKeys.length;
+  var a = 0;
 
-  for (var a = 0; a < updatedStateKeys.length; a++) {
+  while (a < updatedStateKeysLen) {
     store[updatedStateKeys[a]] = updatedStates[updatedStateKeys[a]];
 
-    if (!shouldPersist && persistedStateKeys !== 0 && persistedStateKeys.indexOf(updatedStateKeys[a]) !== -1) {
+    if (persistedStateKeys !== 0 && !shouldPersist && exists(persistedStateKeys, updatedStateKeys[a])) {
       shouldPersist = true;
     }
+
+    ++a;
   }
 
-  for (var _a = 0; _a < observers.length; _a++) {
-    if (updatedStateKeys.length < observers[_a].wantedKeys.length) {
-      for (var b = 0; b < updatedStateKeys.length; b++) {
-        if (observers[_a].wantedKeys.indexOf(updatedStateKeys[b]) !== -1) {
-          observers[_a].callback(store);
+  var observersLen = observers.length;
+  a = 0;
 
+  while (a < observersLen) {
+    var wantedKeysLen = observers[a].wantedKeys.length;
+
+    if (updatedStateKeysLen < wantedKeysLen) {
+      var b = 0;
+
+      while (b < updatedStateKeysLen) {
+        if (exists(observers[a].wantedKeys, updatedStateKeys[b])) {
+          observers[a].callback();
           break;
         }
+
+        ++b;
       }
     } else {
-      for (var _b = 0; _b < observers[_a].wantedKeys.length; _b++) {
-        if (updatedStateKeys.indexOf(observers[_a].wantedKeys[_b]) !== -1) {
-          observers[_a].callback(store);
+      var _b = 0;
 
+      while (_b < updatedStateKeysLen) {
+        if (exists(updatedStateKeys, observers[a].wantedKeys[_b])) {
+          observers[a].callback();
           break;
         }
+
+        ++_b;
       }
     }
+
+    ++a;
   }
 
   if (shouldPersist) {
     persistTimeout = setTimeout(function () {
       if (persistTimeout !== 0) {
         var statesToSave = {};
+        var _a = 0;
 
-        for (var _a2 = 0; _a2 < persistedStateKeys.length; _a2++) {
-          statesToSave[persistedStateKeys[_a2]] = store[persistedStateKeys[_a2]];
+        while (_a < persistedStateKeysLen) {
+          statesToSave[persistedStateKeys[_a]] = store[persistedStateKeys[_a]];
+          ++_a;
         }
 
         persistStorage.setItem('fluxible-js', JSON.stringify(statesToSave));
@@ -93,35 +129,45 @@ function updateStore(updatedStates) {
 }
 
 function addObserver(callback, wantedKeys) {
-  var thisObserver = {
+  var thisId = id;
+  observers.push({
     callback: callback,
     wantedKeys: wantedKeys,
-    id: Math.random()
-  };
-  observers.push(thisObserver);
+    id: thisId
+  });
+  ++id;
   return function () {
-    for (var a = 0; a < observers.length; a++) {
-      if (observers[a].id === thisObserver.id) {
+    var observersLen = observers.length;
+    var a = 0;
+
+    while (a < observersLen) {
+      if (observers[a].id === thisId) {
         return observers.splice(a, 1);
       }
+
+      ++a;
     }
   };
 }
 
 function addEvent(ev, callback) {
-  if (!eventBus[ev]) {
-    eventBus[ev] = [callback];
-  } else {
+  if (ev in eventBus) {
     eventBus[ev].push(callback);
+  } else {
+    eventBus[ev] = [callback];
   }
 }
 
 function emitEvent(ev, payload) {
-  if (!eventBus[ev]) {
-    return -1;
+  if (ev in eventBus) {
+    var eventBusLen = eventBus[ev].length;
+    var a = 0;
+
+    while (a < eventBusLen) {
+      eventBus[ev][a](payload);
+      ++a;
+    }
   }
 
-  for (var a = 0; a < eventBus[ev].length; a++) {
-    eventBus[ev][a](payload);
-  }
+  return -1;
 }

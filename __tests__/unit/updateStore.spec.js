@@ -1,5 +1,5 @@
 /** @format */
-import { getStore, updateStore, initializeStore } from '../../lib';
+import { store, updateStore, initializeStore } from '../../lib';
 
 describe('updateStore', () => {
   test('Update store only updates parts of the store that\'s to be updated. getStore returns the updated store.', () => {
@@ -14,7 +14,7 @@ describe('updateStore', () => {
       count: 100
     });
 
-    expect(getStore()).toEqual({
+    expect(store).toEqual({
       value: 'testValue',
       count: 100
     });
@@ -23,7 +23,7 @@ describe('updateStore', () => {
       count: 50
     });
 
-    expect(getStore()).toEqual({
+    expect(store).toEqual({
       value: 'testValue',
       count: 50
     });
@@ -33,7 +33,7 @@ describe('updateStore', () => {
       count: 100
     });
 
-    expect(getStore()).toEqual({
+    expect(store).toEqual({
       value: 'testing',
       count: 100
     });

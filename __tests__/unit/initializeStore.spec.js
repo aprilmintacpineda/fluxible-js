@@ -1,6 +1,6 @@
 /** @format */
 
-import { getStore, initializeStore } from '../../lib';
+import { store, initializeStore } from '../../lib';
 
 describe('initializeStore', () => {
   test('initializes store', () => {
@@ -11,6 +11,6 @@ describe('initializeStore', () => {
 
     initializeStore({ initialStore });
 
-    expect(getStore()).toEqual(initialStore);
+    expect(store).toEqual(initialStore);
   });
 });

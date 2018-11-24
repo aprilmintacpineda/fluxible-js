@@ -1,7 +1,6 @@
 /** @format */
 
 import {
-  getStore,
   updateStore,
   initializeStore,
   addObserver,
@@ -130,23 +129,6 @@ displayTotalTime();
 for (let a = 0; a < maxKeys; a++) {
   now = Date.now();
   updateStore(initialStore);
-  average += Date.now() - now;
-}
-
-displayAverageTimeAndReset();
-
-// ----------
-console.log('getStore:');
-
-timeTaken = Date.now();
-getStore();
-timeTaken = Date.now() - timeTaken;
-
-displayTotalTime();
-
-for (let a = 0; a < maxKeys; a++) {
-  now = Date.now();
-  getStore();
   average += Date.now() - now;
 }
 

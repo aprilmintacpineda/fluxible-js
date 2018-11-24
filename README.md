@@ -115,20 +115,22 @@ initializeStore({
 
 In the case above, only `user` would be saved and the rest wouldn't be saved.
 
-## Listen to store updates
+## Listen to store updates and getting the store
 
 ```jsx
-import { addObserver, getStore } from 'fluxible-js';
+import { addObserver, store } from 'fluxible-js';
 
 const unsubscribeCallback = addObserver(
   () => {
-    console.log('store has been updated!', getStore());
+    console.log('store has been updated!', store);
   },
   ['someOtherState', 'anotherState']
 );
 ```
 
-`addObserver` expects a function as the argument. This function would be called every **AFTER** store updates and will receive the updated store as it's only argument.
+**Do not mutate the store directly. Doing so may lead to unwanted behaviors in your app.**
+
+`addObserver` expects a function as the argument. This function would be called every **AFTER** store updates.
 
 The second argument is an array of strings which lists the names of the states that you are listening to, it's important that this list has the same name as the states you want to listen to. In the example above, I wanted to listen to `someOtherState` and `anotherState`, so every time one of those two gets updated my listener will be called.
 

@@ -1,6 +1,6 @@
 /** @format */
 
-import { updateStore, initializeStore, getStore } from '../../lib';
+import { updateStore, initializeStore, store } from '../../lib';
 
 describe('config.persist', () => {
   test('calls getItem and setItem on config.persist.storage', () => {
@@ -41,7 +41,7 @@ describe('config.persist', () => {
         name: 'test user'
       }
     });
-    expect(getStore()).toEqual({
+    expect(store).toEqual({
       user: {
         name: 'test user'
       },
@@ -126,7 +126,7 @@ describe('config.persist', () => {
 
     return new Promise(resolve => setTimeout(resolve, 200)).then(() => {
       expect(storage.setItem).toHaveBeenCalledTimes(1);
-      expect(getStore()).toEqual({
+      expect(store).toEqual({
         user: {
           name: 'test user'
         },
@@ -181,7 +181,7 @@ describe('config.persist', () => {
     return new Promise(resolve => setTimeout(resolve, 200))
       .then(() => {
         expect(storage.setItem).toHaveBeenCalledTimes(0);
-        expect(getStore()).toEqual({
+        expect(store).toEqual({
           user: {
             name: 'test user'
           },
@@ -203,7 +203,7 @@ describe('config.persist', () => {
       })
       .then(() => {
         expect(storage.setItem).toHaveBeenCalledTimes(1);
-        expect(getStore()).toEqual({
+        expect(store).toEqual({
           user: {
             name: 'another-user'
           },
@@ -270,7 +270,7 @@ describe('config.persist', () => {
 
     return new Promise(resolve => setTimeout(resolve, 200)).then(() => {
       expect(storage.setItem).toHaveBeenCalledTimes(0);
-      expect(getStore()).toEqual({
+      expect(store).toEqual({
         user: {
           name: 'test user'
         },
@@ -310,7 +310,7 @@ describe('config.persist', () => {
     });
 
     expect(storage.getItem).toHaveBeenCalledWith('fluxible-js');
-    expect(getStore()).toEqual({
+    expect(store).toEqual({
       user: null,
       testValue: 'value',
       anotherValue: 'test value'

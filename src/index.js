@@ -2,33 +2,51 @@
 
 const eventBus = {};
 const observers = [];
-let store = {};
+let id = 0;
 
 // state persistence
 let shouldPersist = false;
 let persistStorage = 0;
 let persistTimeout = 0;
 let persistedStateKeys = 0;
+let persistedStateKeysLen = 0;
+
+export let store = {};
+
+function exists (arr, needle) {
+  const len = arr.length;
+  let a = 0;
+
+  while (a < len) {
+    if (arr[a] === needle) {
+      return true;
+    }
+
+    ++a;
+  }
+
+  return false;
+}
 
 export function initializeStore (config) {
   store = { ...config.initialStore };
 
-  if (config.persist) {
+  if ('persist' in config) {
     const persistedStates = config.persist.restore(
       JSON.parse(config.persist.storage.getItem('fluxible-js')) || {}
     );
 
     persistedStateKeys = Object.keys(persistedStates);
+    persistedStateKeysLen = persistedStateKeys.length;
     persistStorage = config.persist.storage;
 
-    for (let a = 0; a < persistedStateKeys.length; a++) {
+    let a = 0;
+
+    while (a < persistedStateKeysLen) {
       store[persistedStateKeys[a]] = persistedStates[persistedStateKeys[a]];
+      ++a;
     }
   }
-}
-
-export function getStore () {
-  return store;
 }
 
 export function updateStore (updatedStates) {
@@ -38,43 +56,66 @@ export function updateStore (updatedStates) {
   }
 
   const updatedStateKeys = Object.keys(updatedStates);
+  const updatedStateKeysLen = updatedStateKeys.length;
+  let a = 0;
 
-  for (let a = 0; a < updatedStateKeys.length; a++) {
+  while (a < updatedStateKeysLen) {
     store[updatedStateKeys[a]] = updatedStates[updatedStateKeys[a]];
 
     /**
      * We only want to do this if we have not previously stopped
      * the persist timeout.
+     * - The persist feature is turned on.
+     * - There's no scheduled persist to run.
+     * - One of the updated states was persisted.
      */
     if (
-      !shouldPersist &&
       persistedStateKeys !== 0 &&
-      persistedStateKeys.indexOf(updatedStateKeys[a]) !== -1
+      !shouldPersist &&
+      exists(persistedStateKeys, updatedStateKeys[a])
     ) {
       shouldPersist = true;
     }
+
+    ++a;
   }
 
+  const observersLen = observers.length;
+
   // only notify observers that observes the store keys that were updated
-  for (let a = 0; a < observers.length; a++) {
+  a = 0;
+
+  while (a < observersLen) {
+    const wantedKeysLen = observers[a].wantedKeys.length;
+
     // we want to maximize performance, so we loop as little as possible
-    if (updatedStateKeys.length < observers[a].wantedKeys.length) {
-      for (let b = 0; b < updatedStateKeys.length; b++) {
-        if (observers[a].wantedKeys.indexOf(updatedStateKeys[b]) !== -1) {
-          observers[a].callback(store);
+    if (updatedStateKeysLen < wantedKeysLen) {
+      let b = 0;
+
+      while (b < updatedStateKeysLen) {
+        if (exists(observers[a].wantedKeys, updatedStateKeys[b])) {
+          observers[a].callback();
           break;
         }
+
+        ++b;
       }
     } else {
       // they are either of the same length or
       // the wantedKeys is less than the updatedStateKeys
-      for (let b = 0; b < observers[a].wantedKeys.length; b++) {
-        if (updatedStateKeys.indexOf(observers[a].wantedKeys[b]) !== -1) {
-          observers[a].callback(store);
+      let b = 0;
+
+      while (b < updatedStateKeysLen) {
+        if (exists(updatedStateKeys, observers[a].wantedKeys[b])) {
+          observers[a].callback();
           break;
         }
+
+        ++b;
       }
     }
+
+    ++a;
   }
 
   /**
@@ -85,6 +126,7 @@ export function updateStore (updatedStates) {
    * stopped a persist timeout.
    */
   if (shouldPersist) {
+    // Wait 200ms relative to the last update.
     persistTimeout = setTimeout(() => {
       /**
        * in-case we are next in stack and the persistTimeout
@@ -92,9 +134,11 @@ export function updateStore (updatedStates) {
        */
       if (persistTimeout !== 0) {
         const statesToSave = {};
+        let a = 0;
 
-        for (let a = 0; a < persistedStateKeys.length; a++) {
+        while (a < persistedStateKeysLen) {
           statesToSave[persistedStateKeys[a]] = store[persistedStateKeys[a]];
+          ++a;
         }
 
         persistStorage.setItem('fluxible-js', JSON.stringify(statesToSave));
@@ -105,37 +149,48 @@ export function updateStore (updatedStates) {
 }
 
 export function addObserver (callback, wantedKeys) {
-  const thisObserver = {
+  const thisId = id;
+
+  observers.push({
     callback,
     wantedKeys,
-    id: Math.random()
-  };
+    id: thisId
+  });
 
-  observers.push(thisObserver);
+  ++id;
 
   return () => {
-    for (let a = 0; a < observers.length; a++) {
-      if (observers[a].id === thisObserver.id) {
+    const observersLen = observers.length;
+    let a = 0;
+
+    while (a < observersLen) {
+      if (observers[a].id === thisId) {
         return observers.splice(a, 1);
       }
+
+      ++a;
     }
   };
 }
 
 export function addEvent (ev, callback) {
-  if (!eventBus[ev]) {
-    eventBus[ev] = [callback];
-  } else {
+  if (ev in eventBus) {
     eventBus[ev].push(callback);
+  } else {
+    eventBus[ev] = [callback];
   }
 }
 
 export function emitEvent (ev, payload) {
-  if (!eventBus[ev]) {
-    return -1;
+  if (ev in eventBus) {
+    const eventBusLen = eventBus[ev].length;
+    let a = 0;
+
+    while (a < eventBusLen) {
+      eventBus[ev][a](payload);
+      ++a;
+    }
   }
 
-  for (let a = 0; a < eventBus[ev].length; a++) {
-    eventBus[ev][a](payload);
-  }
+  return -1;
 }
