@@ -14,15 +14,10 @@ let persistedStateKeysLen = 0;
 export let store = {};
 
 function exists (arr, needle) {
-  const len = arr.length;
-  let a = 0;
-
-  while (a < len) {
+  for (let a = 0, len = arr.length; a < len; a++) {
     if (arr[a] === needle) {
       return true;
     }
-
-    ++a;
   }
 
   return false;
@@ -40,11 +35,8 @@ export function initializeStore (config) {
     persistedStateKeysLen = persistedStateKeys.length;
     persistStorage = config.persist.storage;
 
-    let a = 0;
-
-    while (a < persistedStateKeysLen) {
+    for (let a = 0; a < persistedStateKeysLen; a++) {
       store[persistedStateKeys[a]] = persistedStates[persistedStateKeys[a]];
-      ++a;
     }
   }
 }
@@ -57,65 +49,48 @@ export function updateStore (updatedStates) {
 
   const updatedStateKeys = Object.keys(updatedStates);
   const updatedStateKeysLen = updatedStateKeys.length;
-  let a = 0;
 
-  while (a < updatedStateKeysLen) {
+  for (let a = 0; a < updatedStateKeysLen; a++) {
     store[updatedStateKeys[a]] = updatedStates[updatedStateKeys[a]];
 
     /**
-     * We only want to do this if we have not previously stopped
-     * the persist timeout.
+     * We only want to do this if
+     * - we have not previously stopped the persist timeout.
      * - The persist feature is turned on.
      * - There's no scheduled persist to run.
      * - One of the updated states was persisted.
      */
     if (
-      persistedStateKeys !== 0 &&
       !shouldPersist &&
+      persistedStateKeys !== 0 &&
       exists(persistedStateKeys, updatedStateKeys[a])
     ) {
       shouldPersist = true;
     }
-
-    ++a;
   }
 
-  const observersLen = observers.length;
-
   // only notify observers that observes the store keys that were updated
-  a = 0;
-
-  while (a < observersLen) {
+  for (let a = 0, observersLen = observers.length; a < observersLen && observers[a]; a++) {
     const wantedKeysLen = observers[a].wantedKeys.length;
 
     // we want to maximize performance, so we loop as little as possible
     if (updatedStateKeysLen < wantedKeysLen) {
-      let b = 0;
-
-      while (b < updatedStateKeysLen) {
+      for (let b = 0; b < updatedStateKeysLen; b++) {
         if (exists(observers[a].wantedKeys, updatedStateKeys[b])) {
           observers[a].callback();
           break;
         }
-
-        ++b;
       }
     } else {
       // they are either of the same length or
       // the wantedKeys is less than the updatedStateKeys
-      let b = 0;
-
-      while (b < updatedStateKeysLen) {
+      for (let b = 0; b < updatedStateKeysLen; b++) {
         if (exists(updatedStateKeys, observers[a].wantedKeys[b])) {
           observers[a].callback();
           break;
         }
-
-        ++b;
       }
     }
-
-    ++a;
   }
 
   /**
@@ -126,19 +101,17 @@ export function updateStore (updatedStates) {
    * stopped a persist timeout.
    */
   if (shouldPersist) {
-    // Wait 200ms relative to the last update.
+    // Wait 200ms relative to the last updateStore
     persistTimeout = setTimeout(() => {
       /**
-       * in-case we are next in stack and the persistTimeout
+       * in case we are next in stack and the persistTimeout
        * has just been cleared, we shouldn't save states to the store.
        */
       if (persistTimeout !== 0) {
         const statesToSave = {};
-        let a = 0;
 
-        while (a < persistedStateKeysLen) {
+        for (let a = 0; a < persistedStateKeysLen; a++) {
           statesToSave[persistedStateKeys[a]] = store[persistedStateKeys[a]];
-          ++a;
         }
 
         persistStorage.setItem('fluxible-js', JSON.stringify(statesToSave));
@@ -160,15 +133,10 @@ export function addObserver (callback, wantedKeys) {
   ++id;
 
   return () => {
-    const observersLen = observers.length;
-    let a = 0;
-
-    while (a < observersLen) {
+    for (let a = 0, observersLen = observers.length; a < observersLen && observers[a]; a++) {
       if (observers[a].id === thisId) {
         return observers.splice(a, 1);
       }
-
-      ++a;
     }
   };
 }
@@ -184,11 +152,9 @@ export function addEvent (ev, callback) {
 export function emitEvent (ev, payload) {
   if (ev in eventBus) {
     const eventBusLen = eventBus[ev].length;
-    let a = 0;
 
-    while (a < eventBusLen) {
+    for (let a = 0; a < eventBusLen && eventBus[ev][a]; a++) {
       eventBus[ev][a](payload);
-      ++a;
     }
   }
 
