@@ -280,8 +280,8 @@ describe('persist using syncStorage', () => {
     });
   });
 
-  test('returns empty object when getItem returned null', () => {
-    expect.assertions(3);
+  test('returns the current store when getItem returned null', () => {
+    expect.assertions(4);
 
     const initialStore = {
       user: null,
@@ -297,18 +297,21 @@ describe('persist using syncStorage', () => {
       setItem: jest.fn((key, item) => {})
     };
 
+    const restore = jest.fn(savedStore => {
+      return {
+        user: savedStore.user
+      };
+    });
+
     initializeStore({
       initialStore,
       persist: {
         syncStorage,
-        restore: savedStore => {
-          return {
-            user: savedStore.user || null
-          };
-        }
+        restore
       }
     });
 
+    expect(restore).toHaveBeenCalledWith(initialStore);
     expect(syncStorage.getItem).toHaveBeenCalledWith('fluxible-js');
     expect(store).toEqual({
       user: null,

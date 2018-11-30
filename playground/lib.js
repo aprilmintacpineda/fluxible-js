@@ -32,10 +32,10 @@ var persistedStateKeys = 0;
 var persistedStateKeysLen = 0;
 /** @end-fluxible-config-no-persist */
 
-/** @fluxible-config-no-useJSON */
+/** @fluxible-config-use-JSON */
 
 var useJSON = true;
-/** @end-fluxible-config-no-useJSON */
+/** @end-fluxible-config-use-JSON */
 
 var store = {};
 exports.store = store;
@@ -52,12 +52,12 @@ function exists(arr, needle) {
 
 function initializeStore(config) {
   exports.store = store = _objectSpread({}, config.initialStore);
-  /** @fluxible-config-no-useJSON */
+  /** @fluxible-config-use-JSON */
 
   if (config.useJSON === false) {
     useJSON = false;
   }
-  /** @end-fluxible-config-no-useJSON */
+  /** @end-fluxible-config-use-JSON */
 
   /** @fluxible-config-no-persist */
 
@@ -71,14 +71,18 @@ function initializeStore(config) {
       /** @fluxible-config-sync */
       config.persist.asyncStorage.getItem('fluxible-js').then(function (savedStore) {
         var persistedStates = config.persist.restore(savedStore ?
-        /** @fluxible-config-no-useJSON */
+        /** @fluxible-config-no-JSON */
+
+        /** @fluxible-config-use-JSON */
         useJSON ?
-        /** @end-fluxible-config-no-useJSON */
+        /** @end-fluxible-config-use-JSON */
         JSON.parse(savedStore)
-        /** @fluxible-config-no-useJSON */
-        : savedStore
-        /** @end-fluxible-config-no-useJSON */
-        : {});
+        /** @fluxible-config-use-JSON */
+        :
+        /** @end-fluxible-config-no-JSON */
+        savedStore
+        /** @end-fluxible-config-use-JSON */
+        : store);
         persistedStateKeys = Object.keys(persistedStates);
         persistedStateKeysLen = persistedStateKeys.length;
         persistStorage = config.persist.asyncStorage;
@@ -96,14 +100,18 @@ function initializeStore(config) {
       /** @fluxible-config-async */
       var savedStore = config.persist.syncStorage.getItem('fluxible-js');
       var persistedStates = config.persist.restore(savedStore ?
-      /** @fluxible-config-no-useJSON */
+      /** @fluxible-config-no-JSON */
+
+      /** @fluxible-config-use-JSON */
       useJSON ?
-      /** @end-fluxible-config-no-useJSON */
+      /** @end-fluxible-config-use-JSON */
       JSON.parse(savedStore)
-      /** @fluxible-config-no-useJSON */
-      : savedStore
-      /** @end-fluxible-config-no-useJSON */
-      : {});
+      /** @fluxible-config-use-JSON */
+      :
+      /** @end-fluxible-config-no-JSON */
+      savedStore
+      /** @end-fluxible-config-use-JSON */
+      : store);
       persistedStateKeys = Object.keys(persistedStates);
       persistedStateKeysLen = persistedStateKeys.length;
       persistStorage = config.persist.syncStorage;
@@ -142,12 +150,15 @@ function updateStore(updatedStates) {
     /**
      * We only want to do this if
      * - we have not previously stopped the persist timeout.
-     * - The persist feature is turned on.
      * - There's no scheduled persist to run.
      * - One of the updated states was persisted.
      */
 
-    if (!shouldPersist && persistedStateKeys !== 0 && exists(persistedStateKeys, updatedStateKeys[a])) {
+    if (
+    /** @fluxible-config-persist */
+    persistedStateKeys !== 0 &&
+    /** @end-fluxible-config-persist */
+    !shouldPersist && exists(persistedStateKeys, updatedStateKeys[a])) {
       shouldPersist = true;
     }
     /** @end-fluxible-config-no-persist */
@@ -219,13 +230,17 @@ function updateStore(updatedStates) {
         }
 
         persistStorage.setItem('fluxible-js',
-        /** @fluxible-config-no-useJSON */
+        /** @fluxible-config-no-JSON */
+
+        /** @fluxible-config-use-JSON */
         useJSON ?
-        /** @end-fluxible-config-no-useJSON */
+        /** @end-fluxible-config-use-JSON */
         JSON.stringify(statesToSave)
-        /** @fluxible-config-no-useJSON */
-        : statesToSave
-        /** @end-fluxible-config-no-useJSON */
+        /** @fluxible-config-use-JSON */
+        :
+        /** @end-fluxible-config-no-JSON */
+        statesToSave
+        /** @end-fluxible-config-use-JSON */
         );
         shouldPersist = false;
       }

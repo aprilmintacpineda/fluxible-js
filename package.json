@@ -17,7 +17,7 @@
     "test-perf": "npm run build && babel-node __tests__/perf.spec.js",
     "test-perf-persist": "npm run build && babel-node __tests__/perf-persist.spec.js",
     "webpack": "rm -rf build && webpack",
-    "build": "node build.js",
+    "build": "npm run lint && node build.js",
     "lint": "prettier \"src/index.js\" \"__tests__/**/*.js\" --write && eslint \"src/index.js\" --fix"
   },
   "husky": {

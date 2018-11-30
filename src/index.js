@@ -55,7 +55,7 @@ export function initializeStore (config) {
               ? /** @end-fluxible-config-use-JSON */
                 JSON.parse(savedStore) /** @fluxible-config-use-JSON */
               : /** @end-fluxible-config-no-JSON */ savedStore /** @end-fluxible-config-use-JSON */
-            : {}
+            : store
         );
 
         persistedStateKeys = Object.keys(persistedStates);
@@ -80,7 +80,7 @@ export function initializeStore (config) {
             ? /** @end-fluxible-config-use-JSON */
               JSON.parse(savedStore) /** @fluxible-config-use-JSON */
             : /** @end-fluxible-config-no-JSON */ savedStore /** @end-fluxible-config-use-JSON */
-          : {}
+          : store
       );
 
       persistedStateKeys = Object.keys(persistedStates);
