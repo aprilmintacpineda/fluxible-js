@@ -194,7 +194,8 @@ export function updateStore (updatedStates) {
           'fluxible-js',
           /** @fluxible-config-no-useJSON */
           useJSON
-            ? /** @end-fluxible-config-no-useJSON */ JSON.stringify(statesToSave)
+            ? /** @end-fluxible-config-no-useJSON */
+              JSON.stringify(statesToSave)
             : /** @fluxible-config-no-useJSON */
               statesToSave
           /** @end-fluxible-config-no-useJSON */
