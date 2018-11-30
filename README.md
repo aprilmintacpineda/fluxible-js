@@ -68,7 +68,7 @@ Simply add the following to your build, under `module.rules`:
 
 ```js
 {
-  test: path.join(__dirname, '../node_modules/fluxible-js/lib/'),
+  test: path.join(__dirname, '../node_modules/fluxible-js/src/'),
   use: [
     'babel-loader',
     /**
