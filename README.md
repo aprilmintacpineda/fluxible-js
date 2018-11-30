@@ -2,7 +2,7 @@
 
 # Fluxible-JS
 
-Smaller, faster, better. A small state management system that supports the idea of asynchronous actions and state persistence out of the box.
+Smaller, faster, better state management system that supports asynchronicity and state persistence out of the box.
 
 # Tests
 

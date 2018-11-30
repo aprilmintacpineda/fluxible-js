@@ -1,7 +1,7 @@
 {
   "name": "fluxible-js",
   "version": "4.0.8",
-  "description": "Smaller, faster, better. A small state management system that supports the idea of asynchronous actions and state persistence out of the box.",
+  "description": "Smaller, faster, better state management system that supports asynchronicity and state persistence out of the box.",
   "main": "src/index.js",
   "files": [
     "src/index.js",
@@ -43,9 +43,9 @@
   },
   "keywords": [
     "state-management",
-    "stateful",
     "state-pattern",
-    "store-management"
+    "asynchronous-state-management",
+    "synchronous-state-management"
   ],
   "author": "April Mintac Pineda",
   "license": "MIT",
