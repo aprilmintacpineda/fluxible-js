@@ -52,9 +52,8 @@ export function initializeStore (config) {
             ? /** @fluxible-config-no-useJSON */
               useJSON
               ? /** @end-fluxible-config-no-useJSON */
-                JSON.parse(savedStore)
-              : /** @fluxible-config-no-useJSON */
-                savedStore /** @end-fluxible-config-no-useJSON */
+                JSON.parse(savedStore) /** @fluxible-config-no-useJSON */
+              : savedStore /** @end-fluxible-config-no-useJSON */
             : {}
         );
 
@@ -77,9 +76,8 @@ export function initializeStore (config) {
           ? /** @fluxible-config-no-useJSON */
             useJSON
             ? /** @end-fluxible-config-no-useJSON */
-              JSON.parse(savedStore)
-            : /** @fluxible-config-no-useJSON */
-              savedStore /** @end-fluxible-config-no-useJSON */
+              JSON.parse(savedStore) /** @fluxible-config-no-useJSON */
+            : savedStore /** @end-fluxible-config-no-useJSON */
           : {}
       );
 
@@ -195,9 +193,8 @@ export function updateStore (updatedStates) {
           /** @fluxible-config-no-useJSON */
           useJSON
             ? /** @end-fluxible-config-no-useJSON */
-              JSON.stringify(statesToSave)
-            : /** @fluxible-config-no-useJSON */
-              statesToSave
+              JSON.stringify(statesToSave) /** @fluxible-config-no-useJSON */
+            : statesToSave
           /** @end-fluxible-config-no-useJSON */
         );
         shouldPersist = false;
