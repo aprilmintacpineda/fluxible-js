@@ -1,16 +1,23 @@
 /** @format */
 
+/** @fluxible-no-synth-events */
 const eventBus = {};
+/** @end-fluxible-no-synth-events */
 const observers = [];
 let id = 0;
 let removedObserverIndex = null;
 
-// state persistence
+/** @fluxible-config-no-persist */
 let shouldPersist = false;
 let persistStorage = 0;
 let persistTimeout = 0;
 let persistedStateKeys = 0;
 let persistedStateKeysLen = 0;
+/** @end-fluxible-config-no-persist */
+
+/** @fluxible-config-no-useJSON */
+let useJSON = true;
+/** @end-fluxible-config-no-useJSON */
 
 export let store = {};
 
@@ -27,26 +34,77 @@ function exists (arr, needle) {
 export function initializeStore (config) {
   store = { ...config.initialStore };
 
+  /** @fluxible-config-no-useJSON */
+  if (config.useJSON === false) {
+    useJSON = false;
+  }
+  /** @end-fluxible-config-no-useJSON */
+
+  /** @fluxible-config-no-persist */
+  /** @fluxible-config-persist */
   if ('persist' in config) {
-    const persistedStates = config.persist.restore(
-      JSON.parse(config.persist.storage.getItem('fluxible-js')) || {}
-    );
+    if ('asyncStorage' in config.persist) {
+      /** @end-fluxible-config-persist */
+      /** @fluxible-config-sync */
+      config.persist.asyncStorage.getItem('fluxible-js').then(savedStore => {
+        const persistedStates = config.persist.restore(
+          savedStore
+            ? /** @fluxible-config-no-useJSON */
+              useJSON
+              ? /** @end-fluxible-config-no-useJSON */
+                JSON.parse(savedStore)
+              : /** @fluxible-config-no-useJSON */
+                savedStore /** @end-fluxible-config-no-useJSON */
+            : {}
+        );
 
-    persistedStateKeys = Object.keys(persistedStates);
-    persistedStateKeysLen = persistedStateKeys.length;
-    persistStorage = config.persist.storage;
+        persistedStateKeys = Object.keys(persistedStates);
+        persistedStateKeysLen = persistedStateKeys.length;
+        persistStorage = config.persist.asyncStorage;
 
-    for (let a = 0; a < persistedStateKeysLen; a += 1) {
-      store[persistedStateKeys[a]] = persistedStates[persistedStateKeys[a]];
+        for (let a = 0; a < persistedStateKeysLen; a += 1) {
+          store[persistedStateKeys[a]] = persistedStates[persistedStateKeys[a]];
+        }
+      });
+      /** @end-fluxible-config-sync */
+      /** @fluxible-config-persist */
+    } else {
+      /** @end-fluxible-config-persist */
+      /** @fluxible-config-async */
+      const savedStore = config.persist.syncStorage.getItem('fluxible-js');
+      const persistedStates = config.persist.restore(
+        savedStore
+          ? /** @fluxible-config-no-useJSON */
+            useJSON
+            ? /** @end-fluxible-config-no-useJSON */
+              JSON.parse(savedStore)
+            : /** @fluxible-config-no-useJSON */
+              savedStore /** @end-fluxible-config-no-useJSON */
+          : {}
+      );
+
+      persistedStateKeys = Object.keys(persistedStates);
+      persistedStateKeysLen = persistedStateKeys.length;
+      persistStorage = config.persist.syncStorage;
+
+      for (let a = 0; a < persistedStateKeysLen; a += 1) {
+        store[persistedStateKeys[a]] = persistedStates[persistedStateKeys[a]];
+      }
+      /** @end-fluxible-config-async */
+      /** @fluxible-config-persist */
     }
   }
+  /** @end-fluxible-config-persist */
+  /** @end-fluxible-config-no-persist */
 }
 
 export function updateStore (updatedStates) {
+  /** @fluxible-config-no-persist */
   if (persistTimeout !== 0) {
     clearTimeout(persistTimeout);
     persistTimeout = 0;
   }
+  /** @end-fluxible-config-no-persist */
 
   const updatedStateKeys = Object.keys(updatedStates);
   const updatedStateKeysLen = updatedStateKeys.length;
@@ -54,6 +112,7 @@ export function updateStore (updatedStates) {
   for (let a = 0; a < updatedStateKeysLen; a += 1) {
     store[updatedStateKeys[a]] = updatedStates[updatedStateKeys[a]];
 
+    /** @fluxible-config-no-persist */
     /**
      * We only want to do this if
      * - we have not previously stopped the persist timeout.
@@ -68,6 +127,7 @@ export function updateStore (updatedStates) {
     ) {
       shouldPersist = true;
     }
+    /** @end-fluxible-config-no-persist */
   }
 
   // only notify observers that observes the store keys that were updated
@@ -108,6 +168,7 @@ export function updateStore (updatedStates) {
     }
   }
 
+  /** @fluxible-config-no-persist */
   /**
    * We should only save states to the store when a
    * persisted state has been updated.
@@ -129,11 +190,20 @@ export function updateStore (updatedStates) {
           statesToSave[persistedStateKeys[a]] = store[persistedStateKeys[a]];
         }
 
-        persistStorage.setItem('fluxible-js', JSON.stringify(statesToSave));
+        persistStorage.setItem(
+          'fluxible-js',
+          /** @fluxible-config-no-useJSON */
+          useJSON
+            ? /** @end-fluxible-config-no-useJSON */ JSON.stringify(statesToSave)
+            : /** @fluxible-config-no-useJSON */
+              statesToSave
+          /** @end-fluxible-config-no-useJSON */
+        );
         shouldPersist = false;
       }
     }, 200);
   }
+  /** @end-fluxible-config-no-persist */
 }
 
 export function addObserver (callback, wantedKeys) {
@@ -157,6 +227,7 @@ export function addObserver (callback, wantedKeys) {
   };
 }
 
+/** @fluxible-no-synth-events */
 export function addEvent (ev, callback) {
   if (ev in eventBus) {
     eventBus[ev].push(callback);
@@ -178,3 +249,4 @@ export function emitEvent (ev, payload) {
 
   return -1;
 }
+/** @end-fluxible-no-synth-events */

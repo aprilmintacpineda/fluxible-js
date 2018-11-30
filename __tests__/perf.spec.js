@@ -21,11 +21,14 @@ for (let a = 0; a < maxKeys; a++) {
 }
 
 function displayTotalTime () {
+  // eslint-disable-next-line
   console.log('Total time taken (one time fire)', timeTaken, 'ms');
 }
 
 function displayAverageTimeAndReset () {
+  // eslint-disable-next-line
   console.log('Average time (' + maxKeys + ' loops)', average / maxKeys, 'ms');
+  // eslint-disable-next-line
   console.log('-----');
 
   average = 0;
@@ -34,13 +37,17 @@ function displayAverageTimeAndReset () {
   tmp = null;
 }
 
+// eslint-disable-next-line
 console.log('created initialStore with', maxKeys, 'keys.');
-
+// eslint-disable-next-line
 console.log('\n-----');
+// eslint-disable-next-line
 console.log('NO PERSIST: Beginning of perf test');
+// eslint-disable-next-line
 console.log('-----\n');
 
 // ----------
+// eslint-disable-next-line
 console.log('initializeStore:');
 
 timeTaken = Date.now();
@@ -58,6 +65,7 @@ for (let a = 0; a < maxKeys; a++) {
 displayAverageTimeAndReset();
 
 // ----------
+// eslint-disable-next-line
 console.log('updateStore with ' + maxKeys + ' keys and 0 observers:');
 
 timeTaken = Date.now();
@@ -75,6 +83,7 @@ for (let a = 0; a < maxKeys; a++) {
 displayAverageTimeAndReset();
 
 // ----------
+// eslint-disable-next-line
 console.log('addObserver:');
 
 timeTaken = Date.now();
@@ -92,6 +101,7 @@ for (let a = 0; a < maxKeys; a++) {
 displayAverageTimeAndReset();
 
 // ----------
+// eslint-disable-next-line
 console.log('updateStore with ' + maxKeys + ' keys and ' + maxKeys + ' observers:');
 
 timeTaken = Date.now();
@@ -109,6 +119,7 @@ for (let a = 0; a < maxKeys; a++) {
 displayAverageTimeAndReset();
 
 // ----------
+// eslint-disable-next-line
 console.log('removing an observer with ', maxKeys + 1, ' observers');
 
 tmp = addObserver(() => {}, ['test1', 'test2', 'test3']);
@@ -128,6 +139,7 @@ for (let a = 0; a < maxKeys; a++) {
 displayAverageTimeAndReset();
 
 // ----------
+// eslint-disable-next-line
 console.log('Adding events');
 
 timeTaken = Date.now();
@@ -150,6 +162,7 @@ for (let a = 0; a < maxKeys; a++) {
 displayAverageTimeAndReset();
 
 // ----------
+// eslint-disable-next-line
 console.log('Emitting events with ' + maxKeys + ' previously added events');
 
 do {
@@ -175,4 +188,5 @@ for (let a = 0; a < maxKeys; a++) {
 
 displayAverageTimeAndReset();
 
+// eslint-disable-next-line
 console.log('END');

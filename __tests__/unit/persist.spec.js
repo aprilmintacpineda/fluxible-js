@@ -2,8 +2,8 @@
 
 import { updateStore, initializeStore, store } from '../../lib';
 
-describe('config.persist', () => {
-  test('calls getItem and setItem on config.persist.storage', () => {
+describe('persist using syncStorage', () => {
+  test('calls getItem and setItem on config.persist.syncStorage', () => {
     expect.assertions(4);
 
     const initialStore = {
@@ -12,7 +12,7 @@ describe('config.persist', () => {
       anotherValue: 'test value'
     };
 
-    const storage = {
+    const syncStorage = {
       getItem: jest.fn(() => {
         return JSON.stringify({
           user: {
@@ -23,20 +23,20 @@ describe('config.persist', () => {
       setItem: jest.fn(() => {})
     };
 
-    const persist = {
-      storage,
-      restore: jest.fn(savedStore => ({
-        user: savedStore.user
-      }))
-    };
+    const restore = jest.fn(savedStore => ({
+      user: savedStore.user
+    }));
 
     initializeStore({
       initialStore,
-      persist
+      persist: {
+        syncStorage,
+        restore
+      }
     });
 
-    expect(storage.getItem).toHaveBeenCalledWith('fluxible-js');
-    expect(persist.restore).toHaveBeenCalledWith({
+    expect(syncStorage.getItem).toHaveBeenCalledWith('fluxible-js');
+    expect(restore).toHaveBeenCalledWith({
       user: {
         name: 'test user'
       }
@@ -57,7 +57,7 @@ describe('config.persist', () => {
     });
 
     return new Promise(resolve => setTimeout(resolve, 200)).then(() => {
-      expect(storage.setItem).toHaveBeenCalledWith(
+      expect(syncStorage.setItem).toHaveBeenCalledWith(
         'fluxible-js',
         JSON.stringify({
           user: {
@@ -77,7 +77,7 @@ describe('config.persist', () => {
       anotherValue: 'test value'
     };
 
-    const storage = {
+    const syncStorage = {
       getItem: jest.fn(() => {
         return JSON.stringify({
           user: {
@@ -89,7 +89,7 @@ describe('config.persist', () => {
     };
 
     const persist = {
-      storage,
+      syncStorage,
       restore: jest.fn(savedStore => {
         return {
           user: savedStore.user,
@@ -125,7 +125,7 @@ describe('config.persist', () => {
     });
 
     return new Promise(resolve => setTimeout(resolve, 200)).then(() => {
-      expect(storage.setItem).toHaveBeenCalledTimes(1);
+      expect(syncStorage.setItem).toHaveBeenCalledTimes(1);
       expect(store).toEqual({
         user: {
           name: 'test user'
@@ -145,7 +145,7 @@ describe('config.persist', () => {
       anotherValue: 'test value'
     };
 
-    const storage = {
+    const syncStorage = {
       getItem: jest.fn(() => {
         return JSON.stringify({
           user: {
@@ -157,7 +157,7 @@ describe('config.persist', () => {
     };
 
     const persist = {
-      storage,
+      syncStorage,
       restore: jest.fn(savedStore => {
         return {
           user: savedStore.user
@@ -180,7 +180,7 @@ describe('config.persist', () => {
 
     return new Promise(resolve => setTimeout(resolve, 200))
       .then(() => {
-        expect(storage.setItem).toHaveBeenCalledTimes(0);
+        expect(syncStorage.setItem).toHaveBeenCalledTimes(0);
         expect(store).toEqual({
           user: {
             name: 'test user'
@@ -202,7 +202,7 @@ describe('config.persist', () => {
         return new Promise(resolve => setTimeout(resolve, 200));
       })
       .then(() => {
-        expect(storage.setItem).toHaveBeenCalledTimes(1);
+        expect(syncStorage.setItem).toHaveBeenCalledTimes(1);
         expect(store).toEqual({
           user: {
             name: 'another-user'
@@ -222,7 +222,7 @@ describe('config.persist', () => {
       anotherValue: 'test value'
     };
 
-    const storage = {
+    const syncStorage = {
       getItem: jest.fn(() => {
         return JSON.stringify({
           user: {
@@ -234,7 +234,7 @@ describe('config.persist', () => {
     };
 
     const persist = {
-      storage,
+      syncStorage,
       restore: jest.fn(savedStore => {
         return {
           user: savedStore.user
@@ -269,7 +269,7 @@ describe('config.persist', () => {
     });
 
     return new Promise(resolve => setTimeout(resolve, 200)).then(() => {
-      expect(storage.setItem).toHaveBeenCalledTimes(0);
+      expect(syncStorage.setItem).toHaveBeenCalledTimes(0);
       expect(store).toEqual({
         user: {
           name: 'test user'
@@ -289,7 +289,7 @@ describe('config.persist', () => {
       anotherValue: 'test value'
     };
 
-    const storage = {
+    const syncStorage = {
       getItem: jest.fn(() => {
         return null;
       }),
@@ -300,7 +300,7 @@ describe('config.persist', () => {
     initializeStore({
       initialStore,
       persist: {
-        storage,
+        syncStorage,
         restore: savedStore => {
           return {
             user: savedStore.user || null
@@ -309,7 +309,7 @@ describe('config.persist', () => {
       }
     });
 
-    expect(storage.getItem).toHaveBeenCalledWith('fluxible-js');
+    expect(syncStorage.getItem).toHaveBeenCalledWith('fluxible-js');
     expect(store).toEqual({
       user: null,
       testValue: 'value',
@@ -324,7 +324,7 @@ describe('config.persist', () => {
     });
 
     return new Promise(resolve => setTimeout(resolve, 200)).then(() => {
-      expect(storage.setItem).toHaveBeenCalledWith(
+      expect(syncStorage.setItem).toHaveBeenCalledWith(
         'fluxible-js',
         JSON.stringify({
           user: {
@@ -333,5 +333,119 @@ describe('config.persist', () => {
         })
       );
     });
+  });
+});
+
+describe('persist using asyncStorage', () => {
+  test('gets item from asyncStorage then calls restore', () => {
+    expect.assertions(3);
+
+    const initialStore = {
+      user: null,
+      testValue: 'value',
+      anotherValue: 'test value'
+    };
+
+    const asyncStorage = {
+      getItem: jest.fn(() =>
+        Promise.resolve(
+          JSON.stringify({
+            user: {
+              name: 'test user'
+            }
+          })
+        )
+      ),
+      setItem: jest.fn(() => Promise.resolve())
+    };
+
+    const restore = jest.fn(savedStore => {
+      return {
+        user: savedStore.user
+      };
+    });
+
+    initializeStore({
+      initialStore,
+      persist: {
+        asyncStorage,
+        restore
+      }
+    });
+
+    return Promise.resolve()
+      .then(() => {
+        expect(asyncStorage.getItem).toHaveBeenCalled();
+        expect(restore).toHaveBeenCalled();
+
+        updateStore({
+          user: 'hello'
+        });
+
+        return new Promise(resolve => setTimeout(resolve, 200));
+      })
+      .then(() => {
+        expect(asyncStorage.setItem).toHaveBeenCalled();
+      });
+  });
+});
+
+describe('saving store to storage', () => {
+  test('can turn off JSON.stringify using stringify config option', () => {
+    expect.assertions(5);
+
+    const initialStore = {
+      user: null,
+      testValue: 'value',
+      anotherValue: 'test value'
+    };
+
+    const asyncStorage = {
+      getItem: jest.fn(() =>
+        Promise.resolve({
+          user: {
+            name: 'test user'
+          }
+        })
+      ),
+      setItem: jest.fn(() => Promise.resolve())
+    };
+
+    const restore = jest.fn(savedStore => {
+      return {
+        user: savedStore.user
+      };
+    });
+
+    initializeStore({
+      initialStore,
+      persist: {
+        asyncStorage,
+        restore
+      },
+      useJSON: false
+    });
+
+    const origStringify = JSON.stringify;
+    const origParse = JSON.parse;
+    JSON.stringify = jest.fn(obj => origStringify(obj));
+    JSON.parse = jest.fn(obj => origParse(obj));
+
+    return Promise.resolve()
+      .then(() => {
+        expect(asyncStorage.getItem).toHaveBeenCalled();
+        expect(restore).toHaveBeenCalled();
+
+        updateStore({
+          user: 'hello'
+        });
+
+        return new Promise(resolve => setTimeout(resolve, 200));
+      })
+      .then(() => {
+        expect(asyncStorage.setItem).toHaveBeenCalled();
+        expect(JSON.stringify).not.toHaveBeenCalled();
+        expect(JSON.parse).not.toHaveBeenCalled();
+      });
   });
 });

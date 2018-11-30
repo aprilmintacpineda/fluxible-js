@@ -7,7 +7,6 @@ const path = require('path');
 const source = fs.readFileSync(path.join(__dirname, '/src/index.js'), 'utf8');
 const code = babelCore.transform(source, {
   babelrc: false,
-  comments: false,
   presets: ['@babel/preset-env'],
   plugins: ['@babel/plugin-proposal-object-rest-spread']
 }).code;

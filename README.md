@@ -10,7 +10,7 @@ Smaller, faster, better. A small state management system that supports the idea 
 
 <img src="docs/test-unit.png">
 
-## Performance tests with a 10,000 key-store
+## Performance tests with a store that has 10,000 keys
 
 All performance test was ran on:
 
@@ -20,13 +20,13 @@ Memory: 16 GB 1600 MHz DDR3
 
 **Complete disclosure**
 
-These tests may or may not be accurate. Consider these to be the cases under the best circumstances.
+These tests may or may not be accurate. Consider these to be the cases under the best circumstances though I tried to make these tests as harsh as possible in order to truly measure how fast it performs on not-so-good devices.
 
-#### With persist with (simulated storage)
+**With persist with (simulated storage)**
 
 <img src="docs/test-perf-persist.png">
 
-#### With no persist
+**With no persist**
 
 <img src="docs/test-perf.png">
 
@@ -49,8 +49,6 @@ The goal of this state management library is to allow you to initialize, update,
 1. `git clone git@github.com:aprilmintacpineda/fluxible-js.git`
 2. `npm i`
 3. `npm run playground`
-
-<img src="docs/playground-screenshot.png">
 
 # Test me
 
@@ -76,25 +74,34 @@ initializeStore({
     anotherState: {
       value: 'value'
     }
+  },
+  persist: {
+    useJSON: false,
+    syncStorage: window.localStorage,
+    restore: savedStore => ({
+      user: savedStore.user || null
+    })
   }
 });
 ```
 
-`initializeStore` function expects an object as the only parameter, the object have a required property called `initialStore` which would be used as the initial value of the store.
+In the case above, only `user` would be saved and the rest wouldn't be saved.
 
-There's also the optional property called `persist` which must also be an object containing two required properties:
+`initializeStore` function expects an object as the only parameter, the object have a required property called `initialStore` which would be used as the initial value of the store. It does not mutate the original `initialStore` so you are still free to use that some other time in your application.
 
-- `storage` which must be a reference to the storage that would be used to save the store. It must have `getItem` and `setItem` methods. Both methods must be synchronous. Example would be `window.localStorage`. The call to `setItem` is deferred by 200ms, this is to minimize and to improve performance.
-- `restore` which must be a function that is synchronous. Restore will be called upon initialization and will receive the `savedStore` as the its only argument. The `savedStore` would be an object containing the states that were previously saved to the storage. It must return an object which would be the states that you want to restore.
+`persist` is an optional property which must also be an object containing the following properties:
+
+- **REQUIRED**: `syncStorage` or `asyncStorage` must be a reference to the storage API that would be used to save the store. It must have `getItem` and `setItem` methods. Example would be `window.localStorage`. The call to `setItem` is deferred by 200ms, this is to minimize and to improve performance.
+- **REQUIRED**: `restore` which must be a function that is synchronous. Restore will be called upon initialization and will receive the `savedStore` as the its only argument. The `savedStore` would be an object containing the states that were previously saved to the storage. It must return an object which would be the states that you want to restore.
+- **OPTIONAL**: `useJSON` can be set to `false` when you want to turn off calls to `JSON.stringify` (when saving the store to the storage) and `JSON.parse` (when initializing the store). This is when it's not necessary for the storage API that you are using.
 
 Persist feature would only save keys that were returned by `config.persist.restore`. That means, other states that you did not return in that method wouldn't be saved. Persist will not fire every state update that you do. It checks if it needs to fire and it would only fire when you updated a state that you persisted.
 
-`initializeStore` function does not mutate the original `initialStore`.
-
-###### Example
+`syncStorage` config option indicates that you are using a storage API that's `synchronous`. If you want to use a storage API that's asynchronous, e.g., [React-Native's AsyncStorage](https://facebook.github.io/react-native/docs/asyncstorage.html) or [localForage](https://github.com/localForage/localForage/), just specify `asyncStorage` in place of `syncStorage` like so:
 
 ```js
 import { initializeStore } from 'fluxible-js';
+import { AsyncStorage } from 'react-native';
 
 initializeStore({
   initialStore: {
@@ -105,7 +112,8 @@ initializeStore({
     }
   },
   persist: {
-    storage: window.localStorage,
+    stringify: false,
+    asyncStorage: AsyncStorage,
     restore: savedStore => ({
       user: savedStore.user || null
     })
@@ -113,7 +121,7 @@ initializeStore({
 });
 ```
 
-In the case above, only `user` would be saved and the rest wouldn't be saved.
+You should only specify either `syncStorage` or `asyncStorage`. Not both. The `asyncStorage` only supports [Promise API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
 
 ## Listen to store updates and getting the store
 
@@ -210,6 +218,94 @@ addEvent('my-event', payload => {
     newValue: payload.newValue
   });
 });
+```
+
+# Code removal
+
+You will surely only be using some of the codes in this library. For example, if you are only using `asyncStorage`, the `syncStorage` becomes a dead code and is no longer necessary. Hence, it can be removed.
+
+This library can work together with [webpack-loader-clean-pragma](https://github.com/aprilmintacpineda/webpack-loader-clean-pragma).
+
+If you are using persist feature with `syncStorage`, copy-paste these pragmas:
+
+```js
+{
+  start: '/** @fluxible-config-sync */',
+  end: '/** @end-fluxible-config-sync */'
+},
+{
+  start: '/** @fluxible-config-persist */',
+  end: '/** @end-fluxible-config-persist */'
+}
+```
+
+If you are using persist feature with `asyncStorage`, copy-paste these pragmas:
+
+```js
+{
+  start: '/** @fluxible-config-async */',
+  end: '/** @end-fluxible-config-async */'
+},
+{
+  start: '/** @fluxible-config-persist */',
+  end: '/** @end-fluxible-config-persist */'
+}
+```
+
+Here are all the available pragmas, just copy-paste one or more of the following pragmas below:
+
+**I don't use useJSON config option**:
+
+```js
+{
+  start: '/** @fluxible-config-no-useJSON */',
+  end: '/** @end-fluxible-config-no-useJSON */'
+}
+```
+
+**I don't use persist feature**:
+
+```js
+{
+  start: '/** @fluxible-config-no-persist */',
+  end: '/** @end-fluxible-config-no-persist */'
+}
+```
+
+**I am using persist feature**:
+
+```js
+{
+  start: '/** @fluxible-config-persist */',
+  end: '/** @end-fluxible-config-persist */'
+}
+```
+
+**I don't use synthetic events feature**:
+
+```js
+{
+  start: '/** @fluxible-no-synth-events */',
+  end: '/** @end-fluxible-no-synth-events */'
+}
+```
+
+**I am using asyncStorage**:
+
+```js
+{
+  start: '/** @fluxible-config-async */',
+  end: '/** @end-fluxible-config-async */'
+}
+```
+
+**I am using syncStorage**:
+
+```js
+{
+  start: '/** @fluxible-config-sync */',
+  end: '/** @end-fluxible-config-sync */'
+}
 ```
 
 # Contributing
