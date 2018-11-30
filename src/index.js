@@ -114,15 +114,10 @@ export function updateStore (updatedStates) {
     /**
      * We only want to do this if
      * - we have not previously stopped the persist timeout.
-     * - The persist feature is turned on.
      * - There's no scheduled persist to run.
      * - One of the updated states was persisted.
      */
-    if (
-      !shouldPersist &&
-      persistedStateKeys !== 0 &&
-      exists(persistedStateKeys, updatedStateKeys[a])
-    ) {
+    if (!shouldPersist && exists(persistedStateKeys, updatedStateKeys[a])) {
       shouldPersist = true;
     }
     /** @end-fluxible-config-no-persist */
