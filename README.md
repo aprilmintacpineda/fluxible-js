@@ -60,6 +60,136 @@ The goal of this state management library is to allow you to initialize, update,
 
 `npm i -s fluxible-js`
 
+# Building
+
+Starting `4.0.0`, `fluxible-js` was intentionally shipped without building. This is to accomodate [code removal](#code-removal) support, which I encourage everyone to put to good use in order to save filesize and also performance.
+
+Simply add the following to your build, under `module.rules`:
+
+```js
+{
+  test: path.join(__dirname, '../node_modules/fluxible-js/lib/'),
+  use: [
+    'babel-loader',
+    /**
+     * the following is optional and used for
+     * on-build code removal
+     */
+    {
+      loader: 'webpack-loader-clean-pragma',
+      options: {
+        pragmas: [
+          {
+            start: '/** @fluxible-config-no-useJSON */',
+            end: '/** @end-fluxible-config-no-useJSON */'
+          },
+          {
+            start: '/** @fluxible-no-synth-events */',
+            end: '/** @end-fluxible-no-synth-events */'
+          },
+          {
+            start: '/** @fluxible-config-sync */',
+            end: '/** @end-fluxible-config-sync */'
+          },
+          {
+            start: '/** @fluxible-config-persist */',
+            end: '/** @end-fluxible-config-persist */'
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+# Code removal
+
+You will surely only be using some of the codes in this library. For example, if you are only using `asyncStorage`, the `syncStorage` becomes a dead code and is no longer necessary. Hence, it can be removed.
+
+This library can work together with [webpack-loader-clean-pragma](https://github.com/aprilmintacpineda/webpack-loader-clean-pragma).
+
+If you are using persist feature with `syncStorage`, copy-paste these pragmas:
+
+```js
+{
+  start: '/** @fluxible-config-sync */',
+  end: '/** @end-fluxible-config-sync */'
+},
+{
+  start: '/** @fluxible-config-persist */',
+  end: '/** @end-fluxible-config-persist */'
+}
+```
+
+If you are using persist feature with `asyncStorage`, copy-paste these pragmas:
+
+```js
+{
+  start: '/** @fluxible-config-async */',
+  end: '/** @end-fluxible-config-async */'
+},
+{
+  start: '/** @fluxible-config-persist */',
+  end: '/** @end-fluxible-config-persist */'
+}
+```
+
+Here are all the available pragmas, just copy-paste one or more of the following pragmas below:
+
+**I don't use useJSON config option**:
+
+```js
+{
+  start: '/** @fluxible-config-no-useJSON */',
+  end: '/** @end-fluxible-config-no-useJSON */'
+}
+```
+
+**I don't use persist feature**:
+
+```js
+{
+  start: '/** @fluxible-config-no-persist */',
+  end: '/** @end-fluxible-config-no-persist */'
+}
+```
+
+**I am using persist feature**:
+
+```js
+{
+  start: '/** @fluxible-config-persist */',
+  end: '/** @end-fluxible-config-persist */'
+}
+```
+
+**I don't use synthetic events feature**:
+
+```js
+{
+  start: '/** @fluxible-no-synth-events */',
+  end: '/** @end-fluxible-no-synth-events */'
+}
+```
+
+**I am using asyncStorage**:
+
+```js
+{
+  start: '/** @fluxible-config-async */',
+  end: '/** @end-fluxible-config-async */'
+}
+```
+
+**I am using syncStorage**:
+
+```js
+{
+  start: '/** @fluxible-config-sync */',
+  end: '/** @end-fluxible-config-sync */'
+}
+```
+
 # Usage
 
 ## Initialize store
@@ -218,94 +348,6 @@ addEvent('my-event', payload => {
     newValue: payload.newValue
   });
 });
-```
-
-# Code removal
-
-You will surely only be using some of the codes in this library. For example, if you are only using `asyncStorage`, the `syncStorage` becomes a dead code and is no longer necessary. Hence, it can be removed.
-
-This library can work together with [webpack-loader-clean-pragma](https://github.com/aprilmintacpineda/webpack-loader-clean-pragma).
-
-If you are using persist feature with `syncStorage`, copy-paste these pragmas:
-
-```js
-{
-  start: '/** @fluxible-config-sync */',
-  end: '/** @end-fluxible-config-sync */'
-},
-{
-  start: '/** @fluxible-config-persist */',
-  end: '/** @end-fluxible-config-persist */'
-}
-```
-
-If you are using persist feature with `asyncStorage`, copy-paste these pragmas:
-
-```js
-{
-  start: '/** @fluxible-config-async */',
-  end: '/** @end-fluxible-config-async */'
-},
-{
-  start: '/** @fluxible-config-persist */',
-  end: '/** @end-fluxible-config-persist */'
-}
-```
-
-Here are all the available pragmas, just copy-paste one or more of the following pragmas below:
-
-**I don't use useJSON config option**:
-
-```js
-{
-  start: '/** @fluxible-config-no-useJSON */',
-  end: '/** @end-fluxible-config-no-useJSON */'
-}
-```
-
-**I don't use persist feature**:
-
-```js
-{
-  start: '/** @fluxible-config-no-persist */',
-  end: '/** @end-fluxible-config-no-persist */'
-}
-```
-
-**I am using persist feature**:
-
-```js
-{
-  start: '/** @fluxible-config-persist */',
-  end: '/** @end-fluxible-config-persist */'
-}
-```
-
-**I don't use synthetic events feature**:
-
-```js
-{
-  start: '/** @fluxible-no-synth-events */',
-  end: '/** @end-fluxible-no-synth-events */'
-}
-```
-
-**I am using asyncStorage**:
-
-```js
-{
-  start: '/** @fluxible-config-async */',
-  end: '/** @end-fluxible-config-async */'
-}
-```
-
-**I am using syncStorage**:
-
-```js
-{
-  start: '/** @fluxible-config-sync */',
-  end: '/** @end-fluxible-config-sync */'
-}
 ```
 
 # Contributing
