@@ -14,10 +14,10 @@ var _lib = require("./lib");
 }, ['count']);
 setInterval(function () {
   (0, _lib.updateStore)({
-    count: (0, _lib.getStore)().count + 1
+    count: _lib.store.count + 1
   }); // eslint-disable-next-line
 
-  console.log('This line ran after updateStore:', (0, _lib.getStore)());
+  console.log('This line ran after updateStore:', _lib.store);
 }, 1000); // eslint-disable-next-line
 
-console.log('initialStore', (0, _lib.getStore)());
+console.log('initialStore', _lib.store);

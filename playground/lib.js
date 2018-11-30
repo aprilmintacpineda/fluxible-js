@@ -17,6 +17,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 var eventBus = {};
 var observers = [];
 var id = 0;
+var removedObserverIndex = null;
 var shouldPersist = false;
 var persistStorage = 0;
 var persistTimeout = 0;
@@ -26,7 +27,7 @@ var store = {};
 exports.store = store;
 
 function exists(arr, needle) {
-  for (var a = 0, len = arr.length; a < len; a++) {
+  for (var a = 0, len = arr.length; a < len; a += 1) {
     if (arr[a] === needle) {
       return true;
     }
@@ -44,7 +45,7 @@ function initializeStore(config) {
     persistedStateKeysLen = persistedStateKeys.length;
     persistStorage = config.persist.storage;
 
-    for (var a = 0; a < persistedStateKeysLen; a++) {
+    for (var a = 0; a < persistedStateKeysLen; a += 1) {
       store[persistedStateKeys[a]] = persistedStates[persistedStateKeys[a]];
     }
   }
@@ -59,7 +60,7 @@ function updateStore(updatedStates) {
   var updatedStateKeys = Object.keys(updatedStates);
   var updatedStateKeysLen = updatedStateKeys.length;
 
-  for (var a = 0; a < updatedStateKeysLen; a++) {
+  for (var a = 0; a < updatedStateKeysLen; a += 1) {
     store[updatedStateKeys[a]] = updatedStates[updatedStateKeys[a]];
 
     if (!shouldPersist && persistedStateKeys !== 0 && exists(persistedStateKeys, updatedStateKeys[a])) {
@@ -67,24 +68,34 @@ function updateStore(updatedStates) {
     }
   }
 
-  for (var _a = 0, observersLen = observers.length; _a < observersLen && observers[_a]; _a++) {
-    var wantedKeysLen = observers[_a].wantedKeys.length;
+  for (var _a = 0, observersLen = observers.length; _a < observersLen; _a += 1) {
+    if (observers[_a]) {
+      var wantedKeysLen = observers[_a].wantedKeys.length;
 
-    if (updatedStateKeysLen < wantedKeysLen) {
-      for (var b = 0; b < updatedStateKeysLen; b++) {
-        if (exists(observers[_a].wantedKeys, updatedStateKeys[b])) {
-          observers[_a].callback();
+      if (updatedStateKeysLen < wantedKeysLen) {
+        for (var b = 0; b < updatedStateKeysLen; b += 1) {
+          if (exists(observers[_a].wantedKeys, updatedStateKeys[b])) {
+            observers[_a].callback();
 
-          break;
+            break;
+          }
+        }
+      } else {
+        for (var _b = 0; _b < updatedStateKeysLen; _b += 1) {
+          if (exists(updatedStateKeys, observers[_a].wantedKeys[_b])) {
+            observers[_a].callback();
+
+            break;
+          }
         }
       }
-    } else {
-      for (var _b = 0; _b < updatedStateKeysLen; _b++) {
-        if (exists(updatedStateKeys, observers[_a].wantedKeys[_b])) {
-          observers[_a].callback();
 
-          break;
+      if (removedObserverIndex !== null) {
+        if (removedObserverIndex <= _a) {
+          _a -= 1;
         }
+
+        removedObserverIndex = null;
       }
     }
   }
@@ -94,7 +105,7 @@ function updateStore(updatedStates) {
       if (persistTimeout !== 0) {
         var statesToSave = {};
 
-        for (var _a2 = 0; _a2 < persistedStateKeysLen; _a2++) {
+        for (var _a2 = 0; _a2 < persistedStateKeysLen; _a2 += 1) {
           statesToSave[persistedStateKeys[_a2]] = store[persistedStateKeys[_a2]];
         }
 
@@ -112,10 +123,11 @@ function addObserver(callback, wantedKeys) {
     wantedKeys: wantedKeys,
     id: thisId
   });
-  ++id;
+  id += 1;
   return function () {
-    for (var a = 0, observersLen = observers.length; a < observersLen && observers[a]; a++) {
-      if (observers[a].id === thisId) {
+    for (var a = 0, observersLen = observers.length; a < observersLen; a += 1) {
+      if (observers[a] && observers[a].id === thisId) {
+        removedObserverIndex = a;
         return observers.splice(a, 1);
       }
     }
@@ -134,8 +146,10 @@ function emitEvent(ev, payload) {
   if (ev in eventBus) {
     var eventBusLen = eventBus[ev].length;
 
-    for (var a = 0; a < eventBusLen && eventBus[ev][a]; a++) {
-      eventBus[ev][a](payload);
+    for (var a = 0; a < eventBusLen; a += 1) {
+      if (eventBus[ev][a]) {
+        eventBus[ev][a](payload);
+      }
     }
   }
 

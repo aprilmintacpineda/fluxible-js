@@ -3,6 +3,7 @@
 const eventBus = {};
 const observers = [];
 let id = 0;
+let removedObserverIndex = null;
 
 // state persistence
 let shouldPersist = false;
@@ -14,7 +15,7 @@ let persistedStateKeysLen = 0;
 export let store = {};
 
 function exists (arr, needle) {
-  for (let a = 0, len = arr.length; a < len; a++) {
+  for (let a = 0, len = arr.length; a < len; a += 1) {
     if (arr[a] === needle) {
       return true;
     }
@@ -35,7 +36,7 @@ export function initializeStore (config) {
     persistedStateKeysLen = persistedStateKeys.length;
     persistStorage = config.persist.storage;
 
-    for (let a = 0; a < persistedStateKeysLen; a++) {
+    for (let a = 0; a < persistedStateKeysLen; a += 1) {
       store[persistedStateKeys[a]] = persistedStates[persistedStateKeys[a]];
     }
   }
@@ -50,7 +51,7 @@ export function updateStore (updatedStates) {
   const updatedStateKeys = Object.keys(updatedStates);
   const updatedStateKeysLen = updatedStateKeys.length;
 
-  for (let a = 0; a < updatedStateKeysLen; a++) {
+  for (let a = 0; a < updatedStateKeysLen; a += 1) {
     store[updatedStateKeys[a]] = updatedStates[updatedStateKeys[a]];
 
     /**
@@ -70,25 +71,39 @@ export function updateStore (updatedStates) {
   }
 
   // only notify observers that observes the store keys that were updated
-  for (let a = 0, observersLen = observers.length; a < observersLen && observers[a]; a++) {
-    const wantedKeysLen = observers[a].wantedKeys.length;
+  for (let a = 0, observersLen = observers.length; a < observersLen; a += 1) {
+    if (observers[a]) {
+      const wantedKeysLen = observers[a].wantedKeys.length;
 
-    // we want to maximize performance, so we loop as little as possible
-    if (updatedStateKeysLen < wantedKeysLen) {
-      for (let b = 0; b < updatedStateKeysLen; b++) {
-        if (exists(observers[a].wantedKeys, updatedStateKeys[b])) {
-          observers[a].callback();
-          break;
+      // we want to maximize performance, so we loop as little as possible
+      if (updatedStateKeysLen < wantedKeysLen) {
+        for (let b = 0; b < updatedStateKeysLen; b += 1) {
+          if (exists(observers[a].wantedKeys, updatedStateKeys[b])) {
+            observers[a].callback();
+            break;
+          }
+        }
+      } else {
+        // they are either of the same length or
+        // the wantedKeys is less than the updatedStateKeys
+        for (let b = 0; b < updatedStateKeysLen; b += 1) {
+          if (exists(updatedStateKeys, observers[a].wantedKeys[b])) {
+            observers[a].callback();
+            break;
+          }
         }
       }
-    } else {
-      // they are either of the same length or
-      // the wantedKeys is less than the updatedStateKeys
-      for (let b = 0; b < updatedStateKeysLen; b++) {
-        if (exists(updatedStateKeys, observers[a].wantedKeys[b])) {
-          observers[a].callback();
-          break;
+
+      /**
+       * this will ensure that we don't miss an observer due
+       * to unsubscription during update
+       */
+      if (removedObserverIndex !== null) {
+        if (removedObserverIndex <= a) {
+          a -= 1;
         }
+
+        removedObserverIndex = null;
       }
     }
   }
@@ -110,7 +125,7 @@ export function updateStore (updatedStates) {
       if (persistTimeout !== 0) {
         const statesToSave = {};
 
-        for (let a = 0; a < persistedStateKeysLen; a++) {
+        for (let a = 0; a < persistedStateKeysLen; a += 1) {
           statesToSave[persistedStateKeys[a]] = store[persistedStateKeys[a]];
         }
 
@@ -130,11 +145,12 @@ export function addObserver (callback, wantedKeys) {
     id: thisId
   });
 
-  ++id;
+  id += 1;
 
   return () => {
-    for (let a = 0, observersLen = observers.length; a < observersLen && observers[a]; a++) {
-      if (observers[a].id === thisId) {
+    for (let a = 0, observersLen = observers.length; a < observersLen; a += 1) {
+      if (observers[a] && observers[a].id === thisId) {
+        removedObserverIndex = a;
         return observers.splice(a, 1);
       }
     }
@@ -153,8 +169,10 @@ export function emitEvent (ev, payload) {
   if (ev in eventBus) {
     const eventBusLen = eventBus[ev].length;
 
-    for (let a = 0; a < eventBusLen && eventBus[ev][a]; a++) {
-      eventBus[ev][a](payload);
+    for (let a = 0; a < eventBusLen; a += 1) {
+      if (eventBus[ev][a]) {
+        eventBus[ev][a](payload);
+      }
     }
   }
 
