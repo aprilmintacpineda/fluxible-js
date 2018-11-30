@@ -80,8 +80,8 @@ Simply add the following to your build, under `module.rules`:
       options: {
         pragmas: [
           {
-            start: '/** @fluxible-config-no-useJSON */',
-            end: '/** @end-fluxible-config-no-useJSON */'
+            start: '/** @fluxible-config-use-JSON */',
+            end: '/** @end-fluxible-config-use-JSON */'
           },
           {
             start: '/** @fluxible-no-synth-events */',
