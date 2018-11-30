@@ -138,10 +138,23 @@ Here are all the available pragmas, just copy-paste one or more of the following
 
 **I don't use useJSON config option**:
 
+Which means you need `JSON.parse` and `JSON.stringify`.
+
 ```js
 {
-  start: '/** @fluxible-config-no-useJSON */',
-  end: '/** @end-fluxible-config-no-useJSON */'
+  start: '/** @fluxible-config-use-JSON */',
+  end: '/** @end-fluxible-config-use-JSON */'
+}
+```
+
+**I am using useJSON config option**:
+
+Which means you **don't** need `JSON.parse` and `JSON.stringify`.
+
+```js
+{
+  start: '/** @fluxible-config-no-JSON */',
+  end: '/** @end-fluxible-config-no-JSON */'
 }
 ```
 

@@ -15,9 +15,9 @@ let persistedStateKeys = 0;
 let persistedStateKeysLen = 0;
 /** @end-fluxible-config-no-persist */
 
-/** @fluxible-config-no-useJSON */
+/** @fluxible-config-use-JSON */
 let useJSON = true;
-/** @end-fluxible-config-no-useJSON */
+/** @end-fluxible-config-use-JSON */
 
 export let store = {};
 
@@ -34,11 +34,11 @@ function exists (arr, needle) {
 export function initializeStore (config) {
   store = { ...config.initialStore };
 
-  /** @fluxible-config-no-useJSON */
+  /** @fluxible-config-use-JSON */
   if (config.useJSON === false) {
     useJSON = false;
   }
-  /** @end-fluxible-config-no-useJSON */
+  /** @end-fluxible-config-use-JSON */
 
   /** @fluxible-config-no-persist */
   /** @fluxible-config-persist */
@@ -49,11 +49,12 @@ export function initializeStore (config) {
       config.persist.asyncStorage.getItem('fluxible-js').then(savedStore => {
         const persistedStates = config.persist.restore(
           savedStore
-            ? /** @fluxible-config-no-useJSON */
+            ? /** @fluxible-config-no-JSON */
+              /** @fluxible-config-use-JSON */
               useJSON
-              ? /** @end-fluxible-config-no-useJSON */
-                JSON.parse(savedStore) /** @fluxible-config-no-useJSON */
-              : savedStore /** @end-fluxible-config-no-useJSON */
+              ? /** @end-fluxible-config-use-JSON */
+                JSON.parse(savedStore) /** @fluxible-config-use-JSON */
+              : /** @end-fluxible-config-no-JSON */ savedStore /** @end-fluxible-config-use-JSON */
             : {}
         );
 
@@ -73,11 +74,12 @@ export function initializeStore (config) {
       const savedStore = config.persist.syncStorage.getItem('fluxible-js');
       const persistedStates = config.persist.restore(
         savedStore
-          ? /** @fluxible-config-no-useJSON */
+          ? /** @fluxible-config-no-JSON */
+            /** @fluxible-config-use-JSON */
             useJSON
-            ? /** @end-fluxible-config-no-useJSON */
-              JSON.parse(savedStore) /** @fluxible-config-no-useJSON */
-            : savedStore /** @end-fluxible-config-no-useJSON */
+            ? /** @end-fluxible-config-use-JSON */
+              JSON.parse(savedStore) /** @fluxible-config-use-JSON */
+            : /** @end-fluxible-config-no-JSON */ savedStore /** @end-fluxible-config-use-JSON */
           : {}
       );
 
@@ -191,12 +193,13 @@ export function updateStore (updatedStates) {
 
         persistStorage.setItem(
           'fluxible-js',
-          /** @fluxible-config-no-useJSON */
+          /** @fluxible-config-no-JSON */
+          /** @fluxible-config-use-JSON */
           useJSON
-            ? /** @end-fluxible-config-no-useJSON */
-              JSON.stringify(statesToSave) /** @fluxible-config-no-useJSON */
-            : statesToSave
-          /** @end-fluxible-config-no-useJSON */
+            ? /** @end-fluxible-config-use-JSON */
+              JSON.stringify(statesToSave) /** @fluxible-config-use-JSON */
+            : /** @end-fluxible-config-no-JSON */ statesToSave
+          /** @end-fluxible-config-use-JSON */
         );
         shouldPersist = false;
       }
