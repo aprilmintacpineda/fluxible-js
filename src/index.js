@@ -117,7 +117,13 @@ export function updateStore (updatedStates) {
      * - There's no scheduled persist to run.
      * - One of the updated states was persisted.
      */
-    if (!shouldPersist && exists(persistedStateKeys, updatedStateKeys[a])) {
+    if (
+      /** @fluxible-config-persist */
+      persistedStateKeys !== 0 &&
+      /** @end-fluxible-config-persist */
+      !shouldPersist &&
+      exists(persistedStateKeys, updatedStateKeys[a])
+    ) {
       shouldPersist = true;
     }
     /** @end-fluxible-config-no-persist */
