@@ -16,9 +16,11 @@ let persistedStateKeys = 0;
 let persistedStateKeysLen = 0;
 /** @end-fluxible-config-no-persist */
 
+/** @fluxible-config-no-JSON */
 /** @fluxible-config-use-JSON */
 let useJSON = true;
 /** @end-fluxible-config-use-JSON */
+/** @end-fluxible-config-no-JSON */
 
 export let store = {};
 
@@ -35,11 +37,13 @@ function exists (arr, needle) {
 export function initializeStore (config) {
   store = { ...config.initialStore };
 
+  /** @fluxible-config-no-JSON */
   /** @fluxible-config-use-JSON */
   if (config.useJSON === false) {
     useJSON = false;
   }
   /** @end-fluxible-config-use-JSON */
+  /** @end-fluxible-config-no-JSON */
 
   /** @fluxible-config-no-persist */
   /** @fluxible-config-persist */
