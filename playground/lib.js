@@ -22,7 +22,7 @@ var eventBus = {};
 
 var observers = [];
 var id = 0;
-var removedObserverIndex = null;
+var updateCounter = null;
 /** @fluxible-config-no-persist */
 
 var shouldPersist = false;
@@ -166,15 +166,16 @@ function updateStore(updatedStates) {
   } // only notify observers that observes the store keys that were updated
 
 
-  for (var _a = 0, observersLen = observers.length; _a < observersLen; _a += 1) {
-    if (observers[_a]) {
-      var wantedKeysLen = observers[_a].wantedKeys.length; // we want to maximize performance, so we loop as little as possible
+  updateCounter = 0;
+
+  for (var observersLen = observers.length; updateCounter < observersLen; updateCounter += 1) {
+    if (observers[updateCounter]) {
+      var wantedKeysLen = observers[updateCounter].wantedKeys.length; // we want to maximize performance, so we loop as little as possible
 
       if (updatedStateKeysLen < wantedKeysLen) {
         for (var b = 0; b < updatedStateKeysLen; b += 1) {
-          if (exists(observers[_a].wantedKeys, updatedStateKeys[b])) {
-            observers[_a].callback();
-
+          if (exists(observers[updateCounter].wantedKeys, updatedStateKeys[b])) {
+            observers[updateCounter].callback();
             break;
           }
         }
@@ -182,28 +183,16 @@ function updateStore(updatedStates) {
         // they are either of the same length or
         // the wantedKeys is less than the updatedStateKeys
         for (var _b = 0; _b < updatedStateKeysLen; _b += 1) {
-          if (exists(updatedStateKeys, observers[_a].wantedKeys[_b])) {
-            observers[_a].callback();
-
+          if (exists(updatedStateKeys, observers[updateCounter].wantedKeys[_b])) {
+            observers[updateCounter].callback();
             break;
           }
         }
       }
-      /**
-       * this will ensure that we don't miss an observer due
-       * to unsubscription during update
-       */
-
-
-      if (removedObserverIndex !== null) {
-        if (removedObserverIndex <= _a) {
-          _a -= 1;
-        }
-
-        removedObserverIndex = null;
-      }
     }
   }
+
+  updateCounter = null;
   /** @fluxible-config-no-persist */
 
   /**
@@ -213,7 +202,6 @@ function updateStore(updatedStates) {
    * We also take into consideration if we have previously
    * stopped a persist timeout.
    */
-
 
   if (shouldPersist) {
     // Wait 200ms relative to the last updateStore
@@ -225,8 +213,8 @@ function updateStore(updatedStates) {
       if (persistTimeout !== 0) {
         var statesToSave = {};
 
-        for (var _a2 = 0; _a2 < persistedStateKeysLen; _a2 += 1) {
-          statesToSave[persistedStateKeys[_a2]] = store[persistedStateKeys[_a2]];
+        for (var _a = 0; _a < persistedStateKeysLen; _a += 1) {
+          statesToSave[persistedStateKeys[_a]] = store[persistedStateKeys[_a]];
         }
 
         persistStorage.setItem('fluxible-js',
@@ -261,7 +249,14 @@ function addObserver(callback, wantedKeys) {
   return function () {
     for (var a = 0, observersLen = observers.length; a < observersLen; a += 1) {
       if (observers[a] && observers[a].id === thisId) {
-        removedObserverIndex = a;
+        /**
+         * this will ensure that we don't miss an observer due
+         * to unsubscription during update
+         */
+        if (updateCounter !== null && a <= updateCounter) {
+          updateCounter -= 1;
+        }
+
         return observers.splice(a, 1);
       }
     }

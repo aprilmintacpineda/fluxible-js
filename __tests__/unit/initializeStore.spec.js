@@ -1,6 +1,6 @@
 /** @format */
 
-import { store, initializeStore } from '../../lib';
+import { store, initializeStore } from '../../src';
 
 describe('initializeStore', () => {
   test('initializes store', () => {

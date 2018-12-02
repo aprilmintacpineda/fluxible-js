@@ -1,6 +1,6 @@
 /** @format */
 
-import { updateStore, initializeStore, store } from '../../lib';
+import { updateStore, initializeStore, store } from '../../src';
 
 describe('persist using syncStorage', () => {
   test('calls getItem and setItem on config.persist.syncStorage', () => {
@@ -394,7 +394,7 @@ describe('persist using asyncStorage', () => {
 });
 
 describe('saving store to storage', () => {
-  test('can turn off JSON.stringify using stringify config option', () => {
+  test('can turn off JSON.stringify using useJSON config option', () => {
     expect.assertions(5);
 
     const initialStore = {

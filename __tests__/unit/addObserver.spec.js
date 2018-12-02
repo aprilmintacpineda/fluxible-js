@@ -1,6 +1,6 @@
 /** @format */
 
-import { updateStore, initializeStore, addObserver } from '../../lib';
+import { updateStore, initializeStore, addObserver } from '../../src';
 
 describe('addObserver', () => {
   test('calls appropriate observer after update store', () => {

@@ -1,6 +1,6 @@
 /** @format */
 
-import { addEvent, emitEvent } from '../../lib';
+import { addEvent, emitEvent } from '../../src';
 
 describe('eventBus', () => {
   test('can add and emit event', () => {
