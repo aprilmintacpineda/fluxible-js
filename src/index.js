@@ -2,6 +2,7 @@
 
 /** @fluxible-no-synth-events */
 const eventBus = {};
+let emitEventCycle = null;
 /** @end-fluxible-no-synth-events */
 const observers = [];
 let id = 0;
@@ -139,7 +140,13 @@ export function updateStore (updatedStates) {
       const wantedKeysLen = observers[updateCounter].wantedKeys.length;
 
       // we want to maximize performance, so we loop as little as possible
-      if (updatedStateKeysLen < wantedKeysLen) {
+      if (
+        (updatedStateKeysLen === 1 &&
+          exists(observers[updateCounter].wantedKeys, updatedStateKeys[0])) ||
+        (wantedKeysLen === 1 && exists(updatedStateKeys, observers[updateCounter].wantedKeys[0]))
+      ) {
+        observers[updateCounter].callback();
+      } else if (updatedStateKeysLen < wantedKeysLen) {
         for (let b = 0; b < updatedStateKeysLen; b += 1) {
           if (exists(observers[updateCounter].wantedKeys, updatedStateKeys[b])) {
             observers[updateCounter].callback();
@@ -149,7 +156,7 @@ export function updateStore (updatedStates) {
       } else {
         // they are either of the same length or
         // the wantedKeys is less than the updatedStateKeys
-        for (let b = 0; b < updatedStateKeysLen; b += 1) {
+        for (let b = 0; b < wantedKeysLen; b += 1) {
           if (exists(updatedStateKeys, observers[updateCounter].wantedKeys[b])) {
             observers[updateCounter].callback();
             break;
@@ -237,17 +244,56 @@ export function addEvent (ev, callback) {
   }
 }
 
-export function emitEvent (ev, payload) {
+export function removeEventCallback (ev, callback) {
   if (ev in eventBus) {
     const eventBusLen = eventBus[ev].length;
 
     for (let a = 0; a < eventBusLen; a += 1) {
-      if (eventBus[ev][a]) {
-        eventBus[ev][a](payload);
+      if (eventBus[ev][a] === callback) {
+        /**
+         * this will ensure that we don't miss an event
+         * listener due to unsubscription during emitEvent
+         */
+        if (emitEventCycle !== null && emitEventCycle.ev === ev && a <= emitEventCycle.counter) {
+          emitEventCycle.counter -= 1;
+        }
+
+        return eventBus[ev].splice(a, 1);
       }
     }
   }
 
   return -1;
+}
+
+export function removeEvent (ev) {
+  if (ev in eventBus === false) {
+    return -1;
+  }
+
+  delete eventBus[ev];
+}
+
+export function emitEvent (ev, payload) {
+  if (ev in eventBus === false) {
+    return -1;
+  }
+
+  emitEventCycle = {
+    ev,
+    counter: 0
+  };
+
+  for (
+    let eventBusLen = eventBus[ev].length;
+    emitEventCycle.counter < eventBusLen;
+    emitEventCycle.counter += 1
+  ) {
+    if (eventBus[ev][emitEventCycle.counter]) {
+      eventBus[ev][emitEventCycle.counter](payload);
+    }
+  }
+
+  emitEventCycle = null;
 }
 /** @end-fluxible-no-synth-events */

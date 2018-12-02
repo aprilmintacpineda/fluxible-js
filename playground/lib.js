@@ -7,6 +7,8 @@ exports.initializeStore = initializeStore;
 exports.updateStore = updateStore;
 exports.addObserver = addObserver;
 exports.addEvent = addEvent;
+exports.removeEventCallback = removeEventCallback;
+exports.removeEvent = removeEvent;
 exports.emitEvent = emitEvent;
 exports.store = void 0;
 
@@ -18,6 +20,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 /** @fluxible-no-synth-events */
 var eventBus = {};
+var emitEventCycle = null;
 /** @end-fluxible-no-synth-events */
 
 var observers = [];
@@ -172,7 +175,9 @@ function updateStore(updatedStates) {
     if (observers[updateCounter]) {
       var wantedKeysLen = observers[updateCounter].wantedKeys.length; // we want to maximize performance, so we loop as little as possible
 
-      if (updatedStateKeysLen < wantedKeysLen) {
+      if (updatedStateKeysLen === 1 && exists(observers[updateCounter].wantedKeys, updatedStateKeys[0]) || wantedKeysLen === 1 && exists(updatedStateKeys, observers[updateCounter].wantedKeys[0])) {
+        observers[updateCounter].callback();
+      } else if (updatedStateKeysLen < wantedKeysLen) {
         for (var b = 0; b < updatedStateKeysLen; b += 1) {
           if (exists(observers[updateCounter].wantedKeys, updatedStateKeys[b])) {
             observers[updateCounter].callback();
@@ -182,7 +187,7 @@ function updateStore(updatedStates) {
       } else {
         // they are either of the same length or
         // the wantedKeys is less than the updatedStateKeys
-        for (var _b = 0; _b < updatedStateKeysLen; _b += 1) {
+        for (var _b = 0; _b < wantedKeysLen; _b += 1) {
           if (exists(updatedStateKeys, observers[updateCounter].wantedKeys[_b])) {
             observers[updateCounter].callback();
             break;
@@ -273,17 +278,52 @@ function addEvent(ev, callback) {
   }
 }
 
-function emitEvent(ev, payload) {
+function removeEventCallback(ev, callback) {
   if (ev in eventBus) {
     var eventBusLen = eventBus[ev].length;
 
     for (var a = 0; a < eventBusLen; a += 1) {
-      if (eventBus[ev][a]) {
-        eventBus[ev][a](payload);
+      if (eventBus[ev][a] === callback) {
+        /**
+         * this will ensure that we don't miss an event
+         * listener due to unsubscription during emitEvent
+         */
+        if (emitEventCycle !== null && emitEventCycle.ev === ev && a <= emitEventCycle.counter) {
+          emitEventCycle.counter -= 1;
+        }
+
+        return eventBus[ev].splice(a, 1);
       }
     }
   }
 
   return -1;
+}
+
+function removeEvent(ev) {
+  if (ev in eventBus === false) {
+    return -1;
+  }
+
+  delete eventBus[ev];
+}
+
+function emitEvent(ev, payload) {
+  if (ev in eventBus === false) {
+    return -1;
+  }
+
+  emitEventCycle = {
+    ev: ev,
+    counter: 0
+  };
+
+  for (var eventBusLen = eventBus[ev].length; emitEventCycle.counter < eventBusLen; emitEventCycle.counter += 1) {
+    if (eventBus[ev][emitEventCycle.counter]) {
+      eventBus[ev][emitEventCycle.counter](payload);
+    }
+  }
+
+  emitEventCycle = null;
 }
 /** @end-fluxible-no-synth-events */

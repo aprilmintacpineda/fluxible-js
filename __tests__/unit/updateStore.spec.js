@@ -2,9 +2,14 @@
 import { store, updateStore, initializeStore, addObserver } from '../../src';
 
 describe('updateStore', () => {
-  test('Update store only updates parts of the store that\'s to be updated. getStore returns the updated store.', () => {
+  test('Update store only updates parts of the store that\'s to be updated', () => {
     const initialStore = {
       value: 'testValue',
+      test1: 'test1',
+      test2: 'test2',
+      test3: 'test3',
+      test4: 'test4',
+      test5: 'test5',
       count: 1
     };
 
@@ -16,6 +21,11 @@ describe('updateStore', () => {
 
     expect(store).toEqual({
       value: 'testValue',
+      test1: 'test1',
+      test2: 'test2',
+      test3: 'test3',
+      test4: 'test4',
+      test5: 'test5',
       count: 100
     });
 
@@ -25,6 +35,11 @@ describe('updateStore', () => {
 
     expect(store).toEqual({
       value: 'testValue',
+      test1: 'test1',
+      test2: 'test2',
+      test3: 'test3',
+      test4: 'test4',
+      test5: 'test5',
       count: 50
     });
 
@@ -35,6 +50,11 @@ describe('updateStore', () => {
 
     expect(store).toEqual({
       value: 'testing',
+      test1: 'test1',
+      test2: 'test2',
+      test3: 'test3',
+      test4: 'test4',
+      test5: 'test5',
       count: 100
     });
   });

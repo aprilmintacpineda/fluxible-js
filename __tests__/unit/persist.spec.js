@@ -280,7 +280,7 @@ describe('persist using syncStorage', () => {
     });
   });
 
-  test('returns the current store when getItem returned null', () => {
+  test('gives the current store when getItem returned null', () => {
     expect.assertions(4);
 
     const initialStore = {
