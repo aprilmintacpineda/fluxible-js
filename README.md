@@ -325,7 +325,9 @@ function myAction() {
 
 # Event bus
 
-## Adding events and event listeners
+## Adding events and event callbacks
+
+`addEvent` is used both to add an event and to add a subscriber to an event that already exists.
 
 ```js
 import { addEvent } from 'fluxible-js';
@@ -339,27 +341,68 @@ addEvent('my-event', payload => {
 });
 ```
 
-## Emitting events
+## Removing event callbacks
+
+`removeEventCallback` expects the first argument to be a string that refers to the event where the callback is subscribed. The second argument to be the callback that was provided to `addEvent`. If the callback was not found **or** the event does not exists, it will return `-1`.
 
 ```js
-import { emitEvent } from 'fluxible-js';
+import { addEvent, removeEventCallback } from 'fluxible-js';
 
-// returns -1 if the emitted event does not exists
-emitEvent('my-event', {
-  value: 1,
-  anotherValue: 2
-});
+function listener1 (payload) {
+  console.log('first listener', payload);
+}
+
+function listener2 (payload) {
+  console.log('second listener', payload);
+}
+
+addEvent('my-event', listener1);
+addEvent('my-event', listener2);
+
+if (removeEventCallback('my-event', listener2) !== -1) {
+  console.log('successfully removed event callback.');
+}
 ```
 
-The second argument to `emitEvent` is an object or value that would be passed to the event listeners as **payload**. Then from the event listeners, feel free to do whatever you need to do such as update the store.
+## Removing an event
+
+`removeEvent` expects only one parameter, which is the event that would be removed. If the event provided does not exists, it will return `-1`.
 
 ```js
-import { addEvent, updateStore } from 'fluxible-js';
+import { removeEvent } from 'fluxible-js';
 
-addEvent('my-event', payload => {
+function listener1 (payload) {
+  console.log('first listener', payload);
+}
+
+addEvent('my-event', listener1);
+
+if (removeEvent('my-event') !== -1) {
+  console.log('successfully removed event.');
+}
+```
+
+## Emitting events
+
+`emitEvent` expects the first argument to be the event that would be emitted. The second argument to be anything (primitive or non-primitive), which would be treated as the payload to be given to all the callbacks subscribed to that event. If the event does not exists, it will return `-1`.
+
+```js
+import { removeEventCallback, emitEvent, addEvent, updateStore } from 'fluxible-js';
+
+function listener1 (payload) {
   updateStore({
     newValue: payload.newValue
   });
+
+  // I'm done. Removing myself.
+  removeEventCallback('my-event', listener1);
+}
+
+addEvent('my-event', listener1);
+
+emitEvent('my-event', {
+  value: 1,
+  anotherValue: 2
 });
 ```
 
