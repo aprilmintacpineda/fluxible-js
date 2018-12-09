@@ -51,6 +51,8 @@ export function initializeStore (config) {
     if ('asyncStorage' in config.persist) {
       /** @end-fluxible-config-persist */
       /** @fluxible-config-sync */
+      store.asyncInitDone = false;
+
       config.persist.asyncStorage.getItem('fluxible-js').then(savedStore => {
         const persistedStates = config.persist.restore(
           savedStore
@@ -70,6 +72,22 @@ export function initializeStore (config) {
         for (let a = 0; a < persistedStateKeysLen; a += 1) {
           store[persistedStateKeys[a]] = persistedStates[persistedStateKeys[a]];
         }
+
+        store.asyncInitDone = true;
+
+        // notify all observers
+        // only notify observers that observes the store keys that were updated
+        updateCounter = 0;
+        for (
+          let observersLen = observers.length;
+          updateCounter < observersLen;
+          updateCounter += 1
+        ) {
+          if (observers[updateCounter]) {
+            observers[updateCounter].callback(true);
+          }
+        }
+        updateCounter = null;
       });
       /** @end-fluxible-config-sync */
       /** @fluxible-config-persist */

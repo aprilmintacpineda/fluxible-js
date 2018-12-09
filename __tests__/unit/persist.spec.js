@@ -1,6 +1,6 @@
 /** @format */
 
-import { updateStore, initializeStore, store } from '../../src';
+import { updateStore, initializeStore, store, addObserver } from '../../src';
 
 describe('persist using syncStorage', () => {
   test('calls getItem and setItem on config.persist.syncStorage', () => {
@@ -341,7 +341,7 @@ describe('persist using syncStorage', () => {
 
 describe('persist using asyncStorage', () => {
   test('gets item from asyncStorage then calls restore', () => {
-    expect.assertions(3);
+    expect.assertions(7);
 
     const initialStore = {
       user: null,
@@ -350,14 +350,19 @@ describe('persist using asyncStorage', () => {
     };
 
     const asyncStorage = {
-      getItem: jest.fn(() =>
-        Promise.resolve(
-          JSON.stringify({
-            user: {
-              name: 'test user'
-            }
+      getItem: jest.fn(
+        () =>
+          new Promise(resolve => {
+            setTimeout(() => {
+              resolve(
+                JSON.stringify({
+                  user: {
+                    name: 'test user'
+                  }
+                })
+              );
+            }, 200);
           })
-        )
       ),
       setItem: jest.fn(() => Promise.resolve())
     };
@@ -368,6 +373,11 @@ describe('persist using asyncStorage', () => {
       };
     });
 
+    const observer1 = jest.fn();
+    const observer2 = jest.fn();
+
+    addObserver(observer1, ['user']);
+
     initializeStore({
       initialStore,
       persist: {
@@ -376,10 +386,20 @@ describe('persist using asyncStorage', () => {
       }
     });
 
-    return Promise.resolve()
+    expect(store.asyncInitDone).toEqual(false);
+
+    addObserver(observer2, ['user']);
+
+    return new Promise(resolve => {
+      setTimeout(resolve, 200);
+    })
       .then(() => {
         expect(asyncStorage.getItem).toHaveBeenCalled();
         expect(restore).toHaveBeenCalled();
+
+        expect(observer1).toHaveBeenCalledWith(true);
+        expect(observer2).toHaveBeenCalledWith(true);
+        expect(store.asyncInitDone).toEqual(true);
 
         updateStore({
           user: 'hello'
