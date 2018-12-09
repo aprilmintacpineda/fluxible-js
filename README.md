@@ -4,6 +4,13 @@
 
 Smaller, faster, better state management system that supports asynchronicity and state persistence out of the box.
 
+# Examples
+
+These examples are using [inferno-js](https://github.com/infernojs/inferno) with [inferno-fluxible](https://github.com/aprilmintacpineda/inferno-fluxible).
+
+- [Using `syncStorage`](https://aprilmintacpineda.github.io/inferno-fluxible/syncStorage/index.html).
+- [Using `asyncStorage`](https://aprilmintacpineda.github.io/inferno-fluxible/asyncStorage/index.html).
+
 # Tests
 
 ## Unit tests
