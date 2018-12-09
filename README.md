@@ -266,6 +266,8 @@ initializeStore({
 
 You should only specify either `syncStorage` or `asyncStorage`. Not both. The `asyncStorage` only supports [Promise API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
 
+When using `asyncStorage`, **after** `persist.restore`, all your observers will be called with `true` as an argument indicating that the initialization just completed.
+
 ## Listen to store updates and getting the store
 
 ```jsx
