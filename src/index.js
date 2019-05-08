@@ -35,7 +35,7 @@ function exists (arr, needle) {
 }
 
 export function initializeStore (config) {
-  store = { ...config.initialStore };
+  store = config.initialStore;
 
   /** @fluxible-config-no-JSON */
   /** @fluxible-config-use-JSON */
@@ -264,6 +264,8 @@ export function addEvent (ev, callback) {
   } else {
     eventBus[ev] = [callback];
   }
+
+  return () => removeEventCallback(ev, callback);
 }
 
 export function removeEventCallback (ev, callback) {

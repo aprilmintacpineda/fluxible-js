@@ -60,6 +60,20 @@ describe('eventBus', () => {
     expect(removeEventCallback('test-event', dummyCallback)).toEqual(-1);
   });
 
+  test('can remove callback twice and returns -1', () => {
+    const callback1 = jest.fn();
+    const callback2 = jest.fn();
+
+    addEvent('test-event', callback1);
+    const listener1 = addEvent('test-event', callback2);
+
+    expect(removeEventCallback('test-event', callback1)).not.toEqual(-1);
+    expect(listener1()).not.toEqual(-1);
+
+    expect(removeEventCallback('test-event', callback1)).toEqual(-1);
+    expect(listener1()).toEqual(-1);
+  });
+
   test('calls only listeners for that event', () => {
     const callback1 = jest.fn();
     const callback2 = jest.fn();
@@ -689,5 +703,55 @@ describe('Does not skip an event callback in the event that an event callback wa
     expect(callback8).toHaveBeenCalledTimes(2);
     expect(callback9).toHaveBeenCalledTimes(2);
     expect(callback10).toHaveBeenCalledTimes(2);
+  });
+
+  test('Can remove event listeners using the return callback of addEvent', () => {
+    let canRemove = false;
+
+    const callback1 = jest.fn();
+    const callback2 = jest.fn();
+    const callback3 = jest.fn();
+    const callback5 = jest.fn();
+    const callback6 = jest.fn();
+    const callback7 = jest.fn();
+
+    const callback4 = jest.fn(() => {
+      if (canRemove) {
+        listener3();
+        listener2();
+        listener5();
+        removeEventCallback('test-event', callback6);
+      }
+    });
+
+    addEvent('test-event', callback1);
+    const listener2 = addEvent('test-event', callback2);
+    const listener3 = addEvent('test-event', callback3);
+    addEvent('test-event', callback4);
+    const listener5 = addEvent('test-event', callback5);
+    addEvent('test-event', callback6);
+    addEvent('test-event', callback7);
+
+    emitEvent('test-event');
+
+    expect(callback1).toHaveBeenCalledTimes(1);
+    expect(callback2).toHaveBeenCalledTimes(1);
+    expect(callback3).toHaveBeenCalledTimes(1);
+    expect(callback4).toHaveBeenCalledTimes(1);
+    expect(callback5).toHaveBeenCalledTimes(1);
+    expect(callback6).toHaveBeenCalledTimes(1);
+    expect(callback7).toHaveBeenCalledTimes(1);
+
+    canRemove = true;
+
+    emitEvent('test-event');
+
+    expect(callback1).toHaveBeenCalledTimes(2);
+    expect(callback2).toHaveBeenCalledTimes(2);
+    expect(callback3).toHaveBeenCalledTimes(2);
+    expect(callback4).toHaveBeenCalledTimes(2);
+    expect(callback5).toHaveBeenCalledTimes(1);
+    expect(callback6).toHaveBeenCalledTimes(1);
+    expect(callback7).toHaveBeenCalledTimes(2);
   });
 });

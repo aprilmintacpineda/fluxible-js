@@ -217,14 +217,18 @@ Which means you **don't** need `JSON.parse` and `JSON.stringify`.
 ```js
 import { initializeStore } from 'fluxible-js';
 
-initializeStore({
-  initialStore: {
+function getInitialStore () {
+  return {
     user: null,
     someOtherState: 'value',
     anotherState: {
       value: 'value'
     }
-  },
+  };
+}
+
+initializeStore({
+  initialStore: getInitialStore(),
   persist: {
     useJSON: false,
     syncStorage: window.localStorage,
@@ -237,7 +241,7 @@ initializeStore({
 
 In the case above, only `user` would be saved and the rest wouldn't be saved.
 
-`initializeStore` function expects an object as the only parameter, the object have a required property called `initialStore` which would be used as the initial value of the store. It does not mutate the original `initialStore` so you are still free to use that some other time in your application.
+`initializeStore` function expects an object as the only parameter, the object have a required property called `initialStore` which would be used as the initial value of the store. `initialStore` will be mutated every updates so it is ideal to call a function that returns the `initialStore`. This will allow you to reuse that function to get the `initialStore` throughout the life cycle of your application.
 
 `persist` is an optional property which must also be an object containing the following properties:
 
@@ -368,9 +372,30 @@ function listener2 (payload) {
 addEvent('my-event', listener1);
 addEvent('my-event', listener2);
 
-if (removeEventCallback('my-event', listener2) !== -1) {
-  console.log('successfully removed event callback.');
-}
+console.log(removeEventCallback('my-event', listener1));
+console.log(removeEventCallback('my-event', listener2));
+
+console.log(removeEventCallback('my-event', listener1)); // -1
+console.log(removeEventCallback('my-event', listener2)); // -1
+```
+
+You can also use the returned callback of `addEvent` to remove a callback function. This is specially useful when you don't want to create a reference to the callback yourself. It also uses `removeEventCallback`, passing the `ev` and `callback` from context.
+
+```js
+import { addEvent, removeEventCallback } from 'fluxible-js';
+
+const listener1 = addEvent('my-event', () => {
+  console.log('first listener', payload);
+});
+const listener2 = addEvent('my-event', () => {
+  console.log('second listener', payload);
+});
+
+console.log(listener1());
+console.log(listener2());
+
+console.log(listener1()); // -1
+console.log(listener2()); // -1
 ```
 
 ## Removing an event
