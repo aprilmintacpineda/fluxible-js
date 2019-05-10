@@ -341,7 +341,7 @@ describe('persist using syncStorage', () => {
 
 describe('persist using asyncStorage', () => {
   test('gets item from asyncStorage then calls restore', () => {
-    expect.assertions(7);
+    expect.assertions(4);
 
     const initialStore = {
       user: null,
@@ -375,18 +375,20 @@ describe('persist using asyncStorage', () => {
 
     const observer1 = jest.fn();
     const observer2 = jest.fn();
+    const asyncInitCallback = jest.fn();
 
     addObserver(observer1, ['user']);
 
-    initializeStore({
-      initialStore,
-      persist: {
-        asyncStorage,
-        restore
-      }
-    });
-
-    expect(store.asyncInitDone).toEqual(false);
+    initializeStore(
+      {
+        initialStore,
+        persist: {
+          asyncStorage,
+          restore
+        }
+      },
+      asyncInitCallback
+    );
 
     addObserver(observer2, ['user']);
 
@@ -394,12 +396,9 @@ describe('persist using asyncStorage', () => {
       setTimeout(resolve, 200);
     })
       .then(() => {
+        expect(asyncInitCallback).toHaveBeenCalledTimes(1);
         expect(asyncStorage.getItem).toHaveBeenCalled();
         expect(restore).toHaveBeenCalled();
-
-        expect(observer1).toHaveBeenCalledWith(true);
-        expect(observer2).toHaveBeenCalledWith(true);
-        expect(store.asyncInitDone).toEqual(true);
 
         updateStore({
           user: 'hello'

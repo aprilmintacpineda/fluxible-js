@@ -24,17 +24,12 @@ let useJSON = true;
 
 export let store = {};
 
-function exists (arr, needle) {
-  for (let a = 0, len = arr.length; a < len; a += 1) {
-    if (arr[a] === needle) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-export function initializeStore (config) {
+export function initializeStore (
+  config,
+  /** @fluxible-config-no-persist */
+  asyncInitCallback
+  /** @end-fluxible-config-no-persist */
+) {
   store = config.initialStore;
 
   /** @fluxible-config-no-JSON */
@@ -51,7 +46,6 @@ export function initializeStore (config) {
     if ('asyncStorage' in config.persist) {
       /** @end-fluxible-config-persist */
       /** @fluxible-config-sync */
-      store.asyncInitDone = false;
 
       config.persist.asyncStorage.getItem('fluxible-js').then(savedStore => {
         const persistedStates = config.persist.restore(
@@ -73,21 +67,7 @@ export function initializeStore (config) {
           store[persistedStateKeys[a]] = persistedStates[persistedStateKeys[a]];
         }
 
-        store.asyncInitDone = true;
-
-        // notify all observers
-        // only notify observers that observes the store keys that were updated
-        updateCounter = 0;
-        for (
-          let observersLen = observers.length;
-          updateCounter < observersLen;
-          updateCounter += 1
-        ) {
-          if (observers[updateCounter]) {
-            observers[updateCounter].callback(true);
-          }
-        }
-        updateCounter = null;
+        if (asyncInitCallback) asyncInitCallback();
       });
       /** @end-fluxible-config-sync */
       /** @fluxible-config-persist */
@@ -147,7 +127,7 @@ export function updateStore (updatedStates) {
       persistedStateKeys !== 0 &&
       /** @end-fluxible-config-persist */
       !shouldPersist &&
-      exists(persistedStateKeys, updatedStateKeys[a])
+      persistedStateKeys.indexOf(updatedStateKeys[a]) > -1
     ) {
       shouldPersist = true;
     }
@@ -164,13 +144,14 @@ export function updateStore (updatedStates) {
       // we want to maximize performance, so we loop as little as possible
       if (
         (updatedStateKeysLen === 1 &&
-          exists(observers[updateCounter].wantedKeys, updatedStateKeys[0])) ||
-        (wantedKeysLen === 1 && exists(updatedStateKeys, observers[updateCounter].wantedKeys[0]))
+          observers[updateCounter].wantedKeys.indexOf(updatedStateKeys[0]) > -1) ||
+        (wantedKeysLen === 1 &&
+          updatedStateKeys.indexOf(observers[updateCounter].wantedKeys[0]) > -1)
       ) {
         observers[updateCounter].callback();
       } else if (updatedStateKeysLen < wantedKeysLen) {
         for (let b = 0; b < updatedStateKeysLen; b += 1) {
-          if (exists(observers[updateCounter].wantedKeys, updatedStateKeys[b])) {
+          if (observers[updateCounter].wantedKeys.indexOf(updatedStateKeys[b]) > -1) {
             observers[updateCounter].callback();
             break;
           }
@@ -179,7 +160,7 @@ export function updateStore (updatedStates) {
         // they are either of the same length or
         // the wantedKeys is less than the updatedStateKeys
         for (let b = 0; b < wantedKeysLen; b += 1) {
-          if (exists(updatedStateKeys, observers[updateCounter].wantedKeys[b])) {
+          if (updatedStateKeys.indexOf(observers[updateCounter].wantedKeys[b]) > -1) {
             observers[updateCounter].callback();
             break;
           }
@@ -265,43 +246,36 @@ export function addEvent (ev, callback) {
     eventBus[ev] = [callback];
   }
 
-  return () => removeEventCallback(ev, callback);
-}
+  return () => {
+    if (ev in eventBus) {
+      const eventBusLen = eventBus[ev].length;
 
-export function removeEventCallback (ev, callback) {
-  if (ev in eventBus) {
-    const eventBusLen = eventBus[ev].length;
+      for (let a = 0; a < eventBusLen; a += 1) {
+        if (eventBus[ev][a] === callback) {
+          /**
+           * this will ensure that we don't miss an event
+           * listener due to unsubscription during emitEvent
+           */
+          if (emitEventCycle !== null && emitEventCycle.ev === ev && a <= emitEventCycle.counter) {
+            emitEventCycle.counter -= 1;
+          }
 
-    for (let a = 0; a < eventBusLen; a += 1) {
-      if (eventBus[ev][a] === callback) {
-        /**
-         * this will ensure that we don't miss an event
-         * listener due to unsubscription during emitEvent
-         */
-        if (emitEventCycle !== null && emitEventCycle.ev === ev && a <= emitEventCycle.counter) {
-          emitEventCycle.counter -= 1;
+          return eventBus[ev].splice(a, 1);
         }
-
-        return eventBus[ev].splice(a, 1);
       }
     }
-  }
 
-  return -1;
+    return -1;
+  };
 }
 
 export function removeEvent (ev) {
-  if (ev in eventBus === false) {
-    return -1;
-  }
-
+  if (ev in eventBus === false) return -1;
   delete eventBus[ev];
 }
 
 export function emitEvent (ev, payload) {
-  if (ev in eventBus === false) {
-    return -1;
-  }
+  if (ev in eventBus === false) return -1;
 
   emitEventCycle = {
     ev,

@@ -257,27 +257,32 @@ Persist feature would only save keys that were returned by `config.persist.resto
 import { initializeStore } from 'fluxible-js';
 import { AsyncStorage } from 'react-native';
 
-initializeStore({
-  initialStore: {
-    user: null,
-    someOtherState: 'value',
-    anotherState: {
-      value: 'value'
+initializeStore(
+  {
+    initialStore: {
+      user: null,
+      someOtherState: 'value',
+      anotherState: {
+        value: 'value'
+      }
+    },
+    persist: {
+      stringify: false,
+      asyncStorage: AsyncStorage,
+      restore: savedStore => ({
+        user: savedStore.user
+      })
     }
   },
-  persist: {
-    stringify: false,
-    asyncStorage: AsyncStorage,
-    restore: savedStore => ({
-      user: savedStore.user
-    })
+  () => {
+    console.log('initialization completed!');
   }
-});
+);
 ```
 
 You should only specify either `syncStorage` or `asyncStorage`. Not both. The `asyncStorage` only supports [Promise API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
 
-When using `asyncStorage`, **after** `persist.restore`, all your observers will be called with `true` as an argument indicating that the initialization just completed.
+When using `asyncStorage`, you can provide a 2nd argument which is a callback function that will be called after initialization has completed.
 
 ## Listen to store updates and getting the store
 
@@ -356,33 +361,10 @@ addEvent('my-event', payload => {
 
 ## Removing event callbacks
 
-`removeEventCallback` expects the first argument to be a string that refers to the event where the callback is subscribed. The second argument to be the callback that was provided to `addEvent`. If the callback was not found **or** the event does not exists, it will return `-1`.
+`addEvent` returns a callback function that you can call when you want to remove that listener from the event. This callback returns `-1` when the listener was not found from the event OR the event itself does not exists.
 
 ```js
-import { addEvent, removeEventCallback } from 'fluxible-js';
-
-function listener1 (payload) {
-  console.log('first listener', payload);
-}
-
-function listener2 (payload) {
-  console.log('second listener', payload);
-}
-
-addEvent('my-event', listener1);
-addEvent('my-event', listener2);
-
-console.log(removeEventCallback('my-event', listener1));
-console.log(removeEventCallback('my-event', listener2));
-
-console.log(removeEventCallback('my-event', listener1)); // -1
-console.log(removeEventCallback('my-event', listener2)); // -1
-```
-
-You can also use the returned callback of `addEvent` to remove a callback function. This is specially useful when you don't want to create a reference to the callback yourself. It also uses `removeEventCallback`, passing the `ev` and `callback` from context.
-
-```js
-import { addEvent, removeEventCallback } from 'fluxible-js';
+import { addEvent, removeEvent } from 'fluxible-js';
 
 const listener1 = addEvent('my-event', () => {
   console.log('first listener', payload);
@@ -396,6 +378,13 @@ console.log(listener2());
 
 console.log(listener1()); // -1
 console.log(listener2()); // -1
+
+const listener3 = addEvent('my-event-3', () => {
+  console.log('my event 3 listener', payload);
+});
+
+removeEvent('my-event-3');
+console.log(listener3()); // -1
 ```
 
 ## Removing an event
