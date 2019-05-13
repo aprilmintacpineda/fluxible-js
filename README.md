@@ -410,18 +410,17 @@ if (removeEvent('my-event') !== -1) {
 `emitEvent` expects the first argument to be the event that would be emitted. The second argument to be anything (primitive or non-primitive), which would be treated as the payload to be given to all the callbacks subscribed to that event. If the event does not exists, it will return `-1`.
 
 ```js
-import { removeEventCallback, emitEvent, addEvent, updateStore } from 'fluxible-js';
+import { emitEvent, addEvent, updateStore } from 'fluxible-js';
 
 function listener1 (payload) {
   updateStore({
     newValue: payload.newValue
   });
 
-  // I'm done. Removing myself.
-  removeEventCallback('my-event', listener1);
+  removeListener1(); // I'm done. Removing myself.
 }
 
-addEvent('my-event', listener1);
+const removeListener1 = addEvent('my-event', listener1);
 
 emitEvent('my-event', {
   value: 1,
