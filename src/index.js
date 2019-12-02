@@ -34,9 +34,7 @@ export function initializeStore (
 
   /** @fluxible-config-no-JSON */
   /** @fluxible-config-use-JSON */
-  if (config.useJSON === false) {
-    useJSON = false;
-  }
+  if (config.useJSON === false) useJSON = false;
   /** @end-fluxible-config-use-JSON */
   /** @end-fluxible-config-no-JSON */
 
@@ -63,9 +61,8 @@ export function initializeStore (
         persistedStateKeysLen = persistedStateKeys.length;
         persistStorage = config.persist.asyncStorage;
 
-        for (let a = 0; a < persistedStateKeysLen; a += 1) {
+        for (let a = 0; a < persistedStateKeysLen; a++)
           store[persistedStateKeys[a]] = persistedStates[persistedStateKeys[a]];
-        }
 
         if (asyncInitCallback) asyncInitCallback();
       });
@@ -90,9 +87,8 @@ export function initializeStore (
       persistedStateKeysLen = persistedStateKeys.length;
       persistStorage = config.persist.syncStorage;
 
-      for (let a = 0; a < persistedStateKeysLen; a += 1) {
+      for (let a = 0; a < persistedStateKeysLen; a++)
         store[persistedStateKeys[a]] = persistedStates[persistedStateKeys[a]];
-      }
       /** @end-fluxible-config-async */
       /** @fluxible-config-persist */
     }
@@ -112,7 +108,7 @@ export function updateStore (updatedStates) {
   const updatedStateKeys = Object.keys(updatedStates);
   const updatedStateKeysLen = updatedStateKeys.length;
 
-  for (let a = 0; a < updatedStateKeysLen; a += 1) {
+  for (let a = 0; a < updatedStateKeysLen; a++) {
     store[updatedStateKeys[a]] = updatedStates[updatedStateKeys[a]];
 
     /** @fluxible-config-no-persist */
@@ -128,39 +124,37 @@ export function updateStore (updatedStates) {
       /** @end-fluxible-config-persist */
       !shouldPersist &&
       persistedStateKeys.indexOf(updatedStateKeys[a]) > -1
-    ) {
+    )
       shouldPersist = true;
-    }
     /** @end-fluxible-config-no-persist */
   }
 
   // only notify observers that observes the store keys that were updated
   updateCounter = 0;
 
-  for (let observersLen = observers.length; updateCounter < observersLen; updateCounter += 1) {
+  for (let observersLen = observers.length; updateCounter < observersLen; updateCounter++) {
     if (observers[updateCounter]) {
-      const wantedKeysLen = observers[updateCounter].wantedKeys.length;
+      const keysLen = observers[updateCounter].keys.length;
 
       // we want to maximize performance, so we loop as little as possible
-      if (
-        (updatedStateKeysLen === 1 &&
-          observers[updateCounter].wantedKeys.indexOf(updatedStateKeys[0]) > -1) ||
-        (wantedKeysLen === 1 &&
-          updatedStateKeys.indexOf(observers[updateCounter].wantedKeys[0]) > -1)
-      ) {
-        observers[updateCounter].callback();
-      } else if (updatedStateKeysLen < wantedKeysLen) {
-        for (let b = 0; b < updatedStateKeysLen; b += 1) {
-          if (observers[updateCounter].wantedKeys.indexOf(updatedStateKeys[b]) > -1) {
+      if (updatedStateKeysLen === 1) {
+        if (observers[updateCounter].keys.indexOf(updatedStateKeys[0]) > -1)
+          observers[updateCounter].callback();
+      } else if (keysLen === 1) {
+        if (updatedStateKeys.indexOf(observers[updateCounter].keys[0]) > -1)
+          observers[updateCounter].callback();
+      } else if (updatedStateKeysLen < keysLen) {
+        for (let b = 0; b < updatedStateKeysLen; b++) {
+          if (observers[updateCounter].keys.indexOf(updatedStateKeys[b]) > -1) {
             observers[updateCounter].callback();
             break;
           }
         }
       } else {
         // they are either of the same length or
-        // the wantedKeys is less than the updatedStateKeys
-        for (let b = 0; b < wantedKeysLen; b += 1) {
-          if (updatedStateKeys.indexOf(observers[updateCounter].wantedKeys[b]) > -1) {
+        // the keys is less than the updatedStateKeys
+        for (let b = 0; b < keysLen; b++) {
+          if (updatedStateKeys.indexOf(observers[updateCounter].keys[b]) > -1) {
             observers[updateCounter].callback();
             break;
           }
@@ -189,9 +183,8 @@ export function updateStore (updatedStates) {
       if (persistTimeout !== 0) {
         const statesToSave = {};
 
-        for (let a = 0; a < persistedStateKeysLen; a += 1) {
+        for (let a = 0; a < persistedStateKeysLen; a++)
           statesToSave[persistedStateKeys[a]] = store[persistedStateKeys[a]];
-        }
 
         persistStorage.setItem(
           'fluxible-js',
@@ -210,28 +203,25 @@ export function updateStore (updatedStates) {
   /** @end-fluxible-config-no-persist */
 }
 
-export function addObserver (callback, wantedKeys) {
+export function addObserver (callback, keys) {
   const thisId = id;
 
   observers.push({
     callback,
-    wantedKeys,
+    keys,
     id: thisId
   });
 
-  id += 1;
+  id++;
 
   return () => {
-    for (let a = 0, observersLen = observers.length; a < observersLen; a += 1) {
+    for (let a = 0, observersLen = observers.length; a < observersLen; a++) {
       if (observers[a] && observers[a].id === thisId) {
         /**
          * this will ensure that we don't miss an observer due
          * to unsubscription during update
          */
-        if (updateCounter !== null && a <= updateCounter) {
-          updateCounter -= 1;
-        }
-
+        if (updateCounter !== null && a <= updateCounter) updateCounter -= 1;
         return observers.splice(a, 1);
       }
     }
@@ -240,25 +230,21 @@ export function addObserver (callback, wantedKeys) {
 
 /** @fluxible-no-synth-events */
 export function addEvent (ev, callback) {
-  if (ev in eventBus) {
-    eventBus[ev].push(callback);
-  } else {
-    eventBus[ev] = [callback];
-  }
+  if (ev in eventBus) eventBus[ev].push(callback);
+  else eventBus[ev] = [callback];
 
   return () => {
     if (ev in eventBus) {
       const eventBusLen = eventBus[ev].length;
 
-      for (let a = 0; a < eventBusLen; a += 1) {
+      for (let a = 0; a < eventBusLen; a++) {
         if (eventBus[ev][a] === callback) {
           /**
            * this will ensure that we don't miss an event
            * listener due to unsubscription during emitEvent
            */
-          if (emitEventCycle !== null && emitEventCycle.ev === ev && a <= emitEventCycle.counter) {
+          if (emitEventCycle !== null && emitEventCycle.ev === ev && a <= emitEventCycle.counter)
             emitEventCycle.counter -= 1;
-          }
 
           return eventBus[ev].splice(a, 1);
         }
@@ -285,12 +271,9 @@ export function emitEvent (ev, payload) {
   for (
     let eventBusLen = eventBus[ev].length;
     emitEventCycle.counter < eventBusLen;
-    emitEventCycle.counter += 1
-  ) {
-    if (eventBus[ev][emitEventCycle.counter]) {
-      eventBus[ev][emitEventCycle.counter](payload);
-    }
-  }
+    emitEventCycle.counter++
+  )
+    if (eventBus[ev][emitEventCycle.counter]) eventBus[ev][emitEventCycle.counter](payload);
 
   emitEventCycle = null;
 }
