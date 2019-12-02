@@ -4,12 +4,9 @@
 
 Smaller, faster, better state management system that supports asynchronicity and state persistence out of the box.
 
-# Examples
+# Demo
 
-These examples are using [inferno-js](https://github.com/infernojs/inferno) with [inferno-fluxible](https://github.com/aprilmintacpineda/inferno-fluxible).
-
-- [Using `syncStorage`](https://aprilmintacpineda.github.io/inferno-fluxible/syncStorage/index.html).
-- [Using `asyncStorage`](https://aprilmintacpineda.github.io/inferno-fluxible/asyncStorage/index.html).
+[See demo](https://aprilmintacpineda.github.io/react-fluxible/). This demo is using [react-fluxible](https://github.com/aprilmintacpineda/react-fluxible).
 
 # Tests
 
