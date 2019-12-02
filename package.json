@@ -1,6 +1,6 @@
 {
   "name": "fluxible-js",
-  "version": "4.4.2",
+  "version": "4.4.3",
   "description": "Smaller, faster, better state management system that supports asynchronicity and state persistence out of the box.",
   "main": "src/index.js",
   "files": [
