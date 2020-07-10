@@ -66,7 +66,7 @@ The goal of this state management library is to allow you to initialize, update,
 
 # Building
 
-Starting `4.0.0`, `fluxible-js` was intentionally shipped without building. This is to accomodate [code removal](#code-removal) support, which I encourage everyone to put to good use in order to save filesize and also performance.
+Starting `4.0.0`, `fluxible-js` supported [code removal](#code-removal), which I encourage everyone to put to good use in order to save extra filesize and also performance, but it is completely optional and the library is still highly performant even without utilizing this.
 
 Simply add the following to your build, under `module.rules`:
 
