@@ -6,14 +6,13 @@ let emitEventCycle = null;
 /** @end-fluxible-no-synth-events */
 const observers = [];
 let id = 0;
-let updateCounter = null;
+let updateCounter = 0;
 
 /** @fluxible-config-no-persist */
 let shouldPersist = false;
-let persistStorage = 0;
-let persistTimeout = 0;
-let persistedStateKeys = 0;
-let persistedStateKeysLen = 0;
+let persistStorage = null;
+let persistTimeout = null;
+let persistedStateKeys = null;
 /** @end-fluxible-config-no-persist */
 
 /** @fluxible-config-no-JSON */
@@ -58,11 +57,11 @@ export function initializeStore (
         );
 
         persistedStateKeys = Object.keys(persistedStates);
-        persistedStateKeysLen = persistedStateKeys.length;
         persistStorage = config.persist.asyncStorage;
 
-        for (let a = 0; a < persistedStateKeysLen; a++)
-          store[persistedStateKeys[a]] = persistedStates[persistedStateKeys[a]];
+        persistedStateKeys.forEach(field => {
+          store[field] = persistedStates[field];
+        });
 
         if (asyncInitCallback) asyncInitCallback();
       });
@@ -84,11 +83,11 @@ export function initializeStore (
       );
 
       persistedStateKeys = Object.keys(persistedStates);
-      persistedStateKeysLen = persistedStateKeys.length;
       persistStorage = config.persist.syncStorage;
 
-      for (let a = 0; a < persistedStateKeysLen; a++)
-        store[persistedStateKeys[a]] = persistedStates[persistedStateKeys[a]];
+      persistedStateKeys.forEach(field => {
+        store[field] = persistedStates[field];
+      });
       /** @end-fluxible-config-async */
       /** @fluxible-config-persist */
     }
@@ -99,17 +98,17 @@ export function initializeStore (
 
 export function updateStore (updatedStates) {
   /** @fluxible-config-no-persist */
-  if (persistTimeout !== 0) {
+  if (persistTimeout) {
     clearTimeout(persistTimeout);
-    persistTimeout = 0;
+    persistTimeout = null;
   }
   /** @end-fluxible-config-no-persist */
 
   const updatedStateKeys = Object.keys(updatedStates);
   const updatedStateKeysLen = updatedStateKeys.length;
 
-  for (let a = 0; a < updatedStateKeysLen; a++) {
-    store[updatedStateKeys[a]] = updatedStates[updatedStateKeys[a]];
+  updatedStateKeys.forEach(field => {
+    store[field] = updatedStates[field];
 
     /** @fluxible-config-no-persist */
     /**
@@ -120,33 +119,30 @@ export function updateStore (updatedStates) {
      */
     if (
       /** @fluxible-config-persist */
-      persistedStateKeys !== 0 &&
+      persistedStateKeys &&
       /** @end-fluxible-config-persist */
       !shouldPersist &&
-      persistedStateKeys.indexOf(updatedStateKeys[a]) > -1
+      persistedStateKeys.indexOf(field) > -1
     )
       shouldPersist = true;
     /** @end-fluxible-config-no-persist */
-  }
+  });
 
   // only notify observers that observes the store keys that were updated
   updateCounter = 0;
 
   for (let observersLen = observers.length; updateCounter < observersLen; updateCounter++) {
-    if (observers[updateCounter]) {
-      const keysLen = observers[updateCounter].keys.length;
+    const observer = observers[updateCounter];
+
+    if (observer) {
+      const { keys, callback } = observer;
+      const keysLen = keys.length;
 
       // we want to maximize performance, so we loop as little as possible
-      if (updatedStateKeysLen === 1) {
-        if (observers[updateCounter].keys.indexOf(updatedStateKeys[0]) > -1)
-          observers[updateCounter].callback();
-      } else if (keysLen === 1) {
-        if (updatedStateKeys.indexOf(observers[updateCounter].keys[0]) > -1)
-          observers[updateCounter].callback();
-      } else if (updatedStateKeysLen < keysLen) {
+      if (updatedStateKeysLen < keysLen) {
         for (let b = 0; b < updatedStateKeysLen; b++) {
-          if (observers[updateCounter].keys.indexOf(updatedStateKeys[b]) > -1) {
-            observers[updateCounter].callback();
+          if (keys.indexOf(updatedStateKeys[b]) > -1) {
+            callback();
             break;
           }
         }
@@ -154,8 +150,8 @@ export function updateStore (updatedStates) {
         // they are either of the same length or
         // the keys is less than the updatedStateKeys
         for (let b = 0; b < keysLen; b++) {
-          if (updatedStateKeys.indexOf(observers[updateCounter].keys[b]) > -1) {
-            observers[updateCounter].callback();
+          if (updatedStateKeys.indexOf(keys[b]) > -1) {
+            callback();
             break;
           }
         }
@@ -163,7 +159,7 @@ export function updateStore (updatedStates) {
     }
   }
 
-  updateCounter = null;
+  updateCounter = 0;
 
   /** @fluxible-config-no-persist */
   /**
@@ -180,11 +176,12 @@ export function updateStore (updatedStates) {
        * in case we are next in stack and the persistTimeout
        * has just been cleared, we shouldn't save states to the store.
        */
-      if (persistTimeout !== 0) {
+      if (persistTimeout) {
         const statesToSave = {};
 
-        for (let a = 0; a < persistedStateKeysLen; a++)
-          statesToSave[persistedStateKeys[a]] = store[persistedStateKeys[a]];
+        persistedStateKeys.forEach(field => {
+          statesToSave[field] = store[field];
+        });
 
         persistStorage.setItem(
           'fluxible-js',
@@ -204,19 +201,19 @@ export function updateStore (updatedStates) {
 }
 
 export function addObserver (callback, keys) {
-  const thisId = id;
+  const observerId = id;
 
   observers.push({
     callback,
     keys,
-    id: thisId
+    id: observerId
   });
 
   id++;
 
   return () => {
     for (let a = 0, observersLen = observers.length; a < observersLen; a++) {
-      if (observers[a] && observers[a].id === thisId) {
+      if (observers[a] && observers[a].id === observerId) {
         /**
          * this will ensure that we don't miss an observer due
          * to unsubscription during update
@@ -243,7 +240,7 @@ export function addEvent (ev, callback) {
            * this will ensure that we don't miss an event
            * listener due to unsubscription during emitEvent
            */
-          if (emitEventCycle !== null && emitEventCycle.ev === ev && a <= emitEventCycle.counter)
+          if (emitEventCycle && emitEventCycle.ev === ev && a <= emitEventCycle.counter)
             emitEventCycle.counter -= 1;
 
           return eventBus[ev].splice(a, 1);
@@ -256,12 +253,12 @@ export function addEvent (ev, callback) {
 }
 
 export function removeEvent (ev) {
-  if (ev in eventBus === false) return -1;
+  if (!(ev in eventBus)) return -1;
   delete eventBus[ev];
 }
 
 export function emitEvent (ev, payload) {
-  if (ev in eventBus === false) return -1;
+  if (!(ev in eventBus)) return -1;
 
   emitEventCycle = {
     ev,
