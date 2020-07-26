@@ -193,6 +193,7 @@ export function updateStore (updatedStates) {
             : /** @end-fluxible-config-no-JSON */ statesToSave
           /** @end-fluxible-config-use-JSON */
         );
+
         shouldPersist = false;
       }
     }, 200);
