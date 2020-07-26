@@ -8,6 +8,10 @@ Smaller, faster, better state management system that supports asynchronicity and
 
 [See demo](https://aprilmintacpineda.github.io/react-fluxible/). This demo is using [react-fluxible](https://github.com/aprilmintacpineda/react-fluxible).
 
+# Change logs
+
+For the change logs, please see the [release notes](https://github.com/aprilmintacpineda/fluxible-js/releases)
+
 # Tests
 
 ## Unit tests
