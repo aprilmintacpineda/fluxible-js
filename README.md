@@ -360,9 +360,37 @@ addEvent('my-event', payload => {
 });
 ```
 
+There is also `addEvents` which accepts an array of events you want your callback to listen to. This is specially useful when you want to also remove this event with only one function call. So you can turn this:
+
+```js
+const eventListenerCallback = payload => {
+  console.log(payload);
+};
+
+const createdListener = addEvent('recordCreated', eventListenerCallback);
+const editedListener = addEvent('recordEdited', eventListenerCallback);
+
+// remove created listener
+createdListener();
+// remove edited listener
+editedListener();
+```
+
+into this:
+
+```js
+const removeListener = addEvents(['recordCreated', 'recordEdited'], payload => {
+  console.log(payload);
+});
+
+// to remove the events callback above
+// this will remove it for both 'recordCreated' and 'recordEdited'
+removeListener();
+```
+
 ## Removing event callbacks
 
-`addEvent` returns a callback function that you can call when you want to remove that listener from the event. This callback returns `-1` when the listener was not found from the event OR the event itself does not exists.
+`addEvent` returns a callback function that you can call when you want to remove that listener from the event it's listening to. This callback returns `-1` when the listener was not found from the event OR the event itself does not exists.
 
 ```js
 import { addEvent, removeEvent } from 'fluxible-js';
@@ -388,6 +416,18 @@ removeEvent('my-event-3');
 console.log(listener3()); // -1
 ```
 
+`addEvents` returns a callback function that you can call to remove that listener from the events it's listening to. This callback does not return anything.
+
+```js
+const removeListener = addEvents(['recordCreated', 'recordEdited'], payload => {
+  console.log(payload);
+});
+
+// to remove the events callback above
+// this will remove it for both 'recordCreated' and 'recordEdited'
+removeListener(); // undefined
+```
+
 ## Removing an event
 
 `removeEvent` expects only one parameter, which is the event that would be removed. If the event provided does not exists, it will return `-1`.
@@ -404,6 +444,20 @@ addEvent('my-event', listener1);
 if (removeEvent('my-event') !== -1) {
   console.log('successfully removed event.');
 }
+```
+
+there is also `removeEvents` which does the same thing but accepts an array of events to be removed, so you can turn this:
+
+```js
+removeEvent('my-event');
+removeEvent('my-other-event');
+removeEvent('even-more-event');
+```
+
+into this:
+
+```js
+removeEvents(['my-event', 'my-other-event', 'even-more-event']);
 ```
 
 ## Emitting events
@@ -424,6 +478,28 @@ function listener1 (payload) {
 const removeListener1 = addEvent('my-event', listener1);
 
 emitEvent('my-event', {
+  value: 1,
+  anotherValue: 2
+});
+```
+
+There is also `emitEvents` which does the same thing as `emitEvent`, except it accepts an array of events to be emitted with the specified payload. So you can turn this:
+
+```js
+const payload = {
+  value: 1,
+  anotherValue: 2
+};
+
+emitEvent('my-event', payload);
+emitEvent('my-other-event', payload);
+emitEvent('even-more-event', payload);
+```
+
+into this:
+
+```js
+emitEvents(['my-event', 'my-other-event', 'even-more-event'], {
   value: 1,
   anotherValue: 2
 });

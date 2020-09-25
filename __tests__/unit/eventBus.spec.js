@@ -1,6 +1,6 @@
 /** @format */
 
-import { addEvent, emitEvent, removeEvent } from '../../src';
+import { addEvent, addEvents, emitEvent, emitEvents, removeEvent, removeEvents } from '../../src';
 
 describe('eventBus', () => {
   test('can add, emit, and remove events', () => {
@@ -741,5 +741,27 @@ describe('Does not skip an event callback in the event that an event callback wa
     expect(callback5).toHaveBeenCalledTimes(1);
     expect(callback6).toHaveBeenCalledTimes(1);
     expect(callback7).toHaveBeenCalledTimes(2);
+  });
+
+  test('Can work with plural events', () => {
+    const listener1 = jest.fn(() => {});
+    const events = ['event-1', 'event-2', 'event-3'];
+    const payload = { value: '1' };
+    const removeListener = addEvents(events, listener1);
+
+    emitEvent('event-1', payload);
+    expect(listener1).toHaveBeenCalledWith(payload);
+    emitEvents(['event-1', 'event-2'], payload);
+    expect(listener1).toHaveBeenCalledWith(payload);
+    removeListener();
+    emitEvents(events);
+    expect(listener1).toHaveBeenCalledTimes(3);
+
+    const listener2 = jest.fn(() => {});
+    addEvents(events, listener2);
+    emitEvents(events);
+    removeEvents(events);
+    emitEvents(events);
+    expect(listener2).toHaveBeenCalledTimes(3);
   });
 });

@@ -253,9 +253,25 @@ export function addEvent (ev, callback) {
   };
 }
 
+export function addEvents (evs, callback) {
+  const removeEventCallbacks = evs.map(ev => addEvent(ev, callback));
+
+  return () => {
+    removeEventCallbacks.forEach(removeEvent => {
+      removeEvent();
+    });
+  };
+}
+
 export function removeEvent (ev) {
   if (!(ev in eventBus)) return -1;
   delete eventBus[ev];
+}
+
+export function removeEvents (evs) {
+  evs.forEach(ev => {
+    removeEvent(ev);
+  });
 }
 
 export function emitEvent (ev, payload) {
@@ -274,5 +290,11 @@ export function emitEvent (ev, payload) {
     if (eventBus[ev][emitEventCycle.counter]) eventBus[ev][emitEventCycle.counter](payload);
 
   emitEventCycle = null;
+}
+
+export function emitEvents (evs, payload) {
+  evs.forEach(ev => {
+    emitEvent(ev, payload);
+  });
 }
 /** @end-fluxible-no-synth-events */
