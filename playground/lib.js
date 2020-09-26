@@ -266,7 +266,7 @@ function addEvent(ev, callback) {
            * this will ensure that we don't miss an event
            * listener due to unsubscription during emitEvent
            */
-          if (emitEventCycle && emitEventCycle.ev === ev && a <= emitEventCycle.counter) emitEventCycle.counter -= 1;
+          if (emitEventCycle && eventBusLen > 1 && emitEventCycle.ev === ev && a <= emitEventCycle.counter) emitEventCycle.counter -= 1;
           return eventBus[ev].splice(a, 1);
         }
       }
