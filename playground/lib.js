@@ -23,7 +23,7 @@ var emitEventCycle = null;
 
 var observers = [];
 var id = 0;
-var updateCounter = 0;
+var updatePointer = 0;
 /** @fluxible-config-no-persist */
 
 var shouldPersist = false;
@@ -156,10 +156,11 @@ function updateStore(updatedStates) {
     /** @end-fluxible-config-no-persist */
   }); // only notify observers that observes the store keys that were updated
 
-  updateCounter = 0;
+  updatePointer = 0;
+  var observersLen = observers.length;
 
-  for (var observersLen = observers.length; updateCounter < observersLen; updateCounter++) {
-    var observer = observers[updateCounter];
+  for (; updatePointer < observersLen; updatePointer++) {
+    var observer = observers[updatePointer];
 
     if (observer) {
       var keys = observer.keys,
@@ -186,7 +187,7 @@ function updateStore(updatedStates) {
     }
   }
 
-  updateCounter = 0;
+  updatePointer = 0;
   /** @fluxible-config-no-persist */
 
   /**
@@ -239,13 +240,17 @@ function addObserver(callback, keys) {
   });
   id++;
   return function () {
-    for (var a = 0, observersLen = observers.length; a < observersLen; a++) {
-      if (observers[a] && observers[a].id === observerId) {
+    var observersLen = observers.length;
+
+    for (var a = 0; a < observersLen; a++) {
+      var observer = observers[a];
+
+      if (observer && observer.id === observerId) {
         /**
-         * this will ensure that we don't miss an observer due
-         * to unsubscription during update
+         * when an observer unsubscribed during an update cycle
+         * we want to shift the pointer 1 point to the left
          */
-        if (updateCounter !== null && a <= updateCounter) updateCounter -= 1;
+        if (updatePointer !== null && a <= updatePointer) updatePointer--;
         return observers.splice(a, 1);
       }
     }
@@ -254,20 +259,20 @@ function addObserver(callback, keys) {
 /** @fluxible-no-synth-events */
 
 
-function addEvent(ev, callback) {
-  if (ev in eventBus) eventBus[ev].push(callback);else eventBus[ev] = [callback];
+function addEvent(targetEv, callback) {
+  if (targetEv in eventBus) eventBus[targetEv].push(callback);else eventBus[targetEv] = [callback];
   return function () {
-    if (ev in eventBus) {
-      var eventBusLen = eventBus[ev].length;
+    if (targetEv in eventBus) {
+      var eventBusLen = eventBus[targetEv].length;
 
       for (var a = 0; a < eventBusLen; a++) {
-        if (eventBus[ev][a] === callback) {
+        if (eventBus[targetEv][a] === callback) {
           /**
-           * this will ensure that we don't miss an event
-           * listener due to unsubscription during emitEvent
+           * when an event was removed during an emit cycle
+           * we want to shift the emit pointer 1 point to the left
            */
-          if (emitEventCycle && eventBusLen > 1 && emitEventCycle.ev === ev && a <= emitEventCycle.counter) emitEventCycle.counter -= 1;
-          return eventBus[ev].splice(a, 1);
+          if (emitEventCycle && emitEventCycle.ev === targetEv && a <= emitEventCycle.pointer) emitEventCycle.pointer--;
+          return eventBus[targetEv].splice(a, 1);
         }
       }
     }
@@ -302,11 +307,13 @@ function emitEvent(ev, payload) {
   if (!(ev in eventBus)) return -1;
   emitEventCycle = {
     ev: ev,
-    counter: 0
+    pointer: 0
   };
+  var eventBusLen = eventBus[ev].length;
 
-  for (var eventBusLen = eventBus[ev].length; emitEventCycle.counter < eventBusLen; emitEventCycle.counter++) {
-    if (eventBus[ev][emitEventCycle.counter]) eventBus[ev][emitEventCycle.counter](payload);
+  for (; emitEventCycle.pointer < eventBusLen; emitEventCycle.pointer++) {
+    var callback = eventBus[ev][emitEventCycle.pointer];
+    if (callback) callback(payload);
   }
 
   emitEventCycle = null;
