@@ -271,7 +271,11 @@ function addEvent(targetEv, callback) {
            * when an event was removed during an emit cycle
            * we want to shift the emit pointer 1 point to the left
            */
-          if (emitEventCycle && emitEventCycle.ev === targetEv && a <= emitEventCycle.pointer) emitEventCycle.pointer--;
+          if (emitEventCycle && emitEventCycle.ev === targetEv && a <= emitEventCycle.pointer) {
+            emitEventCycle.pointer--;
+            emitEventCycle.eventBusLen--;
+          }
+
           return eventBus[targetEv].splice(a, 1);
         }
       }
@@ -307,11 +311,11 @@ function emitEvent(ev, payload) {
   if (!(ev in eventBus)) return -1;
   emitEventCycle = {
     ev: ev,
-    pointer: 0
+    pointer: 0,
+    eventBusLen: eventBus[ev].length
   };
-  var eventBusLen = eventBus[ev].length;
 
-  for (; emitEventCycle.pointer < eventBusLen; emitEventCycle.pointer++) {
+  for (; emitEventCycle.pointer < emitEventCycle.eventBusLen; emitEventCycle.pointer++) {
     var callback = eventBus[ev][emitEventCycle.pointer];
     if (callback) callback(payload);
   }
