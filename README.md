@@ -10,7 +10,7 @@ Smaller, faster, better state management system that supports asynchronicity and
 
 # Change logs
 
-See [CHANGELOGS](./CHANGELOGS.md).
+See [CHANGELOG](./CHANGELOG.md) which follows [keepachangelog](https://keepachangelog.com/en/1.0.0/).
 
 # Tests
 
