@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [5.0.10] - 2017-06-20
 
-See [diff](https://github.com/aprilmintacpineda/fluxible-js/compare/master...v5.0.10)
+See [diff](https://github.com/aprilmintacpineda/fluxible-js/pull/3/files)
 
 ### Changed
 - Calls to `restore` on `initializeStore` will now merge `initialStore` and `savedStore`; `savedStore` will always take precedence over `initializeStore`. This is to allow for better defaults when adding new values to `restore`.
