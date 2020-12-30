@@ -10,7 +10,7 @@ Smaller, faster, better state management system that supports asynchronicity and
 
 # Change logs
 
-For the change logs, please see the [release notes](https://github.com/aprilmintacpineda/fluxible-js/releases)
+See [CHANGELOGS](./CHANGELOGS.md).
 
 # Tests
 
@@ -22,9 +22,10 @@ For the change logs, please see the [release notes](https://github.com/aprilmint
 
 All performance test was ran on:
 
-MacBook Pro (Retina, 15-inch, Mid 2015).
-Processor: 2.5 GHz Intel Core i7, 1 processor, 4 cores.
-Memory: 16 GB 1600 MHz DDR3
+MacBook Pro (15-inch, 2016)
+Processor: 2.7 GHz Quad-Core Intel Core i7
+Memory: 16 GB 2133 MHz LPDDR3
+Graphics: Radeon Pro 455 2 GB, Intel HD Graphics 530 1536 MB
 
 **Complete disclosure**
 
