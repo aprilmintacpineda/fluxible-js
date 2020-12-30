@@ -43,21 +43,24 @@ export function initializeStore (
     if ('asyncStorage' in config.persist) {
       /** @end-fluxible-config-persist */
       /** @fluxible-config-sync */
+      persistStorage = config.persist.asyncStorage;
 
-      config.persist.asyncStorage.getItem('fluxible-js').then(savedStore => {
-        const persistedStates = config.persist.restore(
-          savedStore
-            ? /** @fluxible-config-no-JSON */
-              /** @fluxible-config-use-JSON */
-              useJSON
-              ? /** @end-fluxible-config-use-JSON */
-                JSON.parse(savedStore) /** @fluxible-config-use-JSON */
-              : /** @end-fluxible-config-no-JSON */ savedStore /** @end-fluxible-config-use-JSON */
-            : store
-        );
+      persistStorage.getItem('fluxible-js').then(savedStore => {
+        const parsedSavedStore = savedStore
+          ? /** @fluxible-config-no-JSON */
+            /** @fluxible-config-use-JSON */
+            useJSON
+            ? /** @end-fluxible-config-use-JSON */
+              JSON.parse(savedStore) /** @fluxible-config-use-JSON */
+            : /** @end-fluxible-config-no-JSON */ savedStore /** @end-fluxible-config-use-JSON */
+          : store;
+
+        const persistedStates = config.persist.restore({
+          ...store,
+          ...parsedSavedStore
+        });
 
         persistedStateKeys = Object.keys(persistedStates);
-        persistStorage = config.persist.asyncStorage;
 
         persistedStateKeys.forEach(field => {
           store[field] = persistedStates[field];
@@ -70,20 +73,24 @@ export function initializeStore (
     } else {
       /** @end-fluxible-config-persist */
       /** @fluxible-config-async */
-      const savedStore = config.persist.syncStorage.getItem('fluxible-js');
-      const persistedStates = config.persist.restore(
-        savedStore
-          ? /** @fluxible-config-no-JSON */
-            /** @fluxible-config-use-JSON */
-            useJSON
-            ? /** @end-fluxible-config-use-JSON */
-              JSON.parse(savedStore) /** @fluxible-config-use-JSON */
-            : /** @end-fluxible-config-no-JSON */ savedStore /** @end-fluxible-config-use-JSON */
-          : store
-      );
+      persistStorage = config.persist.syncStorage;
+      const savedStore = persistStorage.getItem('fluxible-js');
+
+      const parsedSavedStore = savedStore
+        ? /** @fluxible-config-no-JSON */
+          /** @fluxible-config-use-JSON */
+          useJSON
+          ? /** @end-fluxible-config-use-JSON */
+            JSON.parse(savedStore) /** @fluxible-config-use-JSON */
+          : /** @end-fluxible-config-no-JSON */ savedStore /** @end-fluxible-config-use-JSON */
+        : store;
+
+      const persistedStates = config.persist.restore({
+        ...store,
+        ...parsedSavedStore
+      });
 
       persistedStateKeys = Object.keys(persistedStates);
-      persistStorage = config.persist.syncStorage;
 
       persistedStateKeys.forEach(field => {
         store[field] = persistedStates[field];

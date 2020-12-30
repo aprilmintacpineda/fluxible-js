@@ -1,6 +1,6 @@
 {
   "name": "fluxible-js",
-  "version": "5.0.9",
+  "version": "5.0.10",
   "description": "Smaller, faster, better state management system that supports asynchronicity and state persistence out of the box.",
   "main": "lib/index.js",
   "files": [
@@ -11,7 +11,6 @@
     "README.md"
   ],
   "scripts": {
-    "reinstallNodeModules": "rm -rf node_modules package-lock.json && npm i",
     "test": "npm run test-unit && npm run test-perf",
     "test-unit": "npm run build && jest __tests__/unit/* --env=node --coverage",
     "test-perf": "npm run build && babel-node __tests__/perf.spec.js",
