@@ -9,9 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.11] - 2021-02-01
+
 ### Added
 
 - Added second argument to events callback, which is the name of the event that was emitted https://github.com/aprilmintacpineda/fluxible-js/pull/4
+
+### Changed
+
+- Linting, formatting, and some variable names https://github.com/aprilmintacpineda/fluxible-js/pull/5
 
 ## [5.0.10] - 2020-12-30
 
