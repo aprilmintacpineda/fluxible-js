@@ -4,13 +4,13 @@
 
 Smaller, faster, better state management system that supports asynchronicity and state persistence out of the box.
 
+# Change logs
+
+From 5.0.10, the changelogs on the project will be kept in [CHANGELOG](./CHANGELOG.md), which follows [keepachangelog](https://keepachangelog.com/en/1.0.0/).
+
 # Demo
 
 [See demo](https://aprilmintacpineda.github.io/react-fluxible/). This demo is using [react-fluxible](https://github.com/aprilmintacpineda/react-fluxible).
-
-# Change logs
-
-See [CHANGELOG](./CHANGELOG.md) which follows [keepachangelog](https://keepachangelog.com/en/1.0.0/).
 
 # Tests
 
@@ -219,7 +219,7 @@ Which means you **don't** need `JSON.parse` and `JSON.stringify`.
 ```js
 import { initializeStore } from 'fluxible-js';
 
-function getInitialStore () {
+function getInitialStore() {
   return {
     user: null,
     someOtherState: 'value',
@@ -291,12 +291,9 @@ When using `asyncStorage`, you can provide a 2nd argument which is a callback fu
 ```jsx
 import { addObserver, store } from 'fluxible-js';
 
-const unsubscribeCallback = addObserver(
-  () => {
-    console.log('store has been updated!', store);
-  },
-  ['someOtherState', 'anotherState']
-);
+const unsubscribeCallback = addObserver(() => {
+  console.log('store has been updated!', store);
+}, ['someOtherState', 'anotherState']);
 ```
 
 **Do not mutate the store directly. Doing so may lead to unwanted behaviors in your app.**
@@ -347,7 +344,7 @@ function myAction() {
 
 ## Adding events and event callbacks
 
-`addEvent` is used both to add an event and to add a subscriber to an event that already exists.
+`addEvent` is used both to add an event and to add a subscriber to an event. If the event doesn't exist yet, it will be created. The _first argument_ to the subscriber is the `payload`, which would be the 2nd argument passed to `emitEvent`. The _second argument_ is the name of the event that was emitted.
 
 ```js
 import { addEvent } from 'fluxible-js';
@@ -436,7 +433,7 @@ removeListener(); // undefined
 ```js
 import { removeEvent } from 'fluxible-js';
 
-function listener1 (payload) {
+function listener1(payload) {
   console.log('first listener', payload);
 }
 
@@ -468,7 +465,7 @@ removeEvents(['my-event', 'my-other-event', 'even-more-event']);
 ```js
 import { emitEvent, addEvent, updateStore } from 'fluxible-js';
 
-function listener1 (payload) {
+function listener1(payload) {
   updateStore({
     newValue: payload.newValue
   });
@@ -478,10 +475,12 @@ function listener1 (payload) {
 
 const removeListener1 = addEvent('my-event', listener1);
 
-emitEvent('my-event', {
+const payload = {
   value: 1,
   anotherValue: 2
-});
+};
+
+emitEvent('my-event', payload);
 ```
 
 There is also `emitEvents` which does the same thing as `emitEvent`, except it accepts an array of events to be emitted with the specified payload. So you can turn this:

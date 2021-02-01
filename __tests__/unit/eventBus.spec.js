@@ -25,9 +25,9 @@ describe('eventBus', () => {
 
     emitEvent('test-event', payload);
 
-    expect(callback1).toHaveBeenCalledWith(payload);
-    expect(callback2).toHaveBeenCalledWith(payload);
-    expect(callback3).toHaveBeenCalledWith(payload);
+    expect(callback1).toHaveBeenCalledWith(payload, 'test-event');
+    expect(callback2).toHaveBeenCalledWith(payload, 'test-event');
+    expect(callback3).toHaveBeenCalledWith(payload, 'test-event');
 
     expect(callback1).toHaveBeenCalledTimes(2);
     expect(callback2).toHaveBeenCalledTimes(2);
@@ -750,9 +750,9 @@ describe('Does not skip an event callback in the event that an event callback wa
     const removeListener = addEvents(events, listener1);
 
     emitEvent('event-1', payload);
-    expect(listener1).toHaveBeenCalledWith(payload);
+    expect(listener1).toHaveBeenCalledWith(payload, 'event-1');
     emitEvents(['event-1', 'event-2'], payload);
-    expect(listener1).toHaveBeenCalledWith(payload);
+    expect(listener1).toHaveBeenCalledWith(payload, 'event-1');
     removeListener();
     emitEvents(events);
     expect(listener1).toHaveBeenCalledTimes(3);
