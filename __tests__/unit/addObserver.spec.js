@@ -1,6 +1,10 @@
 /** @format */
 
-import { updateStore, initializeStore, addObserver } from '../../src';
+import {
+  updateStore,
+  initializeStore,
+  addObserver
+} from '../../src';
 
 describe('addObserver', () => {
   test('calls appropriate observer after update store', () => {
@@ -23,7 +27,15 @@ describe('addObserver', () => {
     addObserver(countListener, ['count']);
     addObserver(valueListener, ['value']);
     addObserver(bothListener, ['count', 'value']);
-    addObserver(allListener, ['value', 'test1', 'test2', 'test3', 'test4', 'test5', 'count']);
+    addObserver(allListener, [
+      'value',
+      'test1',
+      'test2',
+      'test3',
+      'test4',
+      'test5',
+      'count'
+    ]);
 
     updateStore({ count: 2 });
     expect(countListener).toHaveBeenCalled();
