@@ -344,7 +344,7 @@ function myAction() {
 
 ## Adding events and event callbacks
 
-`addEvent` is used both to add an event and to add a subscriber to an event that already exists.
+`addEvent` is used both to add an event and to add a subscriber to an event. If the event doesn't exist yet, it will be created. The _first argument_ to the subscriber is the `payload`, which would be the 2nd argument passed to `emitEvent`. The _second argument_ is the name of the event that was emitted.
 
 ```js
 import { addEvent } from 'fluxible-js';
@@ -475,10 +475,12 @@ function listener1(payload) {
 
 const removeListener1 = addEvent('my-event', listener1);
 
-emitEvent('my-event', {
+const payload = {
   value: 1,
   anotherValue: 2
-});
+};
+
+emitEvent('my-event', payload);
 ```
 
 There is also `emitEvents` which does the same thing as `emitEvent`, except it accepts an array of events to be emitted with the specified payload. So you can turn this:
