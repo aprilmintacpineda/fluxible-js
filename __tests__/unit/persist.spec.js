@@ -1,6 +1,11 @@
 /** @format */
 
-import { updateStore, initializeStore, store, addObserver } from '../../src';
+import {
+  updateStore,
+  initializeStore,
+  store,
+  addObserver
+} from '../../src';
 
 describe('persist using syncStorage', () => {
   test('persist merges savedStore and initialStore', () => {
@@ -89,16 +94,18 @@ describe('persist using syncStorage', () => {
       testValue: 'another test value'
     });
 
-    return new Promise(resolve => setTimeout(resolve, 200)).then(() => {
-      expect(syncStorage.setItem).toHaveBeenCalledWith(
-        'fluxible-js',
-        JSON.stringify({
-          user: {
-            name: 'another test user'
-          }
-        })
-      );
-    });
+    return new Promise(resolve => setTimeout(resolve, 200)).then(
+      () => {
+        expect(syncStorage.setItem).toHaveBeenCalledWith(
+          'fluxible-js',
+          JSON.stringify({
+            user: {
+              name: 'another test user'
+            }
+          })
+        );
+      }
+    );
   });
 
   test('calls setItem only once after multiple state updates within 200 ms', () => {
@@ -157,16 +164,18 @@ describe('persist using syncStorage', () => {
       testValue: 'call 5'
     });
 
-    return new Promise(resolve => setTimeout(resolve, 200)).then(() => {
-      expect(syncStorage.setItem).toHaveBeenCalledTimes(1);
-      expect(store).toEqual({
-        user: {
-          name: 'test user'
-        },
-        testValue: 'call 5',
-        anotherValue: 'call 5'
-      });
-    });
+    return new Promise(resolve => setTimeout(resolve, 200)).then(
+      () => {
+        expect(syncStorage.setItem).toHaveBeenCalledTimes(1);
+        expect(store).toEqual({
+          user: {
+            name: 'test user'
+          },
+          testValue: 'call 5',
+          anotherValue: 'call 5'
+        });
+      }
+    );
   });
 
   test('calls setItem when updated store keys was persisted.', () => {
@@ -301,16 +310,18 @@ describe('persist using syncStorage', () => {
       testValue: 'call 5'
     });
 
-    return new Promise(resolve => setTimeout(resolve, 200)).then(() => {
-      expect(syncStorage.setItem).toHaveBeenCalledTimes(0);
-      expect(store).toEqual({
-        user: {
-          name: 'test user'
-        },
-        testValue: 'call 5',
-        anotherValue: 'call 5'
-      });
-    });
+    return new Promise(resolve => setTimeout(resolve, 200)).then(
+      () => {
+        expect(syncStorage.setItem).toHaveBeenCalledTimes(0);
+        expect(store).toEqual({
+          user: {
+            name: 'test user'
+          },
+          testValue: 'call 5',
+          anotherValue: 'call 5'
+        });
+      }
+    );
   });
 
   test('gives the current store when getItem returned null', () => {
@@ -359,16 +370,18 @@ describe('persist using syncStorage', () => {
       testValue: 'another test value'
     });
 
-    return new Promise(resolve => setTimeout(resolve, 200)).then(() => {
-      expect(syncStorage.setItem).toHaveBeenCalledWith(
-        'fluxible-js',
-        JSON.stringify({
-          user: {
-            name: 'another test user'
-          }
-        })
-      );
-    });
+    return new Promise(resolve => setTimeout(resolve, 200)).then(
+      () => {
+        expect(syncStorage.setItem).toHaveBeenCalledWith(
+          'fluxible-js',
+          JSON.stringify({
+            user: {
+              name: 'another test user'
+            }
+          })
+        );
+      }
+    );
   });
 });
 
@@ -419,17 +432,19 @@ describe('persist using asyncStorage', () => {
       asyncInitCallback
     );
 
-    return new Promise(resolve => setTimeout(resolve, 200)).then(() => {
-      expect(restore).toHaveBeenCalledWith({
-        user: {
-          name: 'test user'
-        },
-        testValue: 'value',
-        anotherValue: 'test value'
-      });
+    return new Promise(resolve => setTimeout(resolve, 200)).then(
+      () => {
+        expect(restore).toHaveBeenCalledWith({
+          user: {
+            name: 'test user'
+          },
+          testValue: 'value',
+          anotherValue: 'test value'
+        });
 
-      expect(asyncInitCallback).toHaveBeenCalled();
-    });
+        expect(asyncInitCallback).toHaveBeenCalled();
+      }
+    );
   });
 
   test('gets item from asyncStorage then calls restore', () => {

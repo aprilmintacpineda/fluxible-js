@@ -16,9 +16,8 @@ let timeTaken = 0;
 let now = 0;
 let tmp = null;
 
-for (let a = 0; a < maxKeys; a++) {
+for (let a = 0; a < maxKeys; a++)
   initialStore['test' + a] = 'test' + a;
-}
 
 function displayTotalTime () {
   // eslint-disable-next-line
@@ -27,7 +26,11 @@ function displayTotalTime () {
 
 function displayAverageTimeAndReset () {
   // eslint-disable-next-line
-  console.log('Average time (' + maxKeys + ' loops)', average / maxKeys, 'ms');
+  console.log(
+    'Average time (' + maxKeys + ' loops)',
+    average / maxKeys,
+    'ms'
+  );
   // eslint-disable-next-line
   console.log('-----');
 
@@ -92,7 +95,9 @@ displayAverageTimeAndReset();
 
 // ----------
 // eslint-disable-next-line
-console.log('updateStore with ' + maxKeys + ' keys and 0 observers:');
+console.log(
+  'updateStore with ' + maxKeys + ' keys and 0 observers:'
+);
 
 timeTaken = Date.now();
 updateStore(initialStore);
@@ -128,7 +133,13 @@ displayAverageTimeAndReset();
 
 // ----------
 // eslint-disable-next-line
-console.log('updateStore with ' + maxKeys + ' keys and ' + maxKeys + ' observers:');
+console.log(
+  'updateStore with ' +
+    maxKeys +
+    ' keys and ' +
+    maxKeys +
+    ' observers:'
+);
 
 timeTaken = Date.now();
 updateStore(initialStore);
@@ -179,9 +190,12 @@ let event;
 
 for (let a = 0; a < maxKeys; a++) {
   now = Date.now();
-  addEvent('test-event-' + Math.floor(Math.random() * 100 + 1), () => {
-    called = true;
-  });
+  addEvent(
+    'test-event-' + Math.floor(Math.random() * 100 + 1),
+    () => {
+      called = true;
+    }
+  );
   average += Date.now() - now;
 }
 
@@ -189,7 +203,9 @@ displayAverageTimeAndReset();
 
 // ----------
 // eslint-disable-next-line
-console.log('Emitting events with ' + maxKeys + ' previously added events');
+console.log(
+  'Emitting events with ' + maxKeys + ' previously added events'
+);
 
 do {
   event = 'test-event-' + Math.floor(Math.random() * 100 + 1);

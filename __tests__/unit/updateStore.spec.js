@@ -1,8 +1,13 @@
 /** @format */
-import { store, updateStore, initializeStore, addObserver } from '../../src';
+import {
+  store,
+  updateStore,
+  initializeStore,
+  addObserver
+} from '../../src';
 
 describe('updateStore', () => {
-  test('Update store only updates parts of the store that\'s to be updated', () => {
+  test("Update store only updates parts of the store that's to be updated", () => {
     const initialStore = {
       value: 'testValue',
       test1: 'test1',
@@ -71,19 +76,17 @@ describe('Does not skip any observer in the event that an observer was removed d
 
     let canRemove = false;
 
-    let listener1 = jest.fn(() => {
-      if (canRemove) {
-        unobserve();
-      }
+    const listener1 = jest.fn(() => {
+      if (canRemove) unobserve();
     });
-    let listener2 = jest.fn();
-    let listener3 = jest.fn();
-    let listener4 = jest.fn();
-    let listener5 = jest.fn();
+    const listener2 = jest.fn();
+    const listener3 = jest.fn();
+    const listener4 = jest.fn();
+    const listener5 = jest.fn();
 
     addObserver(listener1, ['value']);
     addObserver(listener2, ['value']);
-    let unobserve = addObserver(listener3, ['value']);
+    const unobserve = addObserver(listener3, ['value']);
     addObserver(listener4, ['value']);
     addObserver(listener5, ['value']);
 
@@ -120,17 +123,15 @@ describe('Does not skip any observer in the event that an observer was removed d
 
     let canRemove = false;
 
-    let listener1 = jest.fn();
-    let listener2 = jest.fn();
-    let listener3 = jest.fn(() => {
-      if (canRemove) {
-        unobserve();
-      }
+    const listener1 = jest.fn();
+    const listener2 = jest.fn();
+    const listener3 = jest.fn(() => {
+      if (canRemove) unobserve();
     });
-    let listener4 = jest.fn();
-    let listener5 = jest.fn();
+    const listener4 = jest.fn();
+    const listener5 = jest.fn();
 
-    let unobserve = addObserver(listener1, ['value']);
+    const unobserve = addObserver(listener1, ['value']);
     addObserver(listener2, ['value']);
     addObserver(listener3, ['value']);
     addObserver(listener4, ['value']);
@@ -169,19 +170,17 @@ describe('Does not skip any observer in the event that an observer was removed d
 
     let canRemove = false;
 
-    let listener1 = jest.fn();
-    let listener2 = jest.fn();
-    let listener3 = jest.fn(() => {
-      if (canRemove) {
-        unobserve();
-      }
+    const listener1 = jest.fn();
+    const listener2 = jest.fn();
+    const listener3 = jest.fn(() => {
+      if (canRemove) unobserve();
     });
-    let listener4 = jest.fn();
-    let listener5 = jest.fn();
+    const listener4 = jest.fn();
+    const listener5 = jest.fn();
 
     addObserver(listener1, ['value']);
     addObserver(listener2, ['value']);
-    let unobserve = addObserver(listener3, ['value']);
+    const unobserve = addObserver(listener3, ['value']);
     addObserver(listener4, ['value']);
     addObserver(listener5, ['value']);
 
@@ -220,20 +219,20 @@ describe('Does not skip any observer in the event that more than one observers w
 
     let canRemove = false;
 
-    let listener1 = jest.fn();
-    let listener2 = jest.fn(() => {
+    const listener1 = jest.fn();
+    const listener2 = jest.fn(() => {
       if (canRemove) {
         unobserve1();
         unobserve3();
       }
     });
-    let listener3 = jest.fn();
-    let listener4 = jest.fn();
-    let listener5 = jest.fn();
+    const listener3 = jest.fn();
+    const listener4 = jest.fn();
+    const listener5 = jest.fn();
 
-    let unobserve1 = addObserver(listener1, ['value']);
+    const unobserve1 = addObserver(listener1, ['value']);
     addObserver(listener2, ['value']);
-    let unobserve3 = addObserver(listener3, ['value']);
+    const unobserve3 = addObserver(listener3, ['value']);
     addObserver(listener4, ['value']);
     addObserver(listener5, ['value']);
 
@@ -270,20 +269,20 @@ describe('Does not skip any observer in the event that more than one observers w
 
     let canRemove = false;
 
-    let listener1 = jest.fn();
-    let listener2 = jest.fn(() => {
+    const listener1 = jest.fn();
+    const listener2 = jest.fn(() => {
       if (canRemove) {
         unobserve3();
         unobserve1();
       }
     });
-    let listener3 = jest.fn();
-    let listener4 = jest.fn();
-    let listener5 = jest.fn();
+    const listener3 = jest.fn();
+    const listener4 = jest.fn();
+    const listener5 = jest.fn();
 
-    let unobserve1 = addObserver(listener1, ['value']);
+    const unobserve1 = addObserver(listener1, ['value']);
     addObserver(listener2, ['value']);
-    let unobserve3 = addObserver(listener3, ['value']);
+    const unobserve3 = addObserver(listener3, ['value']);
     addObserver(listener4, ['value']);
     addObserver(listener5, ['value']);
 
@@ -320,19 +319,19 @@ describe('Does not skip any observer in the event that more than one observers w
 
     let canRemove = false;
 
-    let listener1 = jest.fn();
-    let listener2 = jest.fn(() => {
+    const listener1 = jest.fn();
+    const listener2 = jest.fn(() => {
       if (canRemove) {
         unobserve1();
         unobserve2();
       }
     });
-    let listener3 = jest.fn();
-    let listener4 = jest.fn();
-    let listener5 = jest.fn();
+    const listener3 = jest.fn();
+    const listener4 = jest.fn();
+    const listener5 = jest.fn();
 
-    let unobserve1 = addObserver(listener1, ['value']);
-    let unobserve2 = addObserver(listener2, ['value']);
+    const unobserve1 = addObserver(listener1, ['value']);
+    const unobserve2 = addObserver(listener2, ['value']);
     addObserver(listener3, ['value']);
     addObserver(listener4, ['value']);
     addObserver(listener5, ['value']);
@@ -370,21 +369,21 @@ describe('Does not skip any observer in the event that more than one observers w
 
     let canRemove = false;
 
-    let listener1 = jest.fn();
-    let listener2 = jest.fn(() => {
+    const listener1 = jest.fn();
+    const listener2 = jest.fn(() => {
       if (canRemove) {
         unobserve4();
         unobserve2();
       }
     });
-    let listener3 = jest.fn();
-    let listener4 = jest.fn();
-    let listener5 = jest.fn();
+    const listener3 = jest.fn();
+    const listener4 = jest.fn();
+    const listener5 = jest.fn();
 
     addObserver(listener1, ['value']);
-    let unobserve2 = addObserver(listener2, ['value']);
+    const unobserve2 = addObserver(listener2, ['value']);
     addObserver(listener3, ['value']);
-    let unobserve4 = addObserver(listener4, ['value']);
+    const unobserve4 = addObserver(listener4, ['value']);
     addObserver(listener5, ['value']);
 
     updateStore({
@@ -420,19 +419,19 @@ describe('Does not skip any observer in the event that more than one observers w
 
     let canRemove = false;
 
-    let listener1 = jest.fn();
-    let listener2 = jest.fn(() => {
+    const listener1 = jest.fn();
+    const listener2 = jest.fn(() => {
       if (canRemove) {
         unobserve2();
         unobserve1();
       }
     });
-    let listener3 = jest.fn();
-    let listener4 = jest.fn();
-    let listener5 = jest.fn();
+    const listener3 = jest.fn();
+    const listener4 = jest.fn();
+    const listener5 = jest.fn();
 
-    let unobserve1 = addObserver(listener1, ['value']);
-    let unobserve2 = addObserver(listener2, ['value']);
+    const unobserve1 = addObserver(listener1, ['value']);
+    const unobserve2 = addObserver(listener2, ['value']);
     addObserver(listener3, ['value']);
     addObserver(listener4, ['value']);
     addObserver(listener5, ['value']);
@@ -470,21 +469,21 @@ describe('Does not skip any observer in the event that more than one observers w
 
     let canRemove = false;
 
-    let listener1 = jest.fn();
-    let listener2 = jest.fn(() => {
+    const listener1 = jest.fn();
+    const listener2 = jest.fn(() => {
       if (canRemove) {
         unobserve2();
         unobserve4();
       }
     });
-    let listener3 = jest.fn();
-    let listener4 = jest.fn();
-    let listener5 = jest.fn();
+    const listener3 = jest.fn();
+    const listener4 = jest.fn();
+    const listener5 = jest.fn();
 
     addObserver(listener1, ['value']);
-    let unobserve2 = addObserver(listener2, ['value']);
+    const unobserve2 = addObserver(listener2, ['value']);
     addObserver(listener3, ['value']);
-    let unobserve4 = addObserver(listener4, ['value']);
+    const unobserve4 = addObserver(listener4, ['value']);
     addObserver(listener5, ['value']);
 
     updateStore({
@@ -520,31 +519,31 @@ describe('Does not skip any observer in the event that more than one observers w
 
     let canRemove = false;
 
-    let listener1 = jest.fn();
-    let listener2 = jest.fn(() => {
+    const listener1 = jest.fn();
+    const listener2 = jest.fn(() => {
       if (canRemove) {
         unobserve6();
         unobserve7();
         unobserve8();
       }
     });
-    let listener3 = jest.fn();
-    let listener4 = jest.fn();
-    let listener5 = jest.fn();
-    let listener6 = jest.fn();
-    let listener7 = jest.fn();
-    let listener8 = jest.fn();
-    let listener9 = jest.fn();
-    let listener10 = jest.fn();
+    const listener3 = jest.fn();
+    const listener4 = jest.fn();
+    const listener5 = jest.fn();
+    const listener6 = jest.fn();
+    const listener7 = jest.fn();
+    const listener8 = jest.fn();
+    const listener9 = jest.fn();
+    const listener10 = jest.fn();
 
     addObserver(listener1, ['value']);
     addObserver(listener2, ['value']);
     addObserver(listener3, ['value']);
     addObserver(listener4, ['value']);
     addObserver(listener5, ['value']);
-    let unobserve6 = addObserver(listener6, ['value']);
-    let unobserve7 = addObserver(listener7, ['value']);
-    let unobserve8 = addObserver(listener8, ['value']);
+    const unobserve6 = addObserver(listener6, ['value']);
+    const unobserve7 = addObserver(listener7, ['value']);
+    const unobserve8 = addObserver(listener8, ['value']);
     addObserver(listener9, ['value']);
     addObserver(listener10, ['value']);
 
@@ -591,16 +590,16 @@ describe('Does not skip any observer in the event that more than one observers w
 
     let canRemove = false;
 
-    let listener1 = jest.fn();
-    let listener2 = jest.fn();
-    let listener3 = jest.fn();
-    let listener4 = jest.fn();
-    let listener5 = jest.fn();
-    let listener6 = jest.fn();
-    let listener7 = jest.fn();
-    let listener8 = jest.fn();
-    let listener9 = jest.fn();
-    let listener10 = jest.fn(() => {
+    const listener1 = jest.fn();
+    const listener2 = jest.fn();
+    const listener3 = jest.fn();
+    const listener4 = jest.fn();
+    const listener5 = jest.fn();
+    const listener6 = jest.fn();
+    const listener7 = jest.fn();
+    const listener8 = jest.fn();
+    const listener9 = jest.fn();
+    const listener10 = jest.fn(() => {
       if (canRemove) {
         unobserve1();
         unobserve3();
@@ -608,11 +607,11 @@ describe('Does not skip any observer in the event that more than one observers w
       }
     });
 
-    let unobserve1 = addObserver(listener1, ['value']);
+    const unobserve1 = addObserver(listener1, ['value']);
     addObserver(listener2, ['value']);
-    let unobserve3 = addObserver(listener3, ['value']);
+    const unobserve3 = addObserver(listener3, ['value']);
     addObserver(listener4, ['value']);
-    let unobserve5 = addObserver(listener5, ['value']);
+    const unobserve5 = addObserver(listener5, ['value']);
     addObserver(listener6, ['value']);
     addObserver(listener7, ['value']);
     addObserver(listener8, ['value']);
@@ -662,8 +661,8 @@ describe('Does not skip any observer in the event that more than one observers w
 
     let canRemove = false;
 
-    let listener1 = jest.fn();
-    let listener2 = jest.fn(() => {
+    const listener1 = jest.fn();
+    const listener2 = jest.fn(() => {
       if (canRemove) {
         unobserve6();
         unobserve7();
@@ -671,23 +670,23 @@ describe('Does not skip any observer in the event that more than one observers w
         unobserver2();
       }
     });
-    let listener3 = jest.fn();
-    let listener4 = jest.fn();
-    let listener5 = jest.fn();
-    let listener6 = jest.fn();
-    let listener7 = jest.fn();
-    let listener8 = jest.fn();
-    let listener9 = jest.fn();
-    let listener10 = jest.fn();
+    const listener3 = jest.fn();
+    const listener4 = jest.fn();
+    const listener5 = jest.fn();
+    const listener6 = jest.fn();
+    const listener7 = jest.fn();
+    const listener8 = jest.fn();
+    const listener9 = jest.fn();
+    const listener10 = jest.fn();
 
     addObserver(listener1, ['value']);
-    let unobserver2 = addObserver(listener2, ['value']);
+    const unobserver2 = addObserver(listener2, ['value']);
     addObserver(listener3, ['value']);
     addObserver(listener4, ['value']);
     addObserver(listener5, ['value']);
-    let unobserve6 = addObserver(listener6, ['value']);
-    let unobserve7 = addObserver(listener7, ['value']);
-    let unobserve8 = addObserver(listener8, ['value']);
+    const unobserve6 = addObserver(listener6, ['value']);
+    const unobserve7 = addObserver(listener7, ['value']);
+    const unobserve8 = addObserver(listener8, ['value']);
     addObserver(listener9, ['value']);
     addObserver(listener10, ['value']);
 
@@ -734,15 +733,15 @@ describe('Does not skip any observer in the event that more than one observers w
 
     let canRemove = false;
 
-    let listener1 = jest.fn();
-    let listener2 = jest.fn();
-    let listener3 = jest.fn();
-    let listener4 = jest.fn();
-    let listener5 = jest.fn();
-    let listener6 = jest.fn();
-    let listener7 = jest.fn();
-    let listener8 = jest.fn();
-    let listener9 = jest.fn(() => {
+    const listener1 = jest.fn();
+    const listener2 = jest.fn();
+    const listener3 = jest.fn();
+    const listener4 = jest.fn();
+    const listener5 = jest.fn();
+    const listener6 = jest.fn();
+    const listener7 = jest.fn();
+    const listener8 = jest.fn();
+    const listener9 = jest.fn(() => {
       if (canRemove) {
         unobserve1();
         unobserve3();
@@ -750,17 +749,17 @@ describe('Does not skip any observer in the event that more than one observers w
         unobserve9();
       }
     });
-    let listener10 = jest.fn();
+    const listener10 = jest.fn();
 
-    let unobserve1 = addObserver(listener1, ['value']);
+    const unobserve1 = addObserver(listener1, ['value']);
     addObserver(listener2, ['value']);
-    let unobserve3 = addObserver(listener3, ['value']);
+    const unobserve3 = addObserver(listener3, ['value']);
     addObserver(listener4, ['value']);
-    let unobserve5 = addObserver(listener5, ['value']);
+    const unobserve5 = addObserver(listener5, ['value']);
     addObserver(listener6, ['value']);
     addObserver(listener7, ['value']);
     addObserver(listener8, ['value']);
-    let unobserve9 = addObserver(listener9, ['value']);
+    const unobserve9 = addObserver(listener9, ['value']);
     addObserver(listener10, ['value']);
 
     updateStore({
@@ -806,8 +805,8 @@ describe('Does not skip any observer in the event that more than one observers w
 
     let canRemove = false;
 
-    let listener1 = jest.fn();
-    let listener2 = jest.fn(() => {
+    const listener1 = jest.fn();
+    const listener2 = jest.fn(() => {
       if (canRemove) {
         unobserver2();
         unobserve6();
@@ -815,23 +814,23 @@ describe('Does not skip any observer in the event that more than one observers w
         unobserve8();
       }
     });
-    let listener3 = jest.fn();
-    let listener4 = jest.fn();
-    let listener5 = jest.fn();
-    let listener6 = jest.fn();
-    let listener7 = jest.fn();
-    let listener8 = jest.fn();
-    let listener9 = jest.fn();
-    let listener10 = jest.fn();
+    const listener3 = jest.fn();
+    const listener4 = jest.fn();
+    const listener5 = jest.fn();
+    const listener6 = jest.fn();
+    const listener7 = jest.fn();
+    const listener8 = jest.fn();
+    const listener9 = jest.fn();
+    const listener10 = jest.fn();
 
     addObserver(listener1, ['value']);
-    let unobserver2 = addObserver(listener2, ['value']);
+    const unobserver2 = addObserver(listener2, ['value']);
     addObserver(listener3, ['value']);
     addObserver(listener4, ['value']);
     addObserver(listener5, ['value']);
-    let unobserve6 = addObserver(listener6, ['value']);
-    let unobserve7 = addObserver(listener7, ['value']);
-    let unobserve8 = addObserver(listener8, ['value']);
+    const unobserve6 = addObserver(listener6, ['value']);
+    const unobserve7 = addObserver(listener7, ['value']);
+    const unobserve8 = addObserver(listener8, ['value']);
     addObserver(listener9, ['value']);
     addObserver(listener10, ['value']);
 
@@ -878,15 +877,15 @@ describe('Does not skip any observer in the event that more than one observers w
 
     let canRemove = false;
 
-    let listener1 = jest.fn();
-    let listener2 = jest.fn();
-    let listener3 = jest.fn();
-    let listener4 = jest.fn();
-    let listener5 = jest.fn();
-    let listener6 = jest.fn();
-    let listener7 = jest.fn();
-    let listener8 = jest.fn();
-    let listener9 = jest.fn(() => {
+    const listener1 = jest.fn();
+    const listener2 = jest.fn();
+    const listener3 = jest.fn();
+    const listener4 = jest.fn();
+    const listener5 = jest.fn();
+    const listener6 = jest.fn();
+    const listener7 = jest.fn();
+    const listener8 = jest.fn();
+    const listener9 = jest.fn(() => {
       if (canRemove) {
         unobserve9();
         unobserve1();
@@ -894,17 +893,17 @@ describe('Does not skip any observer in the event that more than one observers w
         unobserve5();
       }
     });
-    let listener10 = jest.fn();
+    const listener10 = jest.fn();
 
-    let unobserve1 = addObserver(listener1, ['value']);
+    const unobserve1 = addObserver(listener1, ['value']);
     addObserver(listener2, ['value']);
-    let unobserve3 = addObserver(listener3, ['value']);
+    const unobserve3 = addObserver(listener3, ['value']);
     addObserver(listener4, ['value']);
-    let unobserve5 = addObserver(listener5, ['value']);
+    const unobserve5 = addObserver(listener5, ['value']);
     addObserver(listener6, ['value']);
     addObserver(listener7, ['value']);
     addObserver(listener8, ['value']);
-    let unobserve9 = addObserver(listener9, ['value']);
+    const unobserve9 = addObserver(listener9, ['value']);
     addObserver(listener10, ['value']);
 
     updateStore({

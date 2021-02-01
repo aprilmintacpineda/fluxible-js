@@ -198,7 +198,9 @@ export function updateStore (updatedStates) {
           /** @fluxible-config-use-JSON */
           useJSON
             ? /** @end-fluxible-config-use-JSON */
-              JSON.stringify(statesToSave) /** @fluxible-config-use-JSON */
+              JSON.stringify(
+                statesToSave
+              ) /** @fluxible-config-use-JSON */
             : /** @end-fluxible-config-no-JSON */ statesToSave
           /** @end-fluxible-config-use-JSON */
         );
@@ -232,7 +234,8 @@ export function addObserver (callback, keys) {
          * when an observer unsubscribed during an update cycle
          * we want to shift the pointer 1 point to the left
          */
-        if (updatePointer !== null && a <= updatePointer) updatePointer--;
+        if (updatePointer !== null && a <= updatePointer)
+          updatePointer--;
         return observers.splice(a, 1);
       }
     }
@@ -254,7 +257,11 @@ export function addEvent (targetEv, callback) {
            * when an event was removed during an emit cycle
            * we want to shift the emit pointer 1 point to the left
            */
-          if (emitEventCycle && emitEventCycle.ev === targetEv && a <= emitEventCycle.pointer) {
+          if (
+            emitEventCycle &&
+            emitEventCycle.event === targetEv &&
+            a <= emitEventCycle.pointer
+          ) {
             emitEventCycle.pointer--;
             emitEventCycle.eventBusLen--;
           }
@@ -268,8 +275,10 @@ export function addEvent (targetEv, callback) {
   };
 }
 
-export function addEvents (evs, callback) {
-  const removeEventCallbacks = evs.map(ev => addEvent(ev, callback));
+export function addEvents (events, callback) {
+  const removeEventCallbacks = events.map(event =>
+    addEvent(event, callback)
+  );
 
   return () => {
     removeEventCallbacks.forEach(removeEvent => {
@@ -278,37 +287,41 @@ export function addEvents (evs, callback) {
   };
 }
 
-export function removeEvent (ev) {
-  if (!(ev in eventBus)) return -1;
-  delete eventBus[ev];
+export function removeEvent (event) {
+  if (!(event in eventBus)) return -1;
+  delete eventBus[event];
 }
 
-export function removeEvents (evs) {
-  evs.forEach(ev => {
-    removeEvent(ev);
+export function removeEvents (events) {
+  events.forEach(event => {
+    removeEvent(event);
   });
 }
 
-export function emitEvent (ev, payload) {
-  if (!(ev in eventBus)) return -1;
+export function emitEvent (event, payload) {
+  if (!(event in eventBus)) return -1;
 
   emitEventCycle = {
-    ev,
+    event,
     pointer: 0,
-    eventBusLen: eventBus[ev].length
+    eventBusLen: eventBus[event].length
   };
 
-  for (; emitEventCycle.pointer < emitEventCycle.eventBusLen; emitEventCycle.pointer++) {
-    const callback = eventBus[ev][emitEventCycle.pointer];
-    if (callback) callback(payload, ev);
+  for (
+    ;
+    emitEventCycle.pointer < emitEventCycle.eventBusLen;
+    emitEventCycle.pointer++
+  ) {
+    const callback = eventBus[event][emitEventCycle.pointer];
+    if (callback) callback(payload, event);
   }
 
   emitEventCycle = null;
 }
 
-export function emitEvents (evs, payload) {
-  evs.forEach(ev => {
-    emitEvent(ev, payload);
+export function emitEvents (events, payload) {
+  events.forEach(event => {
+    emitEvent(event, payload);
   });
 }
 /** @end-fluxible-no-synth-events */

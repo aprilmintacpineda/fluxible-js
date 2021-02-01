@@ -1,6 +1,13 @@
 /** @format */
 
-import { addEvent, addEvents, emitEvent, emitEvents, removeEvent, removeEvents } from '../../src';
+import {
+  addEvent,
+  addEvents,
+  emitEvent,
+  emitEvents,
+  removeEvent,
+  removeEvents
+} from '../../src';
 
 describe('eventBus', () => {
   test('can add, emit, and remove events', () => {
@@ -457,7 +464,7 @@ describe('Does not skip an event callback in the event that an event callback wa
     expect(callback10).toHaveBeenCalledTimes(2);
   });
 
-  test('when an event callback removed 3 on the front and then itself', () => {
+  test('when an event callback removed middle parts and then itself', () => {
     let canRemove = false;
     const callback1 = jest.fn();
     const callback2 = jest.fn(() => {
@@ -516,7 +523,7 @@ describe('Does not skip an event callback in the event that an event callback wa
     expect(callback10).toHaveBeenCalledTimes(2);
   });
 
-  test('when an event callback removed 3 on the back and then itself', () => {
+  test('when an event callback removed 3 on the front and 1 on the back and then itself', () => {
     let canRemove = false;
     const callback1 = jest.fn();
     const callback2 = jest.fn();
@@ -634,7 +641,7 @@ describe('Does not skip an event callback in the event that an event callback wa
     expect(callback10).toHaveBeenCalledTimes(2);
   });
 
-  test('when an event callback removed 3 on the back and then itself', () => {
+  test('when an event callback removed 1 on the back and 3 on the front and then itself', () => {
     let canRemove = false;
     const callback1 = jest.fn();
     const callback2 = jest.fn();
@@ -774,7 +781,7 @@ describe('Does not skip an event callback in the event that an event callback wa
      */
 
     let removeListener1 = null;
-    let removeListener2 = null;
+    const removeListener2 = null;
 
     const listener1 = jest.fn(() => {
       removeListener1();
