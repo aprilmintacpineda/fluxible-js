@@ -259,7 +259,7 @@ export function addEvent (targetEv, callback) {
            */
           if (
             emitEventCycle &&
-            emitEventCycle.ev === targetEv &&
+            emitEventCycle.event === targetEv &&
             a <= emitEventCycle.pointer
           ) {
             emitEventCycle.pointer--;
@@ -275,8 +275,10 @@ export function addEvent (targetEv, callback) {
   };
 }
 
-export function addEvents (evs, callback) {
-  const removeEventCallbacks = evs.map(ev => addEvent(ev, callback));
+export function addEvents (events, callback) {
+  const removeEventCallbacks = events.map(event =>
+    addEvent(event, callback)
+  );
 
   return () => {
     removeEventCallbacks.forEach(removeEvent => {
@@ -285,24 +287,24 @@ export function addEvents (evs, callback) {
   };
 }
 
-export function removeEvent (ev) {
-  if (!(ev in eventBus)) return -1;
-  delete eventBus[ev];
+export function removeEvent (event) {
+  if (!(event in eventBus)) return -1;
+  delete eventBus[event];
 }
 
-export function removeEvents (evs) {
-  evs.forEach(ev => {
-    removeEvent(ev);
+export function removeEvents (events) {
+  events.forEach(event => {
+    removeEvent(event);
   });
 }
 
-export function emitEvent (ev, payload) {
-  if (!(ev in eventBus)) return -1;
+export function emitEvent (event, payload) {
+  if (!(event in eventBus)) return -1;
 
   emitEventCycle = {
-    ev,
+    event,
     pointer: 0,
-    eventBusLen: eventBus[ev].length
+    eventBusLen: eventBus[event].length
   };
 
   for (
@@ -310,16 +312,16 @@ export function emitEvent (ev, payload) {
     emitEventCycle.pointer < emitEventCycle.eventBusLen;
     emitEventCycle.pointer++
   ) {
-    const callback = eventBus[ev][emitEventCycle.pointer];
-    if (callback) callback(payload, ev);
+    const callback = eventBus[event][emitEventCycle.pointer];
+    if (callback) callback(payload, event);
   }
 
   emitEventCycle = null;
 }
 
-export function emitEvents (evs, payload) {
-  evs.forEach(ev => {
-    emitEvent(ev, payload);
+export function emitEvents (events, payload) {
+  events.forEach(event => {
+    emitEvent(event, payload);
   });
 }
 /** @end-fluxible-no-synth-events */
