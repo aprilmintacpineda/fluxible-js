@@ -300,7 +300,7 @@ export function emitEvent (ev, payload) {
 
   for (; emitEventCycle.pointer < emitEventCycle.eventBusLen; emitEventCycle.pointer++) {
     const callback = eventBus[ev][emitEventCycle.pointer];
-    if (callback) callback(payload);
+    if (callback) callback(payload, ev);
   }
 
   emitEventCycle = null;

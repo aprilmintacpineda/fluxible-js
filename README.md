@@ -4,13 +4,13 @@
 
 Smaller, faster, better state management system that supports asynchronicity and state persistence out of the box.
 
+# Change logs
+
+From 5.0.10, the changelogs on the project will be kept in [CHANGELOG](./CHANGELOG.md), which follows [keepachangelog](https://keepachangelog.com/en/1.0.0/).
+
 # Demo
 
 [See demo](https://aprilmintacpineda.github.io/react-fluxible/). This demo is using [react-fluxible](https://github.com/aprilmintacpineda/react-fluxible).
-
-# Change logs
-
-See [CHANGELOG](./CHANGELOG.md) which follows [keepachangelog](https://keepachangelog.com/en/1.0.0/).
 
 # Tests
 
@@ -219,7 +219,7 @@ Which means you **don't** need `JSON.parse` and `JSON.stringify`.
 ```js
 import { initializeStore } from 'fluxible-js';
 
-function getInitialStore () {
+function getInitialStore() {
   return {
     user: null,
     someOtherState: 'value',
@@ -291,12 +291,9 @@ When using `asyncStorage`, you can provide a 2nd argument which is a callback fu
 ```jsx
 import { addObserver, store } from 'fluxible-js';
 
-const unsubscribeCallback = addObserver(
-  () => {
-    console.log('store has been updated!', store);
-  },
-  ['someOtherState', 'anotherState']
-);
+const unsubscribeCallback = addObserver(() => {
+  console.log('store has been updated!', store);
+}, ['someOtherState', 'anotherState']);
 ```
 
 **Do not mutate the store directly. Doing so may lead to unwanted behaviors in your app.**
@@ -436,7 +433,7 @@ removeListener(); // undefined
 ```js
 import { removeEvent } from 'fluxible-js';
 
-function listener1 (payload) {
+function listener1(payload) {
   console.log('first listener', payload);
 }
 
@@ -468,7 +465,7 @@ removeEvents(['my-event', 'my-other-event', 'even-more-event']);
 ```js
 import { emitEvent, addEvent, updateStore } from 'fluxible-js';
 
-function listener1 (payload) {
+function listener1(payload) {
   updateStore({
     newValue: payload.newValue
   });
