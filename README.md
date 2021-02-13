@@ -1,4 +1,4 @@
-<!-- @format -->
+![npm](https://img.shields.io/npm/dt/fluxible-js) ![npm](https://img.shields.io/npm/dm/fluxible-js) ![npm](https://img.shields.io/npm/dw/fluxible-js)
 
 # Fluxible-JS
 
