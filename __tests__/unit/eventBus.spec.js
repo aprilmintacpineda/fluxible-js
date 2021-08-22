@@ -777,7 +777,8 @@ describe('Does not skip an event callback in the event that an event callback wa
      * -1 +1 problem happens when an event listener
      * removed itself and then a new one was added
      * but the emit cycle pointer is on -1, the next
-     * pointer will be 0
+     * pointer will be 0 so the newly added event will be called
+     * when it shouldn't
      */
 
     let removeListener1 = null;
@@ -797,7 +798,8 @@ describe('Does not skip an event callback in the event that an event callback wa
      * -1 +1 problem happens when an event listener
      * removed itself and then a new one was added
      * but the emit cycle pointer is on -1, the next
-     * pointer will be 0
+     * pointer will be 0 so the newly added event will be called
+     * when it shouldn't
      */
 
     let removeListener1 = null;
@@ -817,7 +819,8 @@ describe('Does not skip an event callback in the event that an event callback wa
      * -1 +1 problem happens when an event listener
      * removed itself and then a new one was added
      * but the emit cycle pointer is on -1, the next
-     * pointer will be 0
+     * pointer will be 0 so the newly added event will be called
+     * when it shouldn't
      */
 
     let removeListener1 = null;
@@ -841,7 +844,8 @@ describe('Does not skip an event callback in the event that an event callback wa
      * -1 +1 problem happens when an event listener
      * removed itself and then a new one was added
      * but the emit cycle pointer is on -1, the next
-     * pointer will be 0
+     * pointer will be 0 so the newly added event will be called
+     * when it shouldn't
      */
 
     let removeListener1 = null;
