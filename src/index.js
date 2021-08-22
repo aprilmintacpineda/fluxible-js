@@ -281,8 +281,8 @@ export function addEvents (events, callback) {
   );
 
   return () => {
-    removeEventCallbacks.forEach(removeEvent => {
-      removeEvent();
+    removeEventCallbacks.forEach(removeEventCallback => {
+      removeEventCallback();
     });
   };
 }
