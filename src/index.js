@@ -140,7 +140,7 @@ export function updateStore (updatedStates) {
 
   const observersLen = observers.length;
 
-  for (; updatePointer < observersLen; updatePointer++) {
+  while (updatePointer < observersLen) {
     const observer = observers[updatePointer];
 
     if (observer) {
@@ -166,6 +166,8 @@ export function updateStore (updatedStates) {
         }
       }
     }
+
+    updatePointer++;
   }
 
   updatePointer = 0;
@@ -281,9 +283,9 @@ export function addEvents (events, callback) {
   );
 
   return () => {
-    removeEventCallbacks.forEach(removeEventCallback => {
-      removeEventCallback();
-    });
+    return removeEventCallbacks.map(removeEventCallback =>
+      removeEventCallback()
+    );
   };
 }
 
@@ -307,13 +309,10 @@ export function emitEvent (event, payload) {
     eventBusLen: eventBus[event].length
   };
 
-  for (
-    ;
-    emitEventCycle.pointer < emitEventCycle.eventBusLen;
-    emitEventCycle.pointer++
-  ) {
+  while (emitEventCycle.pointer < emitEventCycle.eventBusLen) {
     const callback = eventBus[event][emitEventCycle.pointer];
     if (callback) callback(payload, event);
+    emitEventCycle.pointer++;
   }
 
   emitEventCycle = null;

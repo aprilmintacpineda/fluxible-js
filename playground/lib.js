@@ -167,7 +167,7 @@ function updateStore(updatedStates) {
   updatePointer = 0;
   var observersLen = observers.length;
 
-  for (; updatePointer < observersLen; updatePointer++) {
+  while (updatePointer < observersLen) {
     var observer = observers[updatePointer];
 
     if (observer) {
@@ -193,6 +193,8 @@ function updateStore(updatedStates) {
         }
       }
     }
+
+    updatePointer++;
   }
 
   updatePointer = 0;
@@ -298,8 +300,8 @@ function addEvents(events, callback) {
     return addEvent(event, callback);
   });
   return function () {
-    removeEventCallbacks.forEach(function (removeEventCallback) {
-      removeEventCallback();
+    return removeEventCallbacks.map(function (removeEventCallback) {
+      return removeEventCallback();
     });
   };
 }
@@ -323,9 +325,10 @@ function emitEvent(event, payload) {
     eventBusLen: eventBus[event].length
   };
 
-  for (; emitEventCycle.pointer < emitEventCycle.eventBusLen; emitEventCycle.pointer++) {
+  while (emitEventCycle.pointer < emitEventCycle.eventBusLen) {
     var callback = eventBus[event][emitEventCycle.pointer];
     if (callback) callback(payload, event);
+    emitEventCycle.pointer++;
   }
 
   emitEventCycle = null;
