@@ -863,4 +863,22 @@ describe('Does not skip an event callback in the event that an event callback wa
     emitEvent('my-event');
     expect(listener1).toHaveBeenCalledTimes(1);
   });
+
+  test('When an event listener was removed in front during emitEventCycle', () => {
+    let removeListener2 = null;
+
+    const listener1 = jest.fn(() => {
+      removeListener2();
+      addEvent('test-1', listener2);
+    });
+
+    const listener2 = jest.fn(() => {});
+
+    addEvent('test-1', listener1);
+    removeListener2 = addEvent('test-1', listener2);
+    emitEvent('test-1');
+
+    expect(listener1).toHaveBeenCalledTimes(1);
+    expect(listener2).toHaveBeenCalledTimes(0);
+  });
 });
