@@ -781,21 +781,82 @@ describe('Does not skip an event callback in the event that an event callback wa
      */
 
     let removeListener1 = null;
-    const removeListener2 = null;
 
     const listener1 = jest.fn(() => {
       removeListener1();
-      addEvent('my-event', listener2);
-    });
-
-    const listener2 = jest.fn(() => {
-      removeListener2();
       addEvent('my-event', listener1);
     });
 
     removeListener1 = addEvent('my-event', listener1);
     emitEvent('my-event');
     expect(listener1).toHaveBeenCalledTimes(1);
-    expect(listener2).not.toHaveBeenCalled();
+  });
+
+  test('Does not suffer the -1 +1 problem when addEvent was called first', () => {
+    /**
+     * -1 +1 problem happens when an event listener
+     * removed itself and then a new one was added
+     * but the emit cycle pointer is on -1, the next
+     * pointer will be 0
+     */
+
+    let removeListener1 = null;
+
+    const listener1 = jest.fn(() => {
+      addEvent('my-event', listener1);
+      removeListener1();
+    });
+
+    removeListener1 = addEvent('my-event', listener1);
+    emitEvent('my-event');
+    expect(listener1).toHaveBeenCalledTimes(1);
+  });
+
+  test('Does not suffer the -1 +1 problem on addEvents', () => {
+    /**
+     * -1 +1 problem happens when an event listener
+     * removed itself and then a new one was added
+     * but the emit cycle pointer is on -1, the next
+     * pointer will be 0
+     */
+
+    let removeListener1 = null;
+
+    const listener1 = jest.fn(() => {
+      removeListener1();
+      addEvents(['my-event', 'my-event2', 'my-event3'], listener1);
+    });
+
+    removeListener1 = addEvents(
+      ['my-event', 'my-event2', 'my-event3'],
+      listener1
+    );
+
+    emitEvent('my-event');
+    expect(listener1).toHaveBeenCalledTimes(1);
+  });
+
+  test('Does not suffer the -1 +1 problem when addEvents was called first', () => {
+    /**
+     * -1 +1 problem happens when an event listener
+     * removed itself and then a new one was added
+     * but the emit cycle pointer is on -1, the next
+     * pointer will be 0
+     */
+
+    let removeListener1 = null;
+
+    const listener1 = jest.fn(() => {
+      addEvents(['my-event', 'my-event2', 'my-event3'], listener1);
+      removeListener1();
+    });
+
+    removeListener1 = addEvents(
+      ['my-event', 'my-event2', 'my-event3'],
+      listener1
+    );
+
+    emitEvent('my-event');
+    expect(listener1).toHaveBeenCalledTimes(1);
   });
 });
