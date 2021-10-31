@@ -17,7 +17,7 @@ declare type Config<T> = {
     useJSON?: boolean;
     persist?: AsyncPersist<T> | SyncPersist<T>;
 };
-export declare function createStore<StoreType>({ useJSON, initialStore, persist }: Config<StoreType>, initCallback?: () => void): {
+export declare type Store<StoreType> = {
     updateStore: (updatedStates: Partial<StoreType>) => void;
     addObserver: (callback: (store: StoreType) => void, keys: Array<keyof StoreType>) => () => void;
     addEvent: (targetEv: string, callback: (payload: any, store: StoreType, event: string) => void) => () => boolean;
@@ -28,4 +28,5 @@ export declare function createStore<StoreType>({ useJSON, initialStore, persist 
     emitEvents: (events: Array<string>, payload: any) => void;
     store: StoreType;
 };
+export declare function createStore<StoreType>({ useJSON, initialStore, persist }: Config<StoreType>, initCallback?: () => void): Store<StoreType>;
 export {};

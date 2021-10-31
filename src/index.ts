@@ -20,10 +20,31 @@ type Config<T> = {
   persist?: AsyncPersist<T> | SyncPersist<T>;
 };
 
+export type Store<StoreType> = {
+  updateStore: (updatedStates: Partial<StoreType>) => void;
+  addObserver: (
+    callback: (store: StoreType) => void,
+    keys: Array<keyof StoreType>
+  ) => () => void;
+  addEvent: (
+    targetEv: string,
+    callback: (payload: any, store: StoreType, event: string) => void
+  ) => () => boolean;
+  addEvents: (
+    events: Array<string>,
+    callback: (payload: any, store: StoreType, event: string) => void
+  ) => () => void;
+  removeEvent: (event: string) => void;
+  removeEvents: (events: Array<string>) => void;
+  emitEvent: (event: string, payload?: any) => void;
+  emitEvents: (events: Array<string>, payload: any) => void;
+  store: StoreType;
+};
+
 export function createStore<StoreType> (
   { useJSON = true, initialStore, persist }: Config<StoreType>,
   initCallback?: () => void
-) {
+): Store<StoreType> {
   type EventListener = (
     payload: any,
     store: StoreType,
