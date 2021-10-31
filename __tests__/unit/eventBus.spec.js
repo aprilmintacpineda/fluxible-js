@@ -1,18 +1,15 @@
 /** @format */
 
-import {
-  addEvent,
-  addEvents,
-  emitEvent,
-  emitEvents,
-  removeEvent,
-  removeEvents
-} from '../../src';
+import { createStore } from '../../lib';
+
+const store = new createStore({
+  initialStore: {
+    test: 123
+  }
+});
 
 describe('eventBus', () => {
   test('can add, emit, and remove events', () => {
-    expect(emitEvent('test-event')).toEqual(-1);
-
     const callback1 = jest.fn();
     const callback2 = jest.fn();
     const callback3 = jest.fn();
@@ -21,29 +18,41 @@ describe('eventBus', () => {
       test2: 'value'
     };
 
-    addEvent('test-event', callback1);
-    addEvent('test-event', callback2);
-    addEvent('test-event', callback3);
-    emitEvent('test-event');
+    store.addEvent('test-event', callback1);
+    store.addEvent('test-event', callback2);
+    store.addEvent('test-event', callback3);
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledTimes(1);
     expect(callback3).toHaveBeenCalledTimes(1);
 
-    emitEvent('test-event', payload);
+    store.emitEvent('test-event', payload);
 
-    expect(callback1).toHaveBeenCalledWith(payload, 'test-event');
-    expect(callback2).toHaveBeenCalledWith(payload, 'test-event');
-    expect(callback3).toHaveBeenCalledWith(payload, 'test-event');
+    expect(callback1).toHaveBeenCalledWith(
+      payload,
+      store.store,
+      'test-event'
+    );
+    expect(callback2).toHaveBeenCalledWith(
+      payload,
+      store.store,
+      'test-event'
+    );
+    expect(callback3).toHaveBeenCalledWith(
+      payload,
+      store.store,
+      'test-event'
+    );
 
     expect(callback1).toHaveBeenCalledTimes(2);
     expect(callback2).toHaveBeenCalledTimes(2);
     expect(callback3).toHaveBeenCalledTimes(2);
 
-    removeEvent('test-event');
+    store.removeEvent('test-event');
 
-    expect(emitEvent('test-event')).toEqual(-1);
-    expect(removeEvent('test-event')).toEqual(-1);
+    expect(store.emitEvent('test-event')).toEqual(undefined);
+    expect(store.removeEvent('test-event')).toEqual(undefined);
   });
 
   test('can remove event callbacks', () => {
@@ -51,28 +60,16 @@ describe('eventBus', () => {
     const callback2 = jest.fn();
     const callback3 = jest.fn();
 
-    addEvent('test-event', callback1);
-    addEvent('test-event', callback2);
-    const removeCallback3 = addEvent('test-event', callback3);
-    emitEvent('test-event');
+    store.addEvent('test-event', callback1);
+    store.addEvent('test-event', callback2);
+    const removeCallback3 = store.addEvent('test-event', callback3);
+    store.emitEvent('test-event');
     removeCallback3();
-    emitEvent('test-event');
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(2);
     expect(callback2).toHaveBeenCalledTimes(2);
     expect(callback3).toHaveBeenCalledTimes(1);
-  });
-
-  test('can remove callback twice and returns -1', () => {
-    const callback1 = jest.fn();
-    const callback2 = jest.fn();
-
-    addEvent('test-event', callback1);
-    const listener1 = addEvent('test-event', callback2);
-
-    expect(listener1()).not.toEqual(-1);
-
-    expect(listener1()).toEqual(-1);
   });
 
   test('calls only listeners for that event', () => {
@@ -80,16 +77,16 @@ describe('eventBus', () => {
     const callback2 = jest.fn();
     const callback3 = jest.fn();
 
-    addEvent('test-event', callback1);
-    addEvent('test-event', callback2);
-    addEvent('another-event', callback3);
-    emitEvent('test-event');
+    store.addEvent('test-event', callback1);
+    store.addEvent('test-event', callback2);
+    store.addEvent('another-event', callback3);
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledTimes(1);
     expect(callback3).toHaveBeenCalledTimes(0);
 
-    emitEvent('another-event');
+    store.emitEvent('another-event');
 
     expect(callback1).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledTimes(1);
@@ -108,12 +105,12 @@ describe('Does not skip an event callback in the event that an event callback wa
     const callback4 = jest.fn();
     const callback5 = jest.fn();
 
-    addEvent('test-event', callback1);
-    addEvent('test-event', callback2);
-    addEvent('test-event', callback3);
-    const removeCallback4 = addEvent('test-event', callback4);
-    addEvent('test-event', callback5);
-    emitEvent('test-event');
+    store.addEvent('test-event', callback1);
+    store.addEvent('test-event', callback2);
+    store.addEvent('test-event', callback3);
+    const removeCallback4 = store.addEvent('test-event', callback4);
+    store.addEvent('test-event', callback5);
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledTimes(1);
@@ -123,7 +120,7 @@ describe('Does not skip an event callback in the event that an event callback wa
 
     canRemove = true;
 
-    emitEvent('test-event');
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(2);
     expect(callback2).toHaveBeenCalledTimes(2);
@@ -142,12 +139,12 @@ describe('Does not skip an event callback in the event that an event callback wa
     });
     const callback5 = jest.fn();
 
-    const removeCallback1 = addEvent('test-event', callback1);
-    addEvent('test-event', callback2);
-    addEvent('test-event', callback3);
-    addEvent('test-event', callback4);
-    addEvent('test-event', callback5);
-    emitEvent('test-event');
+    const removeCallback1 = store.addEvent('test-event', callback1);
+    store.addEvent('test-event', callback2);
+    store.addEvent('test-event', callback3);
+    store.addEvent('test-event', callback4);
+    store.addEvent('test-event', callback5);
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledTimes(1);
@@ -157,7 +154,7 @@ describe('Does not skip an event callback in the event that an event callback wa
 
     canRemove = true;
 
-    emitEvent('test-event');
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(2);
     expect(callback2).toHaveBeenCalledTimes(2);
@@ -176,12 +173,12 @@ describe('Does not skip an event callback in the event that an event callback wa
     });
     const callback5 = jest.fn();
 
-    addEvent('test-event', callback1);
-    addEvent('test-event', callback2);
-    addEvent('test-event', callback3);
-    const removeCallback4 = addEvent('test-event', callback4);
-    addEvent('test-event', callback5);
-    emitEvent('test-event');
+    store.addEvent('test-event', callback1);
+    store.addEvent('test-event', callback2);
+    store.addEvent('test-event', callback3);
+    const removeCallback4 = store.addEvent('test-event', callback4);
+    store.addEvent('test-event', callback5);
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledTimes(1);
@@ -191,7 +188,7 @@ describe('Does not skip an event callback in the event that an event callback wa
 
     canRemove = true;
 
-    emitEvent('test-event');
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(2);
     expect(callback2).toHaveBeenCalledTimes(2);
@@ -213,12 +210,12 @@ describe('Does not skip an event callback in the event that an event callback wa
     const callback4 = jest.fn();
     const callback5 = jest.fn();
 
-    addEvent('test-event', callback1);
-    const removeCallback2 = addEvent('test-event', callback2);
-    addEvent('test-event', callback3);
-    const removeCallback4 = addEvent('test-event', callback4);
-    addEvent('test-event', callback5);
-    emitEvent('test-event');
+    store.addEvent('test-event', callback1);
+    const removeCallback2 = store.addEvent('test-event', callback2);
+    store.addEvent('test-event', callback3);
+    const removeCallback4 = store.addEvent('test-event', callback4);
+    store.addEvent('test-event', callback5);
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledTimes(1);
@@ -228,7 +225,7 @@ describe('Does not skip an event callback in the event that an event callback wa
 
     canRemove = true;
 
-    emitEvent('test-event');
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(2);
     expect(callback2).toHaveBeenCalledTimes(2);
@@ -250,12 +247,12 @@ describe('Does not skip an event callback in the event that an event callback wa
     });
     const callback5 = jest.fn();
 
-    const removeCallback1 = addEvent('test-event', callback1);
-    addEvent('test-event', callback2);
-    addEvent('test-event', callback3);
-    const removeCallback4 = addEvent('test-event', callback4);
-    addEvent('test-event', callback5);
-    emitEvent('test-event');
+    const removeCallback1 = store.addEvent('test-event', callback1);
+    store.addEvent('test-event', callback2);
+    store.addEvent('test-event', callback3);
+    const removeCallback4 = store.addEvent('test-event', callback4);
+    store.addEvent('test-event', callback5);
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledTimes(1);
@@ -265,7 +262,7 @@ describe('Does not skip an event callback in the event that an event callback wa
 
     canRemove = true;
 
-    emitEvent('test-event');
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(2);
     expect(callback2).toHaveBeenCalledTimes(2);
@@ -287,12 +284,12 @@ describe('Does not skip an event callback in the event that an event callback wa
     const callback4 = jest.fn();
     const callback5 = jest.fn();
 
-    const removeCallback1 = addEvent('test-event', callback1);
-    addEvent('test-event', callback2);
-    addEvent('test-event', callback3);
-    const removeCallback4 = addEvent('test-event', callback4);
-    addEvent('test-event', callback5);
-    emitEvent('test-event');
+    const removeCallback1 = store.addEvent('test-event', callback1);
+    store.addEvent('test-event', callback2);
+    store.addEvent('test-event', callback3);
+    const removeCallback4 = store.addEvent('test-event', callback4);
+    store.addEvent('test-event', callback5);
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledTimes(1);
@@ -302,7 +299,7 @@ describe('Does not skip an event callback in the event that an event callback wa
 
     canRemove = true;
 
-    emitEvent('test-event');
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(2);
     expect(callback2).toHaveBeenCalledTimes(2);
@@ -324,12 +321,12 @@ describe('Does not skip an event callback in the event that an event callback wa
     const callback4 = jest.fn();
     const callback5 = jest.fn();
 
-    const removeCallback1 = addEvent('test-event', callback1);
-    addEvent('test-event', callback2);
-    addEvent('test-event', callback3);
-    const removeCallback4 = addEvent('test-event', callback4);
-    addEvent('test-event', callback5);
-    emitEvent('test-event');
+    const removeCallback1 = store.addEvent('test-event', callback1);
+    store.addEvent('test-event', callback2);
+    store.addEvent('test-event', callback3);
+    const removeCallback4 = store.addEvent('test-event', callback4);
+    store.addEvent('test-event', callback5);
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledTimes(1);
@@ -339,7 +336,7 @@ describe('Does not skip an event callback in the event that an event callback wa
 
     canRemove = true;
 
-    emitEvent('test-event');
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(2);
     expect(callback2).toHaveBeenCalledTimes(2);
@@ -367,17 +364,17 @@ describe('Does not skip an event callback in the event that an event callback wa
     const callback9 = jest.fn();
     const callback10 = jest.fn();
 
-    addEvent('test-event', callback1);
-    addEvent('test-event', callback2);
-    addEvent('test-event', callback3);
-    const removeCallback4 = addEvent('test-event', callback4);
-    const removeCallback5 = addEvent('test-event', callback5);
-    const removeCallback6 = addEvent('test-event', callback6);
-    addEvent('test-event', callback7);
-    addEvent('test-event', callback8);
-    addEvent('test-event', callback9);
-    addEvent('test-event', callback10);
-    emitEvent('test-event');
+    store.addEvent('test-event', callback1);
+    store.addEvent('test-event', callback2);
+    store.addEvent('test-event', callback3);
+    const removeCallback4 = store.addEvent('test-event', callback4);
+    const removeCallback5 = store.addEvent('test-event', callback5);
+    const removeCallback6 = store.addEvent('test-event', callback6);
+    store.addEvent('test-event', callback7);
+    store.addEvent('test-event', callback8);
+    store.addEvent('test-event', callback9);
+    store.addEvent('test-event', callback10);
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledTimes(1);
@@ -392,7 +389,7 @@ describe('Does not skip an event callback in the event that an event callback wa
 
     canRemove = true;
 
-    emitEvent('test-event');
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(2);
     expect(callback2).toHaveBeenCalledTimes(2);
@@ -425,17 +422,17 @@ describe('Does not skip an event callback in the event that an event callback wa
     const callback9 = jest.fn();
     const callback10 = jest.fn();
 
-    const removeCallback1 = addEvent('test-event', callback1);
-    const removeCallback2 = addEvent('test-event', callback2);
-    const removeCallback3 = addEvent('test-event', callback3);
-    addEvent('test-event', callback4);
-    addEvent('test-event', callback5);
-    addEvent('test-event', callback6);
-    addEvent('test-event', callback7);
-    addEvent('test-event', callback8);
-    addEvent('test-event', callback9);
-    addEvent('test-event', callback10);
-    emitEvent('test-event');
+    const removeCallback1 = store.addEvent('test-event', callback1);
+    const removeCallback2 = store.addEvent('test-event', callback2);
+    const removeCallback3 = store.addEvent('test-event', callback3);
+    store.addEvent('test-event', callback4);
+    store.addEvent('test-event', callback5);
+    store.addEvent('test-event', callback6);
+    store.addEvent('test-event', callback7);
+    store.addEvent('test-event', callback8);
+    store.addEvent('test-event', callback9);
+    store.addEvent('test-event', callback10);
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledTimes(1);
@@ -450,7 +447,7 @@ describe('Does not skip an event callback in the event that an event callback wa
 
     canRemove = true;
 
-    emitEvent('test-event');
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(2);
     expect(callback2).toHaveBeenCalledTimes(2);
@@ -484,17 +481,17 @@ describe('Does not skip an event callback in the event that an event callback wa
     const callback9 = jest.fn();
     const callback10 = jest.fn();
 
-    addEvent('test-event', callback1);
-    const removeCallback2 = addEvent('test-event', callback2);
-    addEvent('test-event', callback3);
-    const removeCallback4 = addEvent('test-event', callback4);
-    const removeCallback5 = addEvent('test-event', callback5);
-    const removeCallback6 = addEvent('test-event', callback6);
-    addEvent('test-event', callback7);
-    addEvent('test-event', callback8);
-    addEvent('test-event', callback9);
-    addEvent('test-event', callback10);
-    emitEvent('test-event');
+    store.addEvent('test-event', callback1);
+    const removeCallback2 = store.addEvent('test-event', callback2);
+    store.addEvent('test-event', callback3);
+    const removeCallback4 = store.addEvent('test-event', callback4);
+    const removeCallback5 = store.addEvent('test-event', callback5);
+    const removeCallback6 = store.addEvent('test-event', callback6);
+    store.addEvent('test-event', callback7);
+    store.addEvent('test-event', callback8);
+    store.addEvent('test-event', callback9);
+    store.addEvent('test-event', callback10);
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledTimes(1);
@@ -509,7 +506,7 @@ describe('Does not skip an event callback in the event that an event callback wa
 
     canRemove = true;
 
-    emitEvent('test-event');
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(2);
     expect(callback2).toHaveBeenCalledTimes(2);
@@ -543,17 +540,17 @@ describe('Does not skip an event callback in the event that an event callback wa
     const callback9 = jest.fn();
     const callback10 = jest.fn();
 
-    const removeCallback1 = addEvent('test-event', callback1);
-    const removeCallback2 = addEvent('test-event', callback2);
-    const removeCallback3 = addEvent('test-event', callback3);
-    addEvent('test-event', callback4);
-    addEvent('test-event', callback5);
-    addEvent('test-event', callback6);
-    addEvent('test-event', callback7);
-    const removeCallback8 = addEvent('test-event', callback8);
-    addEvent('test-event', callback9);
-    addEvent('test-event', callback10);
-    emitEvent('test-event');
+    const removeCallback1 = store.addEvent('test-event', callback1);
+    const removeCallback2 = store.addEvent('test-event', callback2);
+    const removeCallback3 = store.addEvent('test-event', callback3);
+    store.addEvent('test-event', callback4);
+    store.addEvent('test-event', callback5);
+    store.addEvent('test-event', callback6);
+    store.addEvent('test-event', callback7);
+    const removeCallback8 = store.addEvent('test-event', callback8);
+    store.addEvent('test-event', callback9);
+    store.addEvent('test-event', callback10);
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledTimes(1);
@@ -568,7 +565,7 @@ describe('Does not skip an event callback in the event that an event callback wa
 
     canRemove = true;
 
-    emitEvent('test-event');
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(2);
     expect(callback2).toHaveBeenCalledTimes(2);
@@ -602,17 +599,17 @@ describe('Does not skip an event callback in the event that an event callback wa
     const callback9 = jest.fn();
     const callback10 = jest.fn();
 
-    addEvent('test-event', callback1);
-    const removeCallback2 = addEvent('test-event', callback2);
-    addEvent('test-event', callback3);
-    const removeCallback4 = addEvent('test-event', callback4);
-    const removeCallback5 = addEvent('test-event', callback5);
-    const removeCallback6 = addEvent('test-event', callback6);
-    addEvent('test-event', callback7);
-    addEvent('test-event', callback8);
-    addEvent('test-event', callback9);
-    addEvent('test-event', callback10);
-    emitEvent('test-event');
+    store.addEvent('test-event', callback1);
+    const removeCallback2 = store.addEvent('test-event', callback2);
+    store.addEvent('test-event', callback3);
+    const removeCallback4 = store.addEvent('test-event', callback4);
+    const removeCallback5 = store.addEvent('test-event', callback5);
+    const removeCallback6 = store.addEvent('test-event', callback6);
+    store.addEvent('test-event', callback7);
+    store.addEvent('test-event', callback8);
+    store.addEvent('test-event', callback9);
+    store.addEvent('test-event', callback10);
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledTimes(1);
@@ -627,7 +624,7 @@ describe('Does not skip an event callback in the event that an event callback wa
 
     canRemove = true;
 
-    emitEvent('test-event');
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(2);
     expect(callback2).toHaveBeenCalledTimes(2);
@@ -661,17 +658,17 @@ describe('Does not skip an event callback in the event that an event callback wa
     const callback9 = jest.fn();
     const callback10 = jest.fn();
 
-    const removeCallback1 = addEvent('test-event', callback1);
-    const removeCallback2 = addEvent('test-event', callback2);
-    const removeCallback3 = addEvent('test-event', callback3);
-    addEvent('test-event', callback4);
-    addEvent('test-event', callback5);
-    addEvent('test-event', callback6);
-    addEvent('test-event', callback7);
-    const removeCallback8 = addEvent('test-event', callback8);
-    addEvent('test-event', callback9);
-    addEvent('test-event', callback10);
-    emitEvent('test-event');
+    const removeCallback1 = store.addEvent('test-event', callback1);
+    const removeCallback2 = store.addEvent('test-event', callback2);
+    const removeCallback3 = store.addEvent('test-event', callback3);
+    store.addEvent('test-event', callback4);
+    store.addEvent('test-event', callback5);
+    store.addEvent('test-event', callback6);
+    store.addEvent('test-event', callback7);
+    const removeCallback8 = store.addEvent('test-event', callback8);
+    store.addEvent('test-event', callback9);
+    store.addEvent('test-event', callback10);
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledTimes(1);
@@ -686,7 +683,7 @@ describe('Does not skip an event callback in the event that an event callback wa
 
     canRemove = true;
 
-    emitEvent('test-event');
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(2);
     expect(callback2).toHaveBeenCalledTimes(2);
@@ -719,15 +716,15 @@ describe('Does not skip an event callback in the event that an event callback wa
       }
     });
 
-    addEvent('test-event', callback1);
-    const removeCallback2 = addEvent('test-event', callback2);
-    const removeCallback3 = addEvent('test-event', callback3);
-    addEvent('test-event', callback4);
-    const removeCallback5 = addEvent('test-event', callback5);
-    const removeCallback6 = addEvent('test-event', callback6);
-    addEvent('test-event', callback7);
+    store.addEvent('test-event', callback1);
+    const removeCallback2 = store.addEvent('test-event', callback2);
+    const removeCallback3 = store.addEvent('test-event', callback3);
+    store.addEvent('test-event', callback4);
+    const removeCallback5 = store.addEvent('test-event', callback5);
+    const removeCallback6 = store.addEvent('test-event', callback6);
+    store.addEvent('test-event', callback7);
 
-    emitEvent('test-event');
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledTimes(1);
@@ -739,7 +736,7 @@ describe('Does not skip an event callback in the event that an event callback wa
 
     canRemove = true;
 
-    emitEvent('test-event');
+    store.emitEvent('test-event');
 
     expect(callback1).toHaveBeenCalledTimes(2);
     expect(callback2).toHaveBeenCalledTimes(2);
@@ -751,24 +748,36 @@ describe('Does not skip an event callback in the event that an event callback wa
   });
 
   test('Can work with plural events', () => {
-    const listener1 = jest.fn(() => {});
+    const listener1 = jest.fn(() => {
+      // empty
+    });
     const events = ['event-1', 'event-2', 'event-3'];
     const payload = { value: '1' };
-    const removeListener = addEvents(events, listener1);
+    const removeListener = store.addEvents(events, listener1);
 
-    emitEvent('event-1', payload);
-    expect(listener1).toHaveBeenCalledWith(payload, 'event-1');
-    emitEvents(['event-1', 'event-2'], payload);
-    expect(listener1).toHaveBeenCalledWith(payload, 'event-1');
+    store.emitEvent('event-1', payload);
+    expect(listener1).toHaveBeenCalledWith(
+      payload,
+      store.store,
+      'event-1'
+    );
+    store.emitEvents(['event-1', 'event-2'], payload);
+    expect(listener1).toHaveBeenCalledWith(
+      payload,
+      store.store,
+      'event-1'
+    );
     removeListener();
-    emitEvents(events);
+    store.emitEvents(events);
     expect(listener1).toHaveBeenCalledTimes(3);
 
-    const listener2 = jest.fn(() => {});
-    addEvents(events, listener2);
-    emitEvents(events);
-    removeEvents(events);
-    emitEvents(events);
+    const listener2 = jest.fn(() => {
+      // empty
+    });
+    store.addEvents(events, listener2);
+    store.emitEvents(events);
+    store.removeEvents(events);
+    store.emitEvents(events);
     expect(listener2).toHaveBeenCalledTimes(3);
   });
 
@@ -785,11 +794,11 @@ describe('Does not skip an event callback in the event that an event callback wa
 
     const listener1 = jest.fn(() => {
       removeListener1();
-      addEvent('my-event', listener1);
+      store.addEvent('my-event', listener1);
     });
 
-    removeListener1 = addEvent('my-event', listener1);
-    emitEvent('my-event');
+    removeListener1 = store.addEvent('my-event', listener1);
+    store.emitEvent('my-event');
     expect(listener1).toHaveBeenCalledTimes(1);
   });
 
@@ -805,12 +814,12 @@ describe('Does not skip an event callback in the event that an event callback wa
     let removeListener1 = null;
 
     const listener1 = jest.fn(() => {
-      addEvent('my-event', listener1);
+      store.addEvent('my-event', listener1);
       removeListener1();
     });
 
-    removeListener1 = addEvent('my-event', listener1);
-    emitEvent('my-event');
+    removeListener1 = store.addEvent('my-event', listener1);
+    store.emitEvent('my-event');
     expect(listener1).toHaveBeenCalledTimes(1);
   });
 
@@ -827,15 +836,18 @@ describe('Does not skip an event callback in the event that an event callback wa
 
     const listener1 = jest.fn(() => {
       removeListener1();
-      addEvents(['my-event', 'my-event2', 'my-event3'], listener1);
+      store.addEvents(
+        ['my-event', 'my-event2', 'my-event3'],
+        listener1
+      );
     });
 
-    removeListener1 = addEvents(
+    removeListener1 = store.addEvents(
       ['my-event', 'my-event2', 'my-event3'],
       listener1
     );
 
-    emitEvent('my-event');
+    store.emitEvent('my-event');
     expect(listener1).toHaveBeenCalledTimes(1);
   });
 
@@ -851,16 +863,19 @@ describe('Does not skip an event callback in the event that an event callback wa
     let removeListener1 = null;
 
     const listener1 = jest.fn(() => {
-      addEvents(['my-event', 'my-event2', 'my-event3'], listener1);
+      store.addEvents(
+        ['my-event', 'my-event2', 'my-event3'],
+        listener1
+      );
       removeListener1();
     });
 
-    removeListener1 = addEvents(
+    removeListener1 = store.addEvents(
       ['my-event', 'my-event2', 'my-event3'],
       listener1
     );
 
-    emitEvent('my-event');
+    store.emitEvent('my-event');
     expect(listener1).toHaveBeenCalledTimes(1);
   });
 
@@ -869,14 +884,16 @@ describe('Does not skip an event callback in the event that an event callback wa
 
     const listener1 = jest.fn(() => {
       removeListener2();
-      addEvent('test-1', listener2);
+      store.addEvent('test-1', listener2);
     });
 
-    const listener2 = jest.fn(() => {});
+    const listener2 = jest.fn(() => {
+      // empty
+    });
 
-    addEvent('test-1', listener1);
-    removeListener2 = addEvent('test-1', listener2);
-    emitEvent('test-1');
+    store.addEvent('test-1', listener1);
+    removeListener2 = store.addEvent('test-1', listener2);
+    store.emitEvent('test-1');
 
     expect(listener1).toHaveBeenCalledTimes(1);
     expect(listener2).toHaveBeenCalledTimes(0);

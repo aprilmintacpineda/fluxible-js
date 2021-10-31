@@ -4,23 +4,20 @@
   "description": "Smaller, faster, better state management system that supports asynchronicity and state persistence out of the box.",
   "main": "lib/index.js",
   "files": [
-    "lib/index.js",
+    "lib/*",
     "__tests__/*",
     "package.json",
     "LICENSE",
     "README.md"
   ],
   "scripts": {
-    "test": "npm run test-unit && npm run test-perf",
-    "test-unit": "npm run build && jest __tests__/unit/* --env=node --coverage",
-    "test-perf": "npm run build && babel-node __tests__/perf.spec.js",
-    "test-perf-persist": "npm run build && babel-node __tests__/perf-persist.spec.js",
+    "test": "npm run build && jest __tests__/unit/* --env=node --coverage",
     "webpack": "rm -rf build && webpack",
-    "build": "npm run lint && node build.js",
-    "eslint": "eslint \"**/*.js\" --fix",
-    "prettier": "prettier \"**/*.js\" --write",
+    "build": "rm -rf lib && mkdir lib && npm run lint && tsc",
+    "eslint": "eslint . --ext .js,.ts --fix",
+    "prettier": "prettier \"*.js|*.ts\" \"src/**/*.js|src/**/*.ts\"  --write",
     "lint": "npm run prettier && npm run eslint",
-    "prepare": "husky install"
+    "postinstall": "husky install"
   },
   "lint-staged": {
     "src/**/*.js": [
@@ -53,24 +50,30 @@
     "@babel/eslint-parser": "^7.15.0",
     "@babel/node": "^7.14.9",
     "@babel/preset-env": "^7.15.0",
+    "@typescript-eslint/eslint-plugin": "^5.2.0",
+    "@typescript-eslint/parser": "^5.2.0",
+    "@typescript-eslint/typescript-estree": "^5.2.0",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
     "babel-plugin-module-resolver": "^4.1.0",
     "babel-preset-minify": "^0.5.1",
-    "eslint": "^7.32.0",
+    "eslint": "^8.1.0",
     "eslint-import-resolver-babel-module": "^5.3.1",
-    "eslint-plugin-import": "^2.24.1",
-    "eslint-plugin-jest": "^24.4.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-jest": "^25.2.2",
     "eslint-plugin-module-resolver": "^1.4.0",
-    "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-react": "^7.26.1",
     "eslint-plugin-react-hooks": "^4.2.0",
-    "husky": "^7.0.1",
+    "husky": "^7.0.4",
     "jest": "^27.0.6",
-    "lint-staged": "^11.1.2",
-    "prettier": "^2.3.2",
+    "lint-staged": "^11.2.6",
+    "prettier": "^2.4.1",
     "webpack": "^5.51.1",
     "webpack-cli": "^4.8.0",
     "webpack-loader-clean-pragma": "^1.0.2"
+  },
+  "dependencies": {
+    "typescript": "^4.4.4"
   }
 }

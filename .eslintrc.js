@@ -18,9 +18,10 @@ module.exports = {
     'jest/globals': true
   },
   root: true,
-  plugins: ['jest', 'module-resolver'],
+  plugins: ['@typescript-eslint', 'jest', 'module-resolver'],
   extends: [
     'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
     'plugin:jest/recommended',
     'plugin:import/errors',
     'plugin:import/warnings'
@@ -28,11 +29,12 @@ module.exports = {
   globals: {
     Atomics: 'readonly'
   },
-  parser: '@babel/eslint-parser',
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     sourceType: 'module'
   },
   rules: {
+    '@typescript-eslint/no-var-requires': 0,
     'brace-style': ['error', '1tbs', { allowSingleLine: false }],
     'no-multiple-empty-lines': ['error', { max: 1 }],
     'no-case-declarations': 0,
@@ -59,18 +61,18 @@ module.exports = {
       }
     ],
     'rest-spread-spacing': ['error', 'never'],
-    // 'no-inline-comments': [
-    //   'error',
-    //   {
-    //     ignorePattern: '_prettier-hack'
-    //   }
-    // ],
+    'no-inline-comments': [
+      'error',
+      {
+        ignorePattern: '_prettier-hack'
+      }
+    ],
     'prefer-spread': ['error'],
     'prefer-const': 'error',
     'no-useless-call': ['error'],
     'no-trailing-spaces': ['error'],
     'space-before-blocks': ['error', 'always'],
-    'no-unused-vars': [
+    '@typescript-eslint/no-unused-vars': [
       'error',
       {
         varsIgnorePattern: unusedVarsIgnorePattern,
@@ -136,12 +138,6 @@ module.exports = {
       }
     ],
     eqeqeq: 'error',
-    'no-empty': 'error',
-    'no-debugger':
-      process.env.NODE_ENV === 'production' ? 'error' : 'warn',
-    'no-console':
-      process.env.NODE_ENV === 'production' ? 'error' : 'warn',
-    'no-alert':
-      process.env.NODE_ENV === 'production' ? 'error' : 'warn'
+    'no-empty': 'error'
   }
 };

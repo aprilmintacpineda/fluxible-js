@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- All functions that previously returns `-1` are now void.
+
+### Changed
+
+- Previously only one store, now you can create self-contained stores by calling `createStore()`.
+
+### Added
+
+- Added typings by using TypeScript
+
 ## [5.0.11] - 2021-02-01
 
 ### Added

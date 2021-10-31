@@ -6,10 +6,10 @@ module.exports = {
   singleQuote: true,
   trailingComma: 'none',
   bracketSpacing: true,
-  jsxBracketSameLine: false,
+  bracketSameLine: false,
   jsxSingleQuote: false,
   quoteProps: 'as-needed',
   arrowParens: 'avoid',
   insertPragma: false,
-  parser: 'babel'
+  parser: 'babel-ts'
 };

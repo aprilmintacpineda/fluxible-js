@@ -1,10 +1,4 @@
-/** @format */
-import {
-  store,
-  updateStore,
-  initializeStore,
-  addObserver
-} from '../../src';
+import { createStore } from '../../lib';
 
 describe('updateStore', () => {
   test("Update store only updates parts of the store that's to be updated", () => {
@@ -18,13 +12,13 @@ describe('updateStore', () => {
       count: 1
     };
 
-    initializeStore({ initialStore });
+    const store = createStore({ initialStore });
 
-    updateStore({
+    store.updateStore({
       count: 100
     });
 
-    expect(store).toEqual({
+    expect(store.store).toEqual({
       value: 'testValue',
       test1: 'test1',
       test2: 'test2',
@@ -34,11 +28,11 @@ describe('updateStore', () => {
       count: 100
     });
 
-    updateStore({
+    store.updateStore({
       count: 50
     });
 
-    expect(store).toEqual({
+    expect(store.store).toEqual({
       value: 'testValue',
       test1: 'test1',
       test2: 'test2',
@@ -48,12 +42,12 @@ describe('updateStore', () => {
       count: 50
     });
 
-    updateStore({
+    store.updateStore({
       value: 'testing',
       count: 100
     });
 
-    expect(store).toEqual({
+    expect(store.store).toEqual({
       value: 'testing',
       test1: 'test1',
       test2: 'test2',
@@ -72,7 +66,7 @@ describe('Does not skip any observer in the event that an observer was removed d
       count: 1
     };
 
-    initializeStore({ initialStore });
+    const store = createStore({ initialStore });
 
     let canRemove = false;
 
@@ -84,13 +78,13 @@ describe('Does not skip any observer in the event that an observer was removed d
     const listener4 = jest.fn();
     const listener5 = jest.fn();
 
-    addObserver(listener1, ['value']);
-    addObserver(listener2, ['value']);
-    const unobserve = addObserver(listener3, ['value']);
-    addObserver(listener4, ['value']);
-    addObserver(listener5, ['value']);
+    store.addObserver(listener1, ['value']);
+    store.addObserver(listener2, ['value']);
+    const unobserve = store.addObserver(listener3, ['value']);
+    store.addObserver(listener4, ['value']);
+    store.addObserver(listener5, ['value']);
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -102,7 +96,7 @@ describe('Does not skip any observer in the event that an observer was removed d
 
     canRemove = true;
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -119,7 +113,7 @@ describe('Does not skip any observer in the event that an observer was removed d
       count: 1
     };
 
-    initializeStore({ initialStore });
+    const store = createStore({ initialStore });
 
     let canRemove = false;
 
@@ -131,13 +125,13 @@ describe('Does not skip any observer in the event that an observer was removed d
     const listener4 = jest.fn();
     const listener5 = jest.fn();
 
-    const unobserve = addObserver(listener1, ['value']);
-    addObserver(listener2, ['value']);
-    addObserver(listener3, ['value']);
-    addObserver(listener4, ['value']);
-    addObserver(listener5, ['value']);
+    const unobserve = store.addObserver(listener1, ['value']);
+    store.addObserver(listener2, ['value']);
+    store.addObserver(listener3, ['value']);
+    store.addObserver(listener4, ['value']);
+    store.addObserver(listener5, ['value']);
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -149,7 +143,7 @@ describe('Does not skip any observer in the event that an observer was removed d
 
     canRemove = true;
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -166,7 +160,7 @@ describe('Does not skip any observer in the event that an observer was removed d
       count: 1
     };
 
-    initializeStore({ initialStore });
+    const store = createStore({ initialStore });
 
     let canRemove = false;
 
@@ -178,13 +172,13 @@ describe('Does not skip any observer in the event that an observer was removed d
     const listener4 = jest.fn();
     const listener5 = jest.fn();
 
-    addObserver(listener1, ['value']);
-    addObserver(listener2, ['value']);
-    const unobserve = addObserver(listener3, ['value']);
-    addObserver(listener4, ['value']);
-    addObserver(listener5, ['value']);
+    store.addObserver(listener1, ['value']);
+    store.addObserver(listener2, ['value']);
+    const unobserve = store.addObserver(listener3, ['value']);
+    store.addObserver(listener4, ['value']);
+    store.addObserver(listener5, ['value']);
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -196,7 +190,7 @@ describe('Does not skip any observer in the event that an observer was removed d
 
     canRemove = true;
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -215,7 +209,7 @@ describe('Does not skip any observer in the event that more than one observers w
       count: 1
     };
 
-    initializeStore({ initialStore });
+    const store = createStore({ initialStore });
 
     let canRemove = false;
 
@@ -230,13 +224,13 @@ describe('Does not skip any observer in the event that more than one observers w
     const listener4 = jest.fn();
     const listener5 = jest.fn();
 
-    const unobserve1 = addObserver(listener1, ['value']);
-    addObserver(listener2, ['value']);
-    const unobserve3 = addObserver(listener3, ['value']);
-    addObserver(listener4, ['value']);
-    addObserver(listener5, ['value']);
+    const unobserve1 = store.addObserver(listener1, ['value']);
+    store.addObserver(listener2, ['value']);
+    const unobserve3 = store.addObserver(listener3, ['value']);
+    store.addObserver(listener4, ['value']);
+    store.addObserver(listener5, ['value']);
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -248,7 +242,7 @@ describe('Does not skip any observer in the event that more than one observers w
 
     canRemove = true;
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -265,7 +259,7 @@ describe('Does not skip any observer in the event that more than one observers w
       count: 1
     };
 
-    initializeStore({ initialStore });
+    const store = createStore({ initialStore });
 
     let canRemove = false;
 
@@ -280,13 +274,13 @@ describe('Does not skip any observer in the event that more than one observers w
     const listener4 = jest.fn();
     const listener5 = jest.fn();
 
-    const unobserve1 = addObserver(listener1, ['value']);
-    addObserver(listener2, ['value']);
-    const unobserve3 = addObserver(listener3, ['value']);
-    addObserver(listener4, ['value']);
-    addObserver(listener5, ['value']);
+    const unobserve1 = store.addObserver(listener1, ['value']);
+    store.addObserver(listener2, ['value']);
+    const unobserve3 = store.addObserver(listener3, ['value']);
+    store.addObserver(listener4, ['value']);
+    store.addObserver(listener5, ['value']);
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -298,7 +292,7 @@ describe('Does not skip any observer in the event that more than one observers w
 
     canRemove = true;
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -315,7 +309,7 @@ describe('Does not skip any observer in the event that more than one observers w
       count: 1
     };
 
-    initializeStore({ initialStore });
+    const store = createStore({ initialStore });
 
     let canRemove = false;
 
@@ -330,13 +324,13 @@ describe('Does not skip any observer in the event that more than one observers w
     const listener4 = jest.fn();
     const listener5 = jest.fn();
 
-    const unobserve1 = addObserver(listener1, ['value']);
-    const unobserve2 = addObserver(listener2, ['value']);
-    addObserver(listener3, ['value']);
-    addObserver(listener4, ['value']);
-    addObserver(listener5, ['value']);
+    const unobserve1 = store.addObserver(listener1, ['value']);
+    const unobserve2 = store.addObserver(listener2, ['value']);
+    store.addObserver(listener3, ['value']);
+    store.addObserver(listener4, ['value']);
+    store.addObserver(listener5, ['value']);
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -348,7 +342,7 @@ describe('Does not skip any observer in the event that more than one observers w
 
     canRemove = true;
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -365,7 +359,7 @@ describe('Does not skip any observer in the event that more than one observers w
       count: 1
     };
 
-    initializeStore({ initialStore });
+    const store = createStore({ initialStore });
 
     let canRemove = false;
 
@@ -380,13 +374,13 @@ describe('Does not skip any observer in the event that more than one observers w
     const listener4 = jest.fn();
     const listener5 = jest.fn();
 
-    addObserver(listener1, ['value']);
-    const unobserve2 = addObserver(listener2, ['value']);
-    addObserver(listener3, ['value']);
-    const unobserve4 = addObserver(listener4, ['value']);
-    addObserver(listener5, ['value']);
+    store.addObserver(listener1, ['value']);
+    const unobserve2 = store.addObserver(listener2, ['value']);
+    store.addObserver(listener3, ['value']);
+    const unobserve4 = store.addObserver(listener4, ['value']);
+    store.addObserver(listener5, ['value']);
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -398,7 +392,7 @@ describe('Does not skip any observer in the event that more than one observers w
 
     canRemove = true;
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -415,7 +409,7 @@ describe('Does not skip any observer in the event that more than one observers w
       count: 1
     };
 
-    initializeStore({ initialStore });
+    const store = createStore({ initialStore });
 
     let canRemove = false;
 
@@ -430,13 +424,13 @@ describe('Does not skip any observer in the event that more than one observers w
     const listener4 = jest.fn();
     const listener5 = jest.fn();
 
-    const unobserve1 = addObserver(listener1, ['value']);
-    const unobserve2 = addObserver(listener2, ['value']);
-    addObserver(listener3, ['value']);
-    addObserver(listener4, ['value']);
-    addObserver(listener5, ['value']);
+    const unobserve1 = store.addObserver(listener1, ['value']);
+    const unobserve2 = store.addObserver(listener2, ['value']);
+    store.addObserver(listener3, ['value']);
+    store.addObserver(listener4, ['value']);
+    store.addObserver(listener5, ['value']);
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -448,7 +442,7 @@ describe('Does not skip any observer in the event that more than one observers w
 
     canRemove = true;
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -465,7 +459,7 @@ describe('Does not skip any observer in the event that more than one observers w
       count: 1
     };
 
-    initializeStore({ initialStore });
+    const store = createStore({ initialStore });
 
     let canRemove = false;
 
@@ -480,13 +474,13 @@ describe('Does not skip any observer in the event that more than one observers w
     const listener4 = jest.fn();
     const listener5 = jest.fn();
 
-    addObserver(listener1, ['value']);
-    const unobserve2 = addObserver(listener2, ['value']);
-    addObserver(listener3, ['value']);
-    const unobserve4 = addObserver(listener4, ['value']);
-    addObserver(listener5, ['value']);
+    store.addObserver(listener1, ['value']);
+    const unobserve2 = store.addObserver(listener2, ['value']);
+    store.addObserver(listener3, ['value']);
+    const unobserve4 = store.addObserver(listener4, ['value']);
+    store.addObserver(listener5, ['value']);
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -498,7 +492,7 @@ describe('Does not skip any observer in the event that more than one observers w
 
     canRemove = true;
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -515,7 +509,7 @@ describe('Does not skip any observer in the event that more than one observers w
       count: 1
     };
 
-    initializeStore({ initialStore });
+    const store = createStore({ initialStore });
 
     let canRemove = false;
 
@@ -536,18 +530,18 @@ describe('Does not skip any observer in the event that more than one observers w
     const listener9 = jest.fn();
     const listener10 = jest.fn();
 
-    addObserver(listener1, ['value']);
-    addObserver(listener2, ['value']);
-    addObserver(listener3, ['value']);
-    addObserver(listener4, ['value']);
-    addObserver(listener5, ['value']);
-    const unobserve6 = addObserver(listener6, ['value']);
-    const unobserve7 = addObserver(listener7, ['value']);
-    const unobserve8 = addObserver(listener8, ['value']);
-    addObserver(listener9, ['value']);
-    addObserver(listener10, ['value']);
+    store.addObserver(listener1, ['value']);
+    store.addObserver(listener2, ['value']);
+    store.addObserver(listener3, ['value']);
+    store.addObserver(listener4, ['value']);
+    store.addObserver(listener5, ['value']);
+    const unobserve6 = store.addObserver(listener6, ['value']);
+    const unobserve7 = store.addObserver(listener7, ['value']);
+    const unobserve8 = store.addObserver(listener8, ['value']);
+    store.addObserver(listener9, ['value']);
+    store.addObserver(listener10, ['value']);
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -564,7 +558,7 @@ describe('Does not skip any observer in the event that more than one observers w
 
     canRemove = true;
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -586,7 +580,7 @@ describe('Does not skip any observer in the event that more than one observers w
       count: 1
     };
 
-    initializeStore({ initialStore });
+    const store = createStore({ initialStore });
 
     let canRemove = false;
 
@@ -607,18 +601,18 @@ describe('Does not skip any observer in the event that more than one observers w
       }
     });
 
-    const unobserve1 = addObserver(listener1, ['value']);
-    addObserver(listener2, ['value']);
-    const unobserve3 = addObserver(listener3, ['value']);
-    addObserver(listener4, ['value']);
-    const unobserve5 = addObserver(listener5, ['value']);
-    addObserver(listener6, ['value']);
-    addObserver(listener7, ['value']);
-    addObserver(listener8, ['value']);
-    addObserver(listener9, ['value']);
-    addObserver(listener10, ['value']);
+    const unobserve1 = store.addObserver(listener1, ['value']);
+    store.addObserver(listener2, ['value']);
+    const unobserve3 = store.addObserver(listener3, ['value']);
+    store.addObserver(listener4, ['value']);
+    const unobserve5 = store.addObserver(listener5, ['value']);
+    store.addObserver(listener6, ['value']);
+    store.addObserver(listener7, ['value']);
+    store.addObserver(listener8, ['value']);
+    store.addObserver(listener9, ['value']);
+    store.addObserver(listener10, ['value']);
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -635,7 +629,7 @@ describe('Does not skip any observer in the event that more than one observers w
 
     canRemove = true;
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -657,7 +651,7 @@ describe('Does not skip any observer in the event that more than one observers w
       count: 1
     };
 
-    initializeStore({ initialStore });
+    const store = createStore({ initialStore });
 
     let canRemove = false;
 
@@ -679,18 +673,18 @@ describe('Does not skip any observer in the event that more than one observers w
     const listener9 = jest.fn();
     const listener10 = jest.fn();
 
-    addObserver(listener1, ['value']);
-    const unobserver2 = addObserver(listener2, ['value']);
-    addObserver(listener3, ['value']);
-    addObserver(listener4, ['value']);
-    addObserver(listener5, ['value']);
-    const unobserve6 = addObserver(listener6, ['value']);
-    const unobserve7 = addObserver(listener7, ['value']);
-    const unobserve8 = addObserver(listener8, ['value']);
-    addObserver(listener9, ['value']);
-    addObserver(listener10, ['value']);
+    store.addObserver(listener1, ['value']);
+    const unobserver2 = store.addObserver(listener2, ['value']);
+    store.addObserver(listener3, ['value']);
+    store.addObserver(listener4, ['value']);
+    store.addObserver(listener5, ['value']);
+    const unobserve6 = store.addObserver(listener6, ['value']);
+    const unobserve7 = store.addObserver(listener7, ['value']);
+    const unobserve8 = store.addObserver(listener8, ['value']);
+    store.addObserver(listener9, ['value']);
+    store.addObserver(listener10, ['value']);
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -707,7 +701,7 @@ describe('Does not skip any observer in the event that more than one observers w
 
     canRemove = true;
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -729,7 +723,7 @@ describe('Does not skip any observer in the event that more than one observers w
       count: 1
     };
 
-    initializeStore({ initialStore });
+    const store = createStore({ initialStore });
 
     let canRemove = false;
 
@@ -751,18 +745,18 @@ describe('Does not skip any observer in the event that more than one observers w
     });
     const listener10 = jest.fn();
 
-    const unobserve1 = addObserver(listener1, ['value']);
-    addObserver(listener2, ['value']);
-    const unobserve3 = addObserver(listener3, ['value']);
-    addObserver(listener4, ['value']);
-    const unobserve5 = addObserver(listener5, ['value']);
-    addObserver(listener6, ['value']);
-    addObserver(listener7, ['value']);
-    addObserver(listener8, ['value']);
-    const unobserve9 = addObserver(listener9, ['value']);
-    addObserver(listener10, ['value']);
+    const unobserve1 = store.addObserver(listener1, ['value']);
+    store.addObserver(listener2, ['value']);
+    const unobserve3 = store.addObserver(listener3, ['value']);
+    store.addObserver(listener4, ['value']);
+    const unobserve5 = store.addObserver(listener5, ['value']);
+    store.addObserver(listener6, ['value']);
+    store.addObserver(listener7, ['value']);
+    store.addObserver(listener8, ['value']);
+    const unobserve9 = store.addObserver(listener9, ['value']);
+    store.addObserver(listener10, ['value']);
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -779,7 +773,7 @@ describe('Does not skip any observer in the event that more than one observers w
 
     canRemove = true;
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -801,7 +795,7 @@ describe('Does not skip any observer in the event that more than one observers w
       count: 1
     };
 
-    initializeStore({ initialStore });
+    const store = createStore({ initialStore });
 
     let canRemove = false;
 
@@ -823,18 +817,18 @@ describe('Does not skip any observer in the event that more than one observers w
     const listener9 = jest.fn();
     const listener10 = jest.fn();
 
-    addObserver(listener1, ['value']);
-    const unobserver2 = addObserver(listener2, ['value']);
-    addObserver(listener3, ['value']);
-    addObserver(listener4, ['value']);
-    addObserver(listener5, ['value']);
-    const unobserve6 = addObserver(listener6, ['value']);
-    const unobserve7 = addObserver(listener7, ['value']);
-    const unobserve8 = addObserver(listener8, ['value']);
-    addObserver(listener9, ['value']);
-    addObserver(listener10, ['value']);
+    store.addObserver(listener1, ['value']);
+    const unobserver2 = store.addObserver(listener2, ['value']);
+    store.addObserver(listener3, ['value']);
+    store.addObserver(listener4, ['value']);
+    store.addObserver(listener5, ['value']);
+    const unobserve6 = store.addObserver(listener6, ['value']);
+    const unobserve7 = store.addObserver(listener7, ['value']);
+    const unobserve8 = store.addObserver(listener8, ['value']);
+    store.addObserver(listener9, ['value']);
+    store.addObserver(listener10, ['value']);
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -851,7 +845,7 @@ describe('Does not skip any observer in the event that more than one observers w
 
     canRemove = true;
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -873,7 +867,7 @@ describe('Does not skip any observer in the event that more than one observers w
       count: 1
     };
 
-    initializeStore({ initialStore });
+    const store = createStore({ initialStore });
 
     let canRemove = false;
 
@@ -895,18 +889,18 @@ describe('Does not skip any observer in the event that more than one observers w
     });
     const listener10 = jest.fn();
 
-    const unobserve1 = addObserver(listener1, ['value']);
-    addObserver(listener2, ['value']);
-    const unobserve3 = addObserver(listener3, ['value']);
-    addObserver(listener4, ['value']);
-    const unobserve5 = addObserver(listener5, ['value']);
-    addObserver(listener6, ['value']);
-    addObserver(listener7, ['value']);
-    addObserver(listener8, ['value']);
-    const unobserve9 = addObserver(listener9, ['value']);
-    addObserver(listener10, ['value']);
+    const unobserve1 = store.addObserver(listener1, ['value']);
+    store.addObserver(listener2, ['value']);
+    const unobserve3 = store.addObserver(listener3, ['value']);
+    store.addObserver(listener4, ['value']);
+    const unobserve5 = store.addObserver(listener5, ['value']);
+    store.addObserver(listener6, ['value']);
+    store.addObserver(listener7, ['value']);
+    store.addObserver(listener8, ['value']);
+    const unobserve9 = store.addObserver(listener9, ['value']);
+    store.addObserver(listener10, ['value']);
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 
@@ -923,7 +917,7 @@ describe('Does not skip any observer in the event that more than one observers w
 
     canRemove = true;
 
-    updateStore({
+    store.updateStore({
       value: 1
     });
 

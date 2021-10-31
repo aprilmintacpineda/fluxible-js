@@ -1,11 +1,6 @@
 /** @format */
 
-import {
-  updateStore,
-  initializeStore,
-  store,
-  addObserver
-} from '../../src';
+import { createStore } from '../../lib';
 
 describe('persist using syncStorage', () => {
   test('persist merges savedStore and initialStore', () => {
@@ -23,18 +18,24 @@ describe('persist using syncStorage', () => {
           }
         });
       }),
-      setItem: jest.fn(() => {})
+      setItem: jest.fn(() => {
+        // empty
+      })
     };
 
     const restore = jest.fn(({ user }) => ({ user }));
+    const initCallback = jest.fn();
 
-    initializeStore({
-      initialStore,
-      persist: {
-        syncStorage,
-        restore
-      }
-    });
+    createStore(
+      {
+        initialStore,
+        persist: {
+          syncStorage,
+          restore
+        }
+      },
+      initCallback
+    );
 
     expect(restore).toHaveBeenCalledWith({
       user: {
@@ -43,6 +44,8 @@ describe('persist using syncStorage', () => {
       testValue: 'value',
       anotherValue: 'test value'
     });
+
+    expect(initCallback).toHaveBeenCalled();
   });
 
   test('calls getItem and setItem on config.persist.syncStorage', () => {
@@ -62,14 +65,16 @@ describe('persist using syncStorage', () => {
           }
         });
       }),
-      setItem: jest.fn(() => {})
+      setItem: jest.fn(() => {
+        // empty
+      })
     };
 
     const restore = jest.fn(savedStore => ({
       user: savedStore.user
     }));
 
-    initializeStore({
+    const store = createStore({
       initialStore,
       persist: {
         syncStorage,
@@ -79,7 +84,7 @@ describe('persist using syncStorage', () => {
 
     expect(syncStorage.getItem).toHaveBeenCalledWith('fluxible-js');
     expect(restore).toHaveBeenCalled();
-    expect(store).toEqual({
+    expect(store.store).toEqual({
       user: {
         name: 'test user'
       },
@@ -87,7 +92,7 @@ describe('persist using syncStorage', () => {
       anotherValue: 'test value'
     });
 
-    updateStore({
+    store.updateStore({
       user: {
         name: 'another test user'
       },
@@ -125,7 +130,9 @@ describe('persist using syncStorage', () => {
           }
         });
       }),
-      setItem: jest.fn(() => {})
+      setItem: jest.fn(() => {
+        // empty
+      })
     };
 
     const persist = {
@@ -138,28 +145,28 @@ describe('persist using syncStorage', () => {
       })
     };
 
-    initializeStore({
+    const store = createStore({
       initialStore,
       persist
     });
 
-    updateStore({
+    store.updateStore({
       anotherValue: 'call 1'
     });
 
-    updateStore({
+    store.updateStore({
       anotherValue: 'call 2'
     });
 
-    updateStore({
+    store.updateStore({
       anotherValue: 'call 3'
     });
 
-    updateStore({
+    store.updateStore({
       anotherValue: 'call 4'
     });
 
-    updateStore({
+    store.updateStore({
       anotherValue: 'call 5',
       testValue: 'call 5'
     });
@@ -167,7 +174,7 @@ describe('persist using syncStorage', () => {
     return new Promise(resolve => setTimeout(resolve, 200)).then(
       () => {
         expect(syncStorage.setItem).toHaveBeenCalledTimes(1);
-        expect(store).toEqual({
+        expect(store.store).toEqual({
           user: {
             name: 'test user'
           },
@@ -195,7 +202,9 @@ describe('persist using syncStorage', () => {
           }
         });
       }),
-      setItem: jest.fn(() => {})
+      setItem: jest.fn(() => {
+        // empty
+      })
     };
 
     const persist = {
@@ -207,23 +216,23 @@ describe('persist using syncStorage', () => {
       })
     };
 
-    initializeStore({
+    const store = createStore({
       initialStore,
       persist
     });
 
-    updateStore({
+    store.updateStore({
       anotherValue: 'call 1'
     });
 
-    updateStore({
+    store.updateStore({
       anotherValue: 'call 2'
     });
 
     return new Promise(resolve => setTimeout(resolve, 200))
       .then(() => {
         expect(syncStorage.setItem).toHaveBeenCalledTimes(0);
-        expect(store).toEqual({
+        expect(store.store).toEqual({
           user: {
             name: 'test user'
           },
@@ -231,13 +240,13 @@ describe('persist using syncStorage', () => {
           anotherValue: 'call 2'
         });
 
-        updateStore({
+        store.updateStore({
           user: {
             name: 'another-user'
           }
         });
 
-        updateStore({
+        store.updateStore({
           testValue: 'call 1'
         });
 
@@ -245,7 +254,7 @@ describe('persist using syncStorage', () => {
       })
       .then(() => {
         expect(syncStorage.setItem).toHaveBeenCalledTimes(1);
-        expect(store).toEqual({
+        expect(store.store).toEqual({
           user: {
             name: 'another-user'
           },
@@ -272,7 +281,9 @@ describe('persist using syncStorage', () => {
           }
         });
       }),
-      setItem: jest.fn(() => {})
+      setItem: jest.fn(() => {
+        // empty
+      })
     };
 
     const persist = {
@@ -284,28 +295,28 @@ describe('persist using syncStorage', () => {
       })
     };
 
-    initializeStore({
+    const store = createStore({
       initialStore,
       persist
     });
 
-    updateStore({
+    store.updateStore({
       anotherValue: 'call 1'
     });
 
-    updateStore({
+    store.updateStore({
       anotherValue: 'call 2'
     });
 
-    updateStore({
+    store.updateStore({
       anotherValue: 'call 3'
     });
 
-    updateStore({
+    store.updateStore({
       anotherValue: 'call 4'
     });
 
-    updateStore({
+    store.updateStore({
       anotherValue: 'call 5',
       testValue: 'call 5'
     });
@@ -313,7 +324,7 @@ describe('persist using syncStorage', () => {
     return new Promise(resolve => setTimeout(resolve, 200)).then(
       () => {
         expect(syncStorage.setItem).toHaveBeenCalledTimes(0);
-        expect(store).toEqual({
+        expect(store.store).toEqual({
           user: {
             name: 'test user'
           },
@@ -347,7 +358,7 @@ describe('persist using syncStorage', () => {
       };
     });
 
-    initializeStore({
+    const store = createStore({
       initialStore,
       persist: {
         syncStorage,
@@ -357,13 +368,13 @@ describe('persist using syncStorage', () => {
 
     expect(restore).toHaveBeenCalledWith(initialStore);
     expect(syncStorage.getItem).toHaveBeenCalledWith('fluxible-js');
-    expect(store).toEqual({
+    expect(store.store).toEqual({
       user: null,
       testValue: 'value',
       anotherValue: 'test value'
     });
 
-    updateStore({
+    store.updateStore({
       user: {
         name: 'another test user'
       },
@@ -396,20 +407,15 @@ describe('persist using asyncStorage', () => {
     };
 
     const asyncStorage = {
-      getItem: jest.fn(
-        () =>
-          new Promise(resolve => {
-            setTimeout(() => {
-              resolve(
-                JSON.stringify({
-                  user: {
-                    name: 'test user'
-                  }
-                })
-              );
-            }, 200);
+      getItem: jest.fn(() => {
+        return Promise.resolve(
+          JSON.stringify({
+            user: {
+              name: 'test user'
+            }
           })
-      ),
+        );
+      }),
       setItem: jest.fn(() => Promise.resolve())
     };
 
@@ -419,9 +425,9 @@ describe('persist using asyncStorage', () => {
       };
     });
 
-    const asyncInitCallback = jest.fn();
+    const initCallback = jest.fn();
 
-    initializeStore(
+    createStore(
       {
         initialStore,
         persist: {
@@ -429,7 +435,7 @@ describe('persist using asyncStorage', () => {
           restore
         }
       },
-      asyncInitCallback
+      initCallback
     );
 
     return new Promise(resolve => setTimeout(resolve, 200)).then(
@@ -442,7 +448,7 @@ describe('persist using asyncStorage', () => {
           anotherValue: 'test value'
         });
 
-        expect(asyncInitCallback).toHaveBeenCalled();
+        expect(initCallback).toHaveBeenCalled();
       }
     );
   });
@@ -482,11 +488,9 @@ describe('persist using asyncStorage', () => {
 
     const observer1 = jest.fn();
     const observer2 = jest.fn();
-    const asyncInitCallback = jest.fn();
+    const initCallback = jest.fn();
 
-    addObserver(observer1, ['user']);
-
-    initializeStore(
+    const store = createStore(
       {
         initialStore,
         persist: {
@@ -494,18 +498,20 @@ describe('persist using asyncStorage', () => {
           restore
         }
       },
-      asyncInitCallback
+      initCallback
     );
 
-    addObserver(observer2, ['user']);
+    store.addObserver(observer1, ['user']);
+
+    store.addObserver(observer2, ['user']);
 
     return new Promise(resolve => setTimeout(resolve, 200))
       .then(() => {
-        expect(asyncInitCallback).toHaveBeenCalledTimes(1);
+        expect(initCallback).toHaveBeenCalledTimes(1);
         expect(asyncStorage.getItem).toHaveBeenCalled();
         expect(restore).toHaveBeenCalled();
 
-        updateStore({
+        store.updateStore({
           user: 'hello'
         });
 
@@ -544,7 +550,7 @@ describe('saving store to storage', () => {
       };
     });
 
-    initializeStore({
+    const store = createStore({
       initialStore,
       persist: {
         asyncStorage,
@@ -563,7 +569,7 @@ describe('saving store to storage', () => {
         expect(asyncStorage.getItem).toHaveBeenCalled();
         expect(restore).toHaveBeenCalled();
 
-        updateStore({
+        store.updateStore({
           user: 'hello'
         });
 
