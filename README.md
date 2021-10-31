@@ -1,6 +1,6 @@
 ![npm](https://img.shields.io/npm/dt/fluxible-js) ![npm](https://img.shields.io/npm/dm/fluxible-js) ![npm](https://img.shields.io/npm/dw/fluxible-js)
 
-# Fluxible-JS
+# Fluxible-JS v6
 
 Smaller, faster, better event-driven state management architecture that supports asynchronicity and state persistence out of the box with no extra code.
 
