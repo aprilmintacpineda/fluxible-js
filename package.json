@@ -17,7 +17,7 @@
     "eslint": "eslint . --ext .js,.ts --fix",
     "prettier": "prettier \"*.js|*.ts\" \"src/**/*.js|src/**/*.ts\"  --write",
     "lint": "npm run prettier && npm run eslint",
-    "postinstall": "husky install"
+    "prepare": "husky install"
   },
   "lint-staged": {
     "src/**/*.js": [
