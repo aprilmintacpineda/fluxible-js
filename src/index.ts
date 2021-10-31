@@ -20,7 +20,7 @@ type Config<T> = {
   persist?: AsyncPersist<T> | SyncPersist<T>;
 };
 
-export function createStore<StoreType = Record<string, any>> (
+export function createStore<StoreType> (
   { useJSON = true, initialStore, persist }: Config<StoreType>,
   initCallback?: () => void
 ) {
