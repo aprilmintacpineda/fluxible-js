@@ -1,7 +1,7 @@
 type AsyncPersist<T> = {
   asyncStorage: {
     getItem: (key: string) => Promise<string | Record<string, any>>;
-    setItem: (key: string, value: string | T) => Promise<void>;
+    setItem: (key: string, value: string | T) => Promise<any>;
   };
   restore: (savedStore: T) => Partial<T>;
 };
