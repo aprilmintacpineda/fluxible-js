@@ -12,7 +12,6 @@
   ],
   "scripts": {
     "test": "npm run build && jest __tests__/unit/* --env=node --coverage",
-    "webpack": "rm -rf build && webpack",
     "build": "rm -rf lib && mkdir lib && npm run lint && tsc",
     "eslint": "eslint . --ext .js,.ts --fix",
     "prettier": "prettier \"*.js|*.ts\" \"src/**/*.js|src/**/*.ts\"  --write",
@@ -68,10 +67,7 @@
     "husky": "^7.0.4",
     "jest": "^27.0.6",
     "lint-staged": "^11.2.6",
-    "prettier": "^2.4.1",
-    "webpack": "^5.51.1",
-    "webpack-cli": "^4.8.0",
-    "webpack-loader-clean-pragma": "^1.0.2"
+    "prettier": "^2.4.1"
   },
   "dependencies": {
     "typescript": "^4.4.4"
