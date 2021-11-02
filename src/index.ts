@@ -1,23 +1,26 @@
-type AsyncPersist<T> = {
+type AsyncPersist<StoreType> = {
   asyncStorage: {
     getItem: (key: string) => Promise<string | Record<string, any>>;
-    setItem: (key: string, value: string | T) => Promise<any>;
+    setItem: (
+      key: string,
+      value: string | StoreType
+    ) => Promise<any>;
   };
-  restore: (savedStore: T) => Partial<T>;
+  restore: (savedStore: StoreType) => Partial<StoreType>;
 };
 
-type SyncPersist<T> = {
+type SyncPersist<StoreType> = {
   syncStorage: {
     getItem: (key: string) => string;
-    setItem: (key: string, value: string | T) => void;
+    setItem: (key: string, value: string | StoreType) => void;
   };
-  restore: (savedStore: T) => Partial<T>;
+  restore: (savedStore: StoreType) => Partial<StoreType>;
 };
 
-type Config<T> = {
-  initialStore: T;
+type Config<StoreType> = {
+  initialStore: StoreType;
   useJSON?: boolean;
-  persist?: AsyncPersist<T> | SyncPersist<T>;
+  persist?: AsyncPersist<StoreType> | SyncPersist<StoreType>;
 };
 
 export type Store<StoreType> = {
