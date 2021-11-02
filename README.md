@@ -27,18 +27,16 @@ From 5.0.10, the changelogs on the project will be kept in [CHANGELOG](./CHANGEL
 ```ts
 import { createStore } from 'fluxible-js';
 
-function getInitialStore() {
-  return {
-    user: null,
-    someOtherState: 'value',
-    anotherState: {
-      value: 'value'
-    }
-  };
-}
+const initialStore = {
+  user: null,
+  someOtherState: 'value',
+  anotherState: {
+    value: 'value'
+  }
+};
 
-const store = createStore<ReturnType<typeof getInitialStore>>({
-  initialStore: getInitialStore(),
+const store = createStore({
+  initialStore,
   persist: {
     useJSON: false,
     syncStorage: window.localStorage,
@@ -54,19 +52,15 @@ const store = createStore<ReturnType<typeof getInitialStore>>({
 ```ts
 import { createStore } from 'fluxible-js';
 
-function getInitialStore() {
-  return {
-    user: null,
-    someOtherState: 'value',
-    anotherState: {
-      value: 'value'
-    }
-  };
-}
+const initialStore = {
+  user: null,
+  someOtherState: 'value',
+  anotherState: {
+    value: 'value'
+  }
+};
 
-const myStore = createStore<ReturnType<typeof getInitialStore>>({
-  initialStore: getInitialStore()
-});
+const myStore = createStore({ initialStore });
 ```
 
 `createStore` function returns an instance of a `store` that has variety of methods in it. You can access the store's current value by via `myStore.store`.
@@ -91,7 +85,7 @@ const initialStore = {
   isLoggedIn: false
 };
 
-const store = createStore<typeof initialStore>({
+const store = createStore({
   initialStore,
   persist: {
     asyncStorage: RNAsyncStorage,
@@ -116,7 +110,7 @@ const initialStore = {
   isLoggedIn: false
 };
 
-const store = createStore<typeof initialStore>({
+const store = createStore({
   initialStore,
   persist: {
     syncStorage: window.localStorage,
@@ -141,7 +135,7 @@ const initialStore = {
   isLoggedIn: false
 };
 
-const store = createStore<typeof initialStore>({
+const store = createStore({
   initialStore,
   persist: {
     syncStorage: window.localStorage,
@@ -281,7 +275,7 @@ const initialStore = {
   // ... your store values here
 };
 
-export default createStore<typeof initialStore>({
+export default createStore({
   initialStore,
   // ... other options
 });
