@@ -10,7 +10,7 @@ From 5.0.10, the changelogs on the project will be kept in [CHANGELOG](./CHANGEL
 
 # Demo
 
-[See demo](https://aprilmintacpineda.github.io/react-fluxible/). This demo is using [react-fluxible](https://github.com/aprilmintacpineda/react-fluxible).
+https://user-images.githubusercontent.com/21032419/139810793-ba875041-133e-4087-b80f-a523213e974d.mp4
 
 # Run me
 
