@@ -2,7 +2,7 @@
 
 import { createStore } from '../../lib';
 
-const store = new createStore({
+const store = createStore({
   initialStore: {
     test: 123
   }

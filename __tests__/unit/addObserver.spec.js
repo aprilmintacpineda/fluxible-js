@@ -4,7 +4,7 @@ import { createStore } from '../../lib';
 
 describe('addObserver', () => {
   test('calls appropriate observer after update store', () => {
-    const store = new createStore({
+    const store = createStore({
       value: 'testValue',
       test1: 'test1',
       test2: 'test2',
@@ -71,7 +71,7 @@ describe('addObserver', () => {
   });
 
   test('can unsubscribe a listener', () => {
-    const store = new createStore({
+    const store = createStore({
       initialStore: {
         value: 'testValue',
         count: 1
