@@ -23,31 +23,31 @@ type Config<StoreType> = {
   persist?: AsyncPersist<StoreType> | SyncPersist<StoreType>;
 };
 
-export type Store<StoreType> = {
-  updateStore: (updatedStates: Partial<StoreType>) => void;
-  addObserver: (
+export type FluxibleStore<StoreType> = {
+  readonly updateStore: (updatedStates: Partial<StoreType>) => void;
+  readonly addObserver: (
     callback: (store: StoreType) => void,
     keys: Array<keyof StoreType>
   ) => () => void;
-  addEvent: (
+  readonly addEvent: (
     targetEv: string,
     callback: (payload: any, store: StoreType, event: string) => void
   ) => () => boolean;
-  addEvents: (
+  readonly addEvents: (
     events: Array<string>,
     callback: (payload: any, store: StoreType, event: string) => void
   ) => () => void;
-  removeEvent: (event: string) => void;
-  removeEvents: (events: Array<string>) => void;
-  emitEvent: (event: string, payload?: any) => void;
-  emitEvents: (events: Array<string>, payload: any) => void;
-  store: StoreType;
+  readonly removeEvent: (event: string) => void;
+  readonly removeEvents: (events: Array<string>) => void;
+  readonly emitEvent: (event: string, payload?: any) => void;
+  readonly emitEvents: (events: Array<string>, payload: any) => void;
+  readonly store: Readonly<StoreType>;
 };
 
 export function createStore<StoreType> (
   { useJSON = true, initialStore, persist }: Config<StoreType>,
   initCallback?: () => void
-): Store<StoreType> {
+): FluxibleStore<StoreType> {
   type EventListener = (
     payload: any,
     store: StoreType,
