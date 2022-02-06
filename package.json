@@ -16,7 +16,8 @@
     "eslint": "eslint . --ext .js,.ts --fix",
     "prettier": "prettier \"*.js|*.ts\" \"src/**/*.js|src/**/*.ts\"  --write",
     "lint": "npm run prettier && npm run eslint",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "prepublish": "yarn test"
   },
   "lint-staged": {
     "src/**/*.ts": [
@@ -45,31 +46,31 @@
   },
   "homepage": "https://github.com/aprilmintacpineda/fluxible-js#readme",
   "devDependencies": {
-    "@babel/core": "^7.15.0",
-    "@babel/eslint-parser": "^7.15.0",
-    "@babel/node": "^7.14.9",
-    "@babel/preset-env": "^7.15.0",
-    "@typescript-eslint/eslint-plugin": "^5.2.0",
-    "@typescript-eslint/parser": "^5.2.0",
-    "@typescript-eslint/typescript-estree": "^5.2.0",
+    "@babel/core": "^7.17.0",
+    "@babel/eslint-parser": "^7.17.0",
+    "@babel/node": "^7.16.8",
+    "@babel/preset-env": "^7.16.11",
+    "@typescript-eslint/eslint-plugin": "^5.10.2",
+    "@typescript-eslint/parser": "^5.10.2",
+    "@typescript-eslint/typescript-estree": "^5.10.2",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.1.0",
-    "babel-loader": "^8.1.0",
+    "babel-loader": "^8.2.3",
     "babel-plugin-module-resolver": "^4.1.0",
     "babel-preset-minify": "^0.5.1",
-    "eslint": "^8.1.0",
+    "eslint": "^8.8.0",
     "eslint-import-resolver-babel-module": "^5.3.1",
-    "eslint-plugin-import": "^2.25.2",
-    "eslint-plugin-jest": "^25.2.2",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-jest": "^26.0.0",
     "eslint-plugin-module-resolver": "^1.4.0",
-    "eslint-plugin-react": "^7.26.1",
-    "eslint-plugin-react-hooks": "^4.2.0",
+    "eslint-plugin-react": "^7.28.0",
+    "eslint-plugin-react-hooks": "^4.3.0",
     "husky": "^7.0.4",
-    "jest": "^27.0.6",
-    "lint-staged": "^11.2.6",
-    "prettier": "^2.4.1"
+    "jest": "^27.5.0",
+    "lint-staged": "^12.3.3",
+    "prettier": "^2.5.1"
   },
   "dependencies": {
-    "typescript": "^4.4.4"
+    "typescript": "^4.5.5"
   }
 }
