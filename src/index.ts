@@ -1,29 +1,29 @@
-type SyncStorage<Store> = {
+export type SyncStorage<Store> = {
   getItem: (key: string) => string;
   setItem: (key: string, value: string | Store) => void;
 };
 
-type AsyncStorage<Store> = {
+export type AsyncStorage<Store> = {
   getItem: (key: string) => Promise<string | Record<string, any>>;
   setItem: (key: string, value: string | Store) => Promise<any>;
 };
 
-type PersistConfig<Store> = {
+export type PersistConfig<Store> = {
   restore: (savedStore: Store) => Partial<Store>;
   stringify: boolean;
 };
 
-type AsyncPersist<Store> = PersistConfig<Store> & {
+export type AsyncPersist<Store> = PersistConfig<Store> & {
   syncStorage?: never;
   asyncStorage: AsyncStorage<Store>;
 };
 
-type SyncPersist<Store> = PersistConfig<Store> & {
+export type SyncPersist<Store> = PersistConfig<Store> & {
   asyncStorage?: never;
   syncStorage: SyncStorage<Store>;
 };
 
-type Config<Store> = {
+export type Config<Store> = {
   initialStore: Store;
   persist?: AsyncPersist<Store> | SyncPersist<Store>;
 };
