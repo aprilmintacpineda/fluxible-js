@@ -1,10 +1,12 @@
 export type SyncStorage<Store> = {
-  getItem: (key: string) => string;
+  getItem: (key: string) => string | Record<string, any> | null;
   setItem: (key: string, value: string | Store) => void;
 };
 
 export type AsyncStorage<Store> = {
-  getItem: (key: string) => Promise<string | Record<string, any>>;
+  getItem: (
+    key: string
+  ) => Promise<string | Record<string, any> | null>;
   setItem: (key: string, value: string | Store) => Promise<any>;
 };
 
@@ -84,7 +86,7 @@ export function createStore<Store> (
   let emitEventCycle = null;
 
   if (persist) {
-    if ('asyncStorage' in persist) {
+    if (persist.asyncStorage) {
       persistStorage = persist.asyncStorage;
 
       persistStorage.getItem('fluxible-js').then(savedStore => {
@@ -104,8 +106,6 @@ export function createStore<Store> (
         persistedStateKeys.forEach(field => {
           store[field] = persistedStates[field];
         });
-
-        if (initCallback) initCallback();
       });
     } else {
       persistStorage = persist.syncStorage;
@@ -127,9 +127,9 @@ export function createStore<Store> (
       persistedStateKeys.forEach(field => {
         store[field] = persistedStates[field];
       });
-
-      if (initCallback) initCallback();
     }
+
+    if (initCallback) initCallback();
   }
 
   function updateStore (updatedStates: Partial<Store>): void {

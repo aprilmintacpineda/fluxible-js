@@ -1,9 +1,9 @@
 export declare type SyncStorage<Store> = {
-    getItem: (key: string) => string;
+    getItem: (key: string) => string | Record<string, any> | null;
     setItem: (key: string, value: string | Store) => void;
 };
 export declare type AsyncStorage<Store> = {
-    getItem: (key: string) => Promise<string | Record<string, any>>;
+    getItem: (key: string) => Promise<string | Record<string, any> | null>;
     setItem: (key: string, value: string | Store) => Promise<any>;
 };
 export declare type PersistConfig<Store> = {
