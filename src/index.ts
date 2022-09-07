@@ -1,60 +1,65 @@
-type AsyncPersist<StoreType> = {
-  asyncStorage: {
-    getItem: (key: string) => Promise<string | Record<string, any>>;
-    setItem: (
-      key: string,
-      value: string | StoreType
-    ) => Promise<any>;
-  };
-  restore: (savedStore: StoreType) => Partial<StoreType>;
+type SyncStorage<Store> = {
+  getItem: (key: string) => string;
+  setItem: (key: string, value: string | Store) => void;
 };
 
-type SyncPersist<StoreType> = {
-  syncStorage: {
-    getItem: (key: string) => string;
-    setItem: (key: string, value: string | StoreType) => void;
-  };
-  restore: (savedStore: StoreType) => Partial<StoreType>;
+type AsyncStorage<Store> = {
+  getItem: (key: string) => Promise<string | Record<string, any>>;
+  setItem: (key: string, value: string | Store) => Promise<any>;
 };
 
-type Config<StoreType> = {
-  initialStore: StoreType;
-  useJSON?: boolean;
-  persist?: AsyncPersist<StoreType> | SyncPersist<StoreType>;
+type PersistConfig<Store> = {
+  restore: (savedStore: Store) => Partial<Store>;
+  stringify: boolean;
 };
 
-export type FluxibleStore<StoreType> = {
-  readonly updateStore: (updatedStates: Partial<StoreType>) => void;
+type AsyncPersist<Store> = PersistConfig<Store> & {
+  syncStorage?: never;
+  asyncStorage: AsyncStorage<Store>;
+};
+
+type SyncPersist<Store> = PersistConfig<Store> & {
+  asyncStorage?: never;
+  syncStorage: SyncStorage<Store>;
+};
+
+type Config<Store> = {
+  initialStore: Store;
+  persist?: AsyncPersist<Store> | SyncPersist<Store>;
+};
+
+export type FluxibleStore<Store> = {
+  readonly updateStore: (updatedStates: Partial<Store>) => void;
   readonly addObserver: (
-    callback: (store: StoreType) => void,
-    keys: Array<keyof StoreType>
+    callback: (store: Store) => void,
+    keys: Array<keyof Store>
   ) => () => void;
   readonly addEvent: (
     targetEv: string,
-    callback: (payload: any, store: StoreType, event: string) => void
+    callback: (payload: any, store: Store, event: string) => void
   ) => () => boolean;
   readonly addEvents: (
     events: Array<string>,
-    callback: (payload: any, store: StoreType, event: string) => void
+    callback: (payload: any, store: Store, event: string) => void
   ) => () => void;
   readonly removeEvent: (event: string) => void;
   readonly removeEvents: (events: Array<string>) => void;
   readonly emitEvent: (event: string, payload?: any) => void;
   readonly emitEvents: (events: Array<string>, payload: any) => void;
-  readonly store: Readonly<StoreType>;
+  readonly store: Readonly<Store>;
 };
 
-export function createStore<StoreType> (
-  { useJSON = true, initialStore, persist }: Config<StoreType>,
+export function createStore<Store> (
+  { initialStore, persist }: Config<Store>,
   initCallback?: () => void
-): FluxibleStore<StoreType> {
+): FluxibleStore<Store> {
   type EventListener = (
     payload: any,
-    store: StoreType,
+    store: Store,
     event: string
   ) => void;
 
-  type Observer = (store: StoreType) => void;
+  type Observer = (store: Store) => void;
 
   const store = { ...initialStore };
   let persistStorage = null;
@@ -65,7 +70,7 @@ export function createStore<StoreType> (
 
   const observers: Array<{
     callback: Observer;
-    keys: Array<keyof StoreType>;
+    keys: Array<keyof Store>;
     id: number;
   }> = [];
 
@@ -84,7 +89,7 @@ export function createStore<StoreType> (
 
       persistStorage.getItem('fluxible-js').then(savedStore => {
         const parsedSavedStore = savedStore
-          ? useJSON
+          ? persist.stringify
             ? JSON.parse(savedStore)
             : savedStore
           : store;
@@ -107,7 +112,7 @@ export function createStore<StoreType> (
       const savedStore = persistStorage.getItem('fluxible-js');
 
       const parsedSavedStore = savedStore
-        ? useJSON
+        ? persist.stringify
           ? JSON.parse(savedStore)
           : savedStore
         : store;
@@ -127,15 +132,15 @@ export function createStore<StoreType> (
     }
   }
 
-  function updateStore (updatedStates: Partial<StoreType>): void {
+  function updateStore (updatedStates: Partial<Store>): void {
     if (persistTimeout) {
       clearTimeout(persistTimeout);
       persistTimeout = null;
     }
 
-    const updatedStateKeys: Array<keyof StoreType> = Object.keys(
+    const updatedStateKeys: Array<keyof Store> = Object.keys(
       updatedStates
-    ) as Array<keyof StoreType>;
+    ) as Array<keyof Store>;
 
     updatedStateKeys.forEach(field => {
       store[field] = updatedStates[field];
@@ -210,7 +215,9 @@ export function createStore<StoreType> (
 
           persistStorage.setItem(
             'fluxible-js',
-            useJSON ? JSON.stringify(statesToSave) : statesToSave
+            persist.stringify
+              ? JSON.stringify(statesToSave)
+              : statesToSave
           );
 
           shouldPersist = false;
@@ -221,7 +228,7 @@ export function createStore<StoreType> (
 
   function addObserver (
     callback: Observer,
-    keys: Array<keyof StoreType>
+    keys: Array<keyof Store>
   ) {
     const observer = {
       callback,

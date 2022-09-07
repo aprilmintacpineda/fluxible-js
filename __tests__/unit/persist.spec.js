@@ -31,7 +31,8 @@ describe('persist using syncStorage', () => {
         initialStore,
         persist: {
           syncStorage,
-          restore
+          restore,
+          stringify: true
         }
       },
       initCallback
@@ -78,7 +79,8 @@ describe('persist using syncStorage', () => {
       initialStore,
       persist: {
         syncStorage,
-        restore
+        restore,
+        stringify: true
       }
     });
 
@@ -135,19 +137,18 @@ describe('persist using syncStorage', () => {
       })
     };
 
-    const persist = {
-      syncStorage,
-      restore: jest.fn(savedStore => {
-        return {
-          user: savedStore.user,
-          anotherValue: ''
-        };
-      })
-    };
-
     const store = createStore({
       initialStore,
-      persist
+      persist: {
+        stringify: true,
+        syncStorage,
+        restore: jest.fn(savedStore => {
+          return {
+            user: savedStore.user,
+            anotherValue: ''
+          };
+        })
+      }
     });
 
     store.updateStore({
@@ -207,18 +208,17 @@ describe('persist using syncStorage', () => {
       })
     };
 
-    const persist = {
-      syncStorage,
-      restore: jest.fn(savedStore => {
-        return {
-          user: savedStore.user
-        };
-      })
-    };
-
     const store = createStore({
       initialStore,
-      persist
+      persist: {
+        stringify: true,
+        syncStorage,
+        restore: jest.fn(savedStore => {
+          return {
+            user: savedStore.user
+          };
+        })
+      }
     });
 
     store.updateStore({
@@ -286,18 +286,17 @@ describe('persist using syncStorage', () => {
       })
     };
 
-    const persist = {
-      syncStorage,
-      restore: jest.fn(savedStore => {
-        return {
-          user: savedStore.user
-        };
-      })
-    };
-
     const store = createStore({
       initialStore,
-      persist
+      persist: {
+        stringify: true,
+        syncStorage,
+        restore: jest.fn(savedStore => {
+          return {
+            user: savedStore.user
+          };
+        })
+      }
     });
 
     store.updateStore({
@@ -361,6 +360,7 @@ describe('persist using syncStorage', () => {
     const store = createStore({
       initialStore,
       persist: {
+        stringify: true,
         syncStorage,
         restore
       }
@@ -431,6 +431,7 @@ describe('persist using asyncStorage', () => {
       {
         initialStore,
         persist: {
+          stringify: true,
           asyncStorage,
           restore
         }
@@ -495,7 +496,8 @@ describe('persist using asyncStorage', () => {
         initialStore,
         persist: {
           asyncStorage,
-          restore
+          restore,
+          stringify: true
         }
       },
       initCallback
@@ -524,7 +526,7 @@ describe('persist using asyncStorage', () => {
 });
 
 describe('saving store to storage', () => {
-  test('can turn off JSON.stringify using useJSON config option', () => {
+  test('can turn off JSON.stringify using stringify config option', () => {
     expect.assertions(5);
 
     const initialStore = {
@@ -554,9 +556,9 @@ describe('saving store to storage', () => {
       initialStore,
       persist: {
         asyncStorage,
-        restore
-      },
-      useJSON: false
+        restore,
+        stringify: false
+      }
     });
 
     const origStringify = JSON.stringify;

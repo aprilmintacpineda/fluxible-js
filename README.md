@@ -38,7 +38,7 @@ const initialStore = {
 const store = createStore({
   initialStore,
   persist: {
-    useJSON: false,
+    stringify: true,
     syncStorage: window.localStorage,
     restore: savedStore => ({
       user: savedStore.user
@@ -73,6 +73,8 @@ You need to tell `fluxible-js` which storage to use, a storage API must have a `
 
 You also need to tell `fluxible-js` which states to persist, you can do this via the `restore` callback function.
 
+You need to tell `fluxible-js` if the states has to be stringified (using `JSON.stringify`) before being saved to the storage by specifying `stringify` parameter.
+
 ### Using asynchronous storage
 
 Storage like [react-native-async-storage](https://github.com/react-native-async-storage/async-storage) or [LocalForage](https://github.com/localForage/localForage). These are storage that return a `Promise` for the `setItem` and `getItem` methods.
@@ -88,6 +90,7 @@ const initialStore = {
 const store = createStore({
   initialStore,
   persist: {
+    stringify: true,
     asyncStorage: RNAsyncStorage,
     restore: (savedStore) => {
       return {
@@ -113,6 +116,7 @@ const initialStore = {
 const store = createStore({
   initialStore,
   persist: {
+    stringify: true,
     syncStorage: window.localStorage,
     restore: (savedStore) => {
       return {
@@ -138,6 +142,7 @@ const initialStore = {
 const store = createStore({
   initialStore,
   persist: {
+    stringify: true,
     syncStorage: window.localStorage,
     restore: (savedStore) => {
       return {
