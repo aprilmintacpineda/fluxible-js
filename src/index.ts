@@ -1,12 +1,14 @@
 export type SyncStorage<Store> = {
-  getItem: (key: string) => string | Record<string, any> | null;
+  getItem: (
+    key: string
+  ) => string | Record<string, any> | null | undefined;
   setItem: (key: string, value: string | Store) => void;
 };
 
 export type AsyncStorage<Store> = {
   getItem: (
     key: string
-  ) => Promise<string | Record<string, any> | null>;
+  ) => Promise<string | Record<string, any> | null | undefined>;
   setItem: (key: string, value: string | Store) => Promise<any>;
 };
 
