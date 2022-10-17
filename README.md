@@ -85,7 +85,7 @@ You need to tell `fluxible-js` if the states has to be stringified (using `JSON.
 
 ### Using asynchronous storage
 
-`setItem` and `getItem` should be async or should return a promise, pretty much like with [React-Native-Async-Storage](https://react-native-async-storage.github.io/async-storage/docs/usage)
+`setItem` and `getItem` should be async or should return a promise, pretty much like with [React-Native-Async-Storage](https://react-native-async-storage.github.io/async-storage/docs/usage). [See example use-case with react-fluxible](https://github.com/aprilmintacpineda/react-fluxible#example-with-state-persistence-using-react-native-async-storage).
 
 ```ts
 import { createStore } from 'fluxible-js';
@@ -120,7 +120,7 @@ const store = createStore(
 
 ### Using synchronous storage
 
-`getItem` and `setItem` should be sync, pretty much like with [window.localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)
+`getItem` and `setItem` should be sync, pretty much like with [window.localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage). [See example use-case with react-fluxible](https://github.com/aprilmintacpineda/react-fluxible#example-with-state-persistence-using-windowlocalstorage).
 
 ```ts
 import { createStore } from 'fluxible-js';
