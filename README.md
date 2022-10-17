@@ -36,15 +36,19 @@ const initialStore = {
 };
 
 const store = createStore({
-  initialStore,
-  persist: {
-    stringify: true,
-    syncStorage: window.localStorage,
-    restore: savedStore => ({
-      user: savedStore.user
-    })
-  }
-});
+    initialStore,
+    persist: {
+      stringify: true,
+      syncStorage: {
+        setItem: (key, value) =>
+          window.localStorage.setItem(key, value as string),
+        getItem: key => window.localStorage.getItem(key)
+      },
+      restore: savedStore => ({
+        user: savedStore.user
+      })
+    }
+  });
 ```
 
 ## Creating a store
@@ -60,16 +64,20 @@ const initialStore = {
   }
 };
 
-const myStore = createStore({ initialStore });
+function initCallback () {
+  console.log('initialization complete');
+}
+
+const myStore = createStore({ initialStore }, initCallback);
 ```
 
-`createStore` function returns an instance of a `store` that has variety of methods in it. You can access the store's current value by via `myStore.store`.
+`createStore` function returns an instance of a `store` that has variety of methods in it. You can access the store's current value by via `myStore.store`. The 2nd parameter which is the `initCallback` is optional function that gets called after the store has been initialized, this is especially useful when using async storage.
 
 ## Persisting states
 
 Persisting states allows you to save your application's state to a storage on the local device and then reuse those states the next time your application starts.
 
-You need to tell `fluxible-js` which storage to use, a storage API must have a `getItem` and `setItem` methods in them. An example of this would be `window.localStorage`.
+You need to tell `fluxible-js` which storage to use, a storage API must have a `getItem` and `setItem` methods in them. An example of this would be [window.localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) or [React-Async-Storage](https://react-native-async-storage.github.io/async-storage/docs/usage)
 
 You also need to tell `fluxible-js` which states to persist, you can do this via the `restore` callback function.
 
@@ -77,7 +85,42 @@ You need to tell `fluxible-js` if the states has to be stringified (using `JSON.
 
 ### Using asynchronous storage
 
-Storage like [react-native-async-storage](https://github.com/react-native-async-storage/async-storage) or [LocalForage](https://github.com/localForage/localForage). These are storage that return a `Promise` for the `setItem` and `getItem` methods.
+`setItem` and `getItem` should be async or should return a promise, pretty much like with [React-Native-Async-Storage](https://react-native-async-storage.github.io/async-storage/docs/usage)
+
+```ts
+import { createStore } from 'fluxible-js';
+
+const initialStore = {
+  token: null,
+  isLoggedIn: false,
+  initComplete: false
+};
+
+const store = createStore(
+  {
+    initialStore,
+    persist: {
+      stringify: true,
+      asyncStorage: {
+        setItem: (key, value) => someAsyncStorage.setItem(key, value as string), // value will be a string because `stringify` is set to `true`
+        getItem: key => someAsyncStorage.getItem(key) // has to be a string because `stringify` is set to true
+      }
+      restore: (savedStore) => {
+        return {
+          token: savedStore.token
+        };
+      }
+    }
+  },
+  () => {
+    store.updateStore({ initComplete: true });
+  }
+);
+```
+
+### Using synchronous storage
+
+`getItem` and `setItem` should be sync, pretty much like with [window.localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)
 
 ```ts
 import { createStore } from 'fluxible-js';
@@ -91,7 +134,11 @@ const store = createStore({
   initialStore,
   persist: {
     stringify: true,
-    asyncStorage: RNAsyncStorage,
+    syncStorage: {
+      setItem: (key, value) =>
+        window.localStorage.setItem(key, value as string), // value will be a string because `stringify` is set to `true`
+      getItem: key => window.localStorage.getItem(key) // has to be a string because `stringify` is set to true
+    },
     restore: (savedStore) => {
       return {
         token: savedStore.token
@@ -101,30 +148,16 @@ const store = createStore({
 });
 ```
 
-### Using synchronous storage
-
-Storage like `window.localStorage`. These are storage that doesn't return a `Promise` for their `getItem` and `setItem` methods.
+If you don't care that much about typings, you can also just do:
 
 ```ts
-import { createStore } from 'fluxible-js';
+syncStorage: window.localStorage as SyncStorage<typeof initialStore>,
+```
 
-const initialStore = {
-  token: null,
-  isLoggedIn: false
-};
+or
 
-const store = createStore({
-  initialStore,
-  persist: {
-    stringify: true,
-    syncStorage: window.localStorage,
-    restore: (savedStore) => {
-      return {
-        token: savedStore.token
-      };
-    }
-  }
-});
+```ts
+syncStorage: ReactNativeAsyncStorage as AsyncStorage<typeof initialStore>,
 ```
 
 ## Updating the store
@@ -143,7 +176,11 @@ const store = createStore({
   initialStore,
   persist: {
     stringify: true,
-    syncStorage: window.localStorage,
+    syncStorage: {
+      setItem: (key, value) =>
+        window.localStorage.setItem(key, value as string),
+      getItem: key => window.localStorage.getItem(key)
+    },
     restore: (savedStore) => {
       return {
         token: savedStore.token
