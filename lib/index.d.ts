@@ -1,9 +1,9 @@
 export declare type SyncStorage<Store> = {
-    getItem: (key: string) => string | Record<string, any> | null;
+    getItem: (key: string) => string | Record<string, any> | null | undefined;
     setItem: (key: string, value: string | Store) => void;
 };
 export declare type AsyncStorage<Store> = {
-    getItem: (key: string) => Promise<string | Record<string, any> | null>;
+    getItem: (key: string) => Promise<string | Record<string, any> | null | undefined>;
     setItem: (key: string, value: string | Store) => Promise<any>;
 };
 export declare type PersistConfig<Store> = {
@@ -33,4 +33,4 @@ export declare type FluxibleStore<Store> = {
     readonly emitEvents: (events: Array<string>, payload: any) => void;
     readonly store: Readonly<Store>;
 };
-export declare function createStore<Store>({ initialStore, persist }: Config<Store>, initCallback?: () => void): FluxibleStore<Store>;
+export declare function createStore<Store>({ initialStore, persist }: Config<Store>, initCallback?: (store: Store) => void): FluxibleStore<Store>;

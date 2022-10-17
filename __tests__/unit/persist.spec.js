@@ -46,7 +46,13 @@ describe('persist using syncStorage', () => {
       anotherValue: 'test value'
     });
 
-    expect(initCallback).toHaveBeenCalled();
+    expect(initCallback).toHaveBeenCalledWith({
+      user: {
+        name: 'test user'
+      },
+      testValue: 'value',
+      anotherValue: 'test value'
+    });
   });
 
   test('calls getItem and setItem on config.persist.syncStorage', () => {
@@ -449,7 +455,13 @@ describe('persist using asyncStorage', () => {
           anotherValue: 'test value'
         });
 
-        expect(initCallback).toHaveBeenCalled();
+        expect(initCallback).toHaveBeenCalledWith({
+          user: {
+            name: 'test user'
+          },
+          testValue: 'value',
+          anotherValue: 'test value'
+        });
       }
     );
   });

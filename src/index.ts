@@ -55,7 +55,7 @@ export type FluxibleStore<Store> = {
 
 export function createStore<Store> (
   { initialStore, persist }: Config<Store>,
-  initCallback?: () => void
+  initCallback?: (store: Store) => void
 ): FluxibleStore<Store> {
   type EventListener = (
     payload: any,
@@ -108,6 +108,8 @@ export function createStore<Store> (
         persistedStateKeys.forEach(field => {
           store[field] = persistedStates[field];
         });
+
+        if (initCallback) initCallback(store);
       });
     } else {
       persistStorage = persist.syncStorage;
@@ -129,9 +131,9 @@ export function createStore<Store> (
       persistedStateKeys.forEach(field => {
         store[field] = persistedStates[field];
       });
-    }
 
-    if (initCallback) initCallback();
+      if (initCallback) initCallback(store);
+    }
   }
 
   function updateStore (updatedStates: Partial<Store>): void {
